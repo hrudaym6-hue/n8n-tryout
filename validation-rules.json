@@ -1,0 +1,6 @@
+{
+  "validation_rules": [
+    "range checks, required field verifications, balance validations from cbl, cpy, and cpy-bms files",
+    "e.g., TRANSACTION-AMOUNT > 0; ACCOUNT-NUMBER must be length 10; CUSTOMER-NAME must not be blank, as described"
+  ]
+}

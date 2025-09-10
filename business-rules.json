@@ -1,0 +1,6 @@
+{
+  "business_rules": [
+    "logic such as customer type-based discounts, order classification, error handling, etc. from cbl and cpy files as described",
+    "e.g., CUSTOMER-TYPE = P => DISCOUNT-RATE = 0.10"
+  ]
+}

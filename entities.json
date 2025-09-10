@@ -1,0 +1,8 @@
+{
+  "entities": [
+    "COADM01C.cbl", "COUSR00C.cbl", "COUSR01C.cbl", "COUSR02C.cbl", "COUSR03C.cbl", "COADM02Y.cpy", "COSGN00.CPY", "COUSR00.CPY", "COUSR01.CPY", "COUSR02.CPY", "COUSR03.CPY"
+  ],
+  "details": [
+    "Functions, variables, and data groups extracted from cbl and cpy/cpy-bms files as described in agent output, including admin, user profile, sign-on, user CRUD operations and respective structures"
+  ]
+}
