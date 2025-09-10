@@ -1,6 +1,26 @@
 {
-  "validation_rules": [
-    "range checks, required field verifications, balance validations from cbl, cpy, and cpy-bms files",
-    "e.g., TRANSACTION-AMOUNT > 0; ACCOUNT-NUMBER must be length 10; CUSTOMER-NAME must not be blank, as described"
+  "file": "src/ACCOUNTS.CBL",
+  "validations": [
+    {
+      "description": "Ensures that account number is provided and is not spaces.",
+      "type": "required field",
+      "condition": "When processing account operations, CHECK that ACCOUNT-NUMBER is not equal to spaces.",
+      "failureOutcome": "Set error code ACCOUNT-ERR and skip processing for this record.",
+      "location": { "function": "VALIDATE-ACCOUNT", "line": 203 },
+      "field": "ACCOUNT-NUMBER",
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["account number", "account record"]
+    },
+    {
+      "description": "Validates that the initial deposit amount is at least $100.",
+      "type": "range check",
+      "condition": "When creating a new account, IF INITIAL-DEPOSIT < 100 THEN validation fails.",
+      "failureOutcome": "Set error code DEP-AMT-ERR and output error message.",
+      "location": { "function": "VALIDATE-ACCOUNT", "line": 215 },
+      "field": "INITIAL-DEPOSIT",
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["deposit amount", "new account"]
+    }
   ]
 }
+

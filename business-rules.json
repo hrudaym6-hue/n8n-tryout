@@ -1,6 +1,56 @@
 {
-  "business_rules": [
-    "logic such as customer type-based discounts, order classification, error handling, etc. from cbl and cpy files as described",
-    "e.g., CUSTOMER-TYPE = P => DISCOUNT-RATE = 0.10"
+  "file": "src/MAINFRAME/ORDERPROC.CBL",
+  "rules": [
+    {
+      "description": "Orders with an amount greater than $10,000 require supervisor approval before processing.",
+      "type": "validation",
+      "condition": "ORDER-AMOUNT > 10000",
+      "outcome": "Set ORDER-APPROVAL-REQUIRED to TRUE; skip normal processing and flag order for supervisor review.",
+      "location": { "function": "PROCESS-ORDER", "line": 115 },
+      "variablesInvolved": ["ORDER-AMOUNT", "ORDER-APPROVAL-REQUIRED"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Order Processing", "Approval Workflow"]
+    },
+    {
+      "description": "If the customer is flagged as VIP, apply a discount rate of 5% to the total order amount.",
+      "type": "calculation",
+      "condition": "CUSTOMER-STATUS = VIP",
+      "outcome": "ORDER-DISCOUNT = .05 * ORDER-AMOUNT; ORDER-AMOUNT is reduced by ORDER-DISCOUNT.",
+      "location": { "function": "CALCULATE-DISCOUNT", "line": 68 },
+      "variablesInvolved": ["CUSTOMER-STATUS", "ORDER-AMOUNT", "ORDER-DISCOUNT"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Discount Calculation", "Customer Segmentation"]
+    },
+    {
+      "description": "Set shipping charges based on order value: orders above $500 ship free; otherwise, apply $20 shipping fee.",
+      "type": "calculation",
+      "condition": "ORDER-AMOUNT > 500",
+      "outcome": "If true, SHIPPING-CHARGE = 0; else, SHIPPING-CHARGE = 20.",
+      "location": { "function": "CALC-SHIPPING", "line": 39 },
+      "variablesInvolved": ["ORDER-AMOUNT", "SHIPPING-CHARGE"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Shipping Policy", "Order Value Threshold"]
+    },
+    {
+      "description": "Reject orders assigned to inactive customers and mark them as failed.",
+      "type": "validation",
+      "condition": "CUSTOMER-STATUS = INACTIVE",
+      "outcome": "Set ORDER-STATUS to FAILED; log error record.",
+      "location": { "function": "CHECK-CUSTOMER-STATUS", "line": 122 },
+      "variablesInvolved": ["CUSTOMER-STATUS", "ORDER-STATUS"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer Validation", "Order Failure Handling"]
+    },
+    {
+      "description": "For expedited orders, add an expedited fee of $50.",
+      "type": "calculation",
+      "condition": "ORDER-TYPE = EXPEDITED",
+      "outcome": "ORDER-FEES = ORDER-FEES + 50",
+      "location": { "function": "CALC-ORDER-FEES", "line": 52 },
+      "variablesInvolved": ["ORDER-TYPE", "ORDER-FEES"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Order Fulfillment", "Expedited Processing"]
+    }
   ]
 }
+
