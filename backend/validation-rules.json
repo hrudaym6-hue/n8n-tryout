@@ -1,0 +1,77 @@
+[
+  {
+    "file": "PAYROLL.CBL",
+    "validations": [
+      {
+        "description": "Employee ID must be provided and cannot be spaces.",
+        "type": "required field",
+        "condition": "IF EMPLOYEE-ID = SPACES",
+        "failureOutcome": "Display error message and skip further processing for the record.",
+        "location": { "function": "PROCESS-EMPLOYEE", "line": 74 },
+        "field": "EMPLOYEE-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["employee ID"]
+      },
+      {
+        "description": "Gross pay must not be less than zero.",
+        "type": "range check",
+        "condition": "IF GROSS-PAY < 0",
+        "failureOutcome": "Display error and reject record for payroll calculation.",
+        "location": { "function": "CALCULATE-PAY", "line": 143 },
+        "field": "GROSS-PAY",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["gross pay", "payroll"]
+      },
+      {
+        "description": "Tax code must be one of A, B, or C.",
+        "type": "format check (fixed set membership)",
+        "condition": "IF TAX-CODE NOT = A AND TAX-CODE NOT = B AND TAX-CODE NOT = C",
+        "failureOutcome": "Display error and stop payroll processing for the record.",
+        "location": { "function": "VERIFY-TAX-CODE", "line": 195 },
+        "field": "TAX-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["tax code", "payroll"]
+      }
+    ]
+  },
+  {
+    "file": "HR.CBL",
+    "validations": [
+      {
+        "description": "Date of birth must not be in the future.",
+        "type": "range check",
+        "condition": "IF DATE-OF-BIRTH > WS-TODAY",
+        "failureOutcome": "Display error and reject new employee entry.",
+        "location": { "function": "VALIDATE-DOB", "line": 38 },
+        "field": "DATE-OF-BIRTH",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["employee", "date of birth"]
+      },
+      {
+        "description": "Department must be provided.",
+        "type": "required field",
+        "condition": "IF DEPARTMENT = SPACES",
+        "failureOutcome": "Display error and prevent new employee onboarding.",
+        "location": { "function": "VALIDATE-DEPARTMENT", "line": 58 },
+        "field": "DEPARTMENT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["department", "employee"]
+      }
+    ]
+  },
+  {
+    "file": "BENEFITS.CBL",
+    "validations": [
+      {
+        "description": "Benefits type must be a valid code: MED, DEN, VIS.",
+        "type": "format check (fixed set membership)",
+        "condition": "IF BENEFITS-TYPE NOT = MED AND BENEFITS-TYPE NOT = DEN AND BENEFITS-TYPE NOT = VIS",
+        "failureOutcome": "Display error and skip benefit enrollment.",
+        "location": { "function": "CHECK-BENEFIT-TYPE", "line": 29 },
+        "field": "BENEFITS-TYPE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["benefits type", "employee benefits"]
+      }
+    ]
+  }
+]

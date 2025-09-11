@@ -1,0 +1,150 @@
+[
+  {
+    "file": "src/CALCADD.CBL",
+    "entities": {
+      "functions": [
+        {
+          "name": "ADD_TWO_NUMBERS",
+          "params": [
+            {
+              "name": "NUM1",
+              "type": "numeric",
+              "scope": "local"
+            },
+            {
+              "name": "NUM2",
+              "type": "numeric",
+              "scope": "local"
+            }
+          ],
+          "return_type": "numeric",
+          "access": "public",
+          "location": "PROCEDURE DIVISION, lines 10-25",
+          "relationships": {
+            "calls": []
+          }
+        }
+      ],
+      "variables": [
+        {
+          "name": "NUM1",
+          "type": "PIC 9(4)",
+          "scope": "local",
+          "default": "0000",
+          "location": "DATA DIVISION > WORKING-STORAGE SECTION, line 3",
+          "usage": ["INPUT in ADD_TWO_NUMBERS"]
+        },
+        {
+          "name": "NUM2",
+          "type": "PIC 9(4)",
+          "scope": "local",
+          "default": "0000",
+          "location": "DATA DIVISION > WORKING-STORAGE SECTION, line 4",
+          "usage": ["INPUT in ADD_TWO_NUMBERS"]
+        },
+        {
+          "name": "RESULT",
+          "type": "PIC 9(4)",
+          "scope": "local",
+          "default": "0000",
+          "location": "DATA DIVISION > WORKING-STORAGE SECTION, line 5",
+          "usage": ["OUTPUT of ADD_TWO_NUMBERS"]
+        }
+      ],
+      "classes": [],
+      "modules": [
+        {
+          "name": "CALCADD",
+          "imports": [],
+          "exports": ["ADD_TWO_NUMBERS"],
+          "internal_structure": [
+            "IDENTIFICATION DIVISION",
+            "ENVIRONMENT DIVISION",
+            "DATA DIVISION",
+            "PROCEDURE DIVISION"
+          ]
+        }
+      ],
+      "constants": []
+    }
+  },
+  {
+    "file": "src/HELLOWORLD.CBL",
+    "entities": {
+      "functions": [
+        {
+          "name": "DISPLAY_HELLO",
+          "params": [],
+          "return_type": "none",
+          "access": "public",
+          "location": "PROCEDURE DIVISION, lines 8-13",
+          "relationships": {
+            "calls": []
+          }
+        }
+      ],
+      "variables": [],
+      "classes": [],
+      "modules": [
+        {
+          "name": "HELLOWORLD",
+          "imports": [],
+          "exports": ["DISPLAY_HELLO"],
+          "internal_structure": [
+            "IDENTIFICATION DIVISION",
+            "PROCEDURE DIVISION"
+          ]
+        }
+      ],
+      "constants": []
+    }
+  },
+  {
+    "file": "src/FILEIO.CBL",
+    "entities": {
+      "functions": [
+        {
+          "name": "WRITE_TO_FILE",
+          "params": [
+            {
+              "name": "REC",
+              "type": "PIC X(80)",
+              "scope": "local"
+            }
+          ],
+          "return_type": "none",
+          "access": "public",
+          "location": "PROCEDURE DIVISION, lines 18-40",
+          "relationships": {
+            "calls": []
+          }
+        }
+      ],
+      "variables": [
+        {
+          "name": "REC",
+          "type": "PIC X(80)",
+          "scope": "local",
+          "default": "",
+          "location": "FILE SECTION, line 8",
+          "usage": ["INPUT/OUTPUT in WRITE_TO_FILE"]
+        }
+      ],
+      "classes": [],
+      "modules": [
+        {
+          "name": "FILEIO",
+          "imports": [],
+          "exports": ["WRITE_TO_FILE"],
+          "internal_structure": [
+            "IDENTIFICATION DIVISION",
+            "ENVIRONMENT DIVISION",
+            "DATA DIVISION",
+            "PROCEDURE DIVISION"
+          ]
+        }
+      ],
+      "constants": []
+    }
+  }
+]

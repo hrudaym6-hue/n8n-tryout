@@ -1,0 +1,56 @@
+{
+  "file": "src/CUSTMSTR.COB",
+  "rules": [
+    {
+      "description": "Customer account number must be a 10-digit numeric value.",
+      "type": "validation",
+      "condition": "If input account number is not numeric or not 10 digits long",
+      "outcome": "Reject the input account record and generate error message.",
+      "location": { "function": "VALIDATE-ACCOUNT-NUM", "line": 105 },
+      "variablesInvolved": ["WS-ACCOUNT-NUM"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer", "Account Number"]
+    },
+    {
+      "description": "Customer status is determined by account balance. If balance >= 0, status is ACTIVE. If balance < 0, status is OVERDRAFT.",
+      "type": "calculation",
+      "condition": "If WS-ACCOUNT-BAL >= 0 set status to ACTIVE, else set status to OVERDRAFT",
+      "outcome": "Assign customer status value.",
+      "location": { "function": "SET-CUSTOMER-STATUS", "line": 132 },
+      "variablesInvolved": ["WS-ACCOUNT-BAL", "WS-STATUS"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer", "Account Balance", "Status"]
+    },
+    {
+      "description": "Customer names must not be blank.",
+      "type": "validation",
+      "condition": "If WS-CNAME is blank",
+      "outcome": "Reject the customer record.",
+      "location": { "function": "VALIDATE-NAME", "line": 85 },
+      "variablesInvolved": ["WS-CNAME"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer Name"]
+    },
+    {
+      "description": "If customers account is newly created, set OPEN-DATE to current date.,
+      type: calculation,
+      condition: If NEW-ACCOUNT-IND = Y,
+      outcome: Move todays date to WS-OPEN-DATE.",
+      "location": { "function": "PROCESS-NEW-ACCOUNT", "line": 148 },
+      "variablesInvolved": ["NEW-ACCOUNT-IND", "WS-OPEN-DATE"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Account Creation", "Opening Date"]
+    },
+    {
+      "description": "Customers under 18 years old cannot open accounts.",
+      "type": "validation",
+      "condition": "If WS-AGE < 18",
+      "outcome": "Reject account creation.",
+      "location": { "function": "VALIDATE-AGE", "line": 115 },
+      "variablesInvolved": ["WS-AGE"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer Age", "Account Eligibility"]
+    }
+  ]
+}
+

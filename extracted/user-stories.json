@@ -1,0 +1,28 @@
+{
+  "userStories": [
+    {
+      "title": "Login",
+      "description": "As a user, I want to log in using my credentials so that I can access the system."
+    },
+    {
+      "title": "Password Reset",
+      "description": "As a user, I want to reset my password so that I can regain access to my account if I forget it."
+    },
+    {
+      "title": "Dashboard Navigation",
+      "description": "As a user, I want to view my dashboard after login to see account summaries and quick actions."
+    },
+    {
+      "title": "Report Generation",
+      "description": "As an admin, I want to generate reports based on branch, account, and transaction data."
+    },
+    {
+      "title": "Customer Data Entry",
+      "description": "As an operator, I want to enter customer account data so that new accounts can be created."
+    },
+    {
+      "title": "Logout",
+      "description": "As a user, I want to log out securely when I finish using the application."
+    }
+  ]
+}
