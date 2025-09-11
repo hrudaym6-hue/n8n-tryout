@@ -1,0 +1,87 @@
+[
+  {
+    "file": "n8n-tryout/compressed/cbl/COADM01C.cbl",
+    "userStories": [
+      {
+        "story": "As an admin user, I want to log into the system with my credentials so that I can access administrative functions.",
+        "component": "Admin Login Screen",
+        "trigger": "Submit username and password",
+        "expectedBehavior": "Displays success message on correct credentials; shows error on invalid credentials.",
+        "location": { "line": 100 },
+        "route": "ADMIN-LOGIN",
+        "dependencies": ["user credentials DB", "authentication routine"],
+        "validationStates": ["Username must be present", "Password must be present", "Invalid login message on failure"]
+      },
+      {
+        "story": "As an admin, I want to log out of the system so that my session can be securely ended.",
+        "component": "Logout Button",
+        "trigger": "Click on 'Logout' button",
+        "expectedBehavior": "Returns user to login screen and ends session.",
+        "location": { "line": 255 },
+        "route": "ADMIN-LOGOUT",
+        "dependencies": ["session state"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "n8n-tryout/compressed/cbl/COUSR00C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to register a new account by providing personal information so that I can access the system.",
+        "component": "User Registration Form",
+        "trigger": "Submit registration form",
+        "expectedBehavior": "Creates new user record and shows success or error message.",
+        "location": { "line": 120 },
+        "route": "USER-REGISTER",
+        "dependencies": ["user database"],
+        "validationStates": ["Fields required: name, username, password", "Error shown when username exists"]
+      }
+    ]
+  },
+  {
+    "file": "n8n-tryout/compressed/cbl/COUSR01C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to log into the system using my username and password so that I can access my account.",
+        "component": "User Login Form",
+        "trigger": "Submit login form",
+        "expectedBehavior": "Displays dashboard on success, error message on failure.",
+        "location": { "line": 110 },
+        "route": "USER-LOGIN",
+        "dependencies": ["user credentials DB", "authentication routine"],
+        "validationStates": ["Username and password required", "Invalid login message on failure"]
+      }
+    ]
+  },
+  {
+    "file": "n8n-tryout/compressed/cbl/COUSR02C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to update my account details so that my profile information stays current.",
+        "component": "Profile Edit Form",
+        "trigger": "Submit profile change",
+        "expectedBehavior": "Saves new profile information and displays confirmation.",
+        "location": { "line": 130 },
+        "route": "USER-PROFILE-EDIT",
+        "dependencies": ["user profile DB"],
+        "validationStates": ["All required fields must have values", "Show error on invalid data"]
+      }
+    ]
+  },
+  {
+    "file": "n8n-tryout/compressed/cbl/COUSR03C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to reset my password so that I can regain access to my account if I forget it.",
+        "component": "Password Reset Request",
+        "trigger": "Submit request for password reset",
+        "expectedBehavior": "Sends reset token or email; shows confirmation or error message.",
+        "location": { "line": 115 },
+        "route": "USER-PASSWORD-RESET",
+        "dependencies": ["user email DB", "reset token generation routine"],
+        "validationStates": ["Email must be valid", "Show error if user not found"]
+      }
+    ]
+  }
+]
