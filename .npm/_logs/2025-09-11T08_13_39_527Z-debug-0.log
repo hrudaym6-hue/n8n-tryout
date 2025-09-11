@@ -1,0 +1,51 @@
+0 verbose cli /usr/local/bin/node /usr/local/bin/npm
+1 info using npm@11.4.2
+2 info using node@v22.17.0
+3 silly config load:file:/usr/local/lib/node_modules/npm/npmrc
+4 silly config load:file:/home/node/.npmrc
+5 silly config load:file:/usr/local/etc/npmrc
+6 verbose title npm create angular@latest frontend --routing --style=scss
+7 verbose argv "create" "angular@latest" "frontend" "--" "--routing" "--style=scss"
+8 verbose logfile logs-max:10 dir:/home/node/.npm/_logs/2025-09-11T08_13_39_527Z-
+9 verbose logfile /home/node/.npm/_logs/2025-09-11T08_13_39_527Z-debug-0.log
+10 silly logfile done cleaning log files
+11 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+12 http fetch GET 200 https://registry.npmjs.org/create-angular 568ms (cache miss)
+13 silly packumentCache heap:2197815296 maxSize:549453824 maxEntrySize:274726912
+14 warn exec The following package was not found and will be installed: create-angular@0.0.4
+15 silly idealTree buildDeps
+16 silly fetch manifest create-angular@0.0.4
+17 silly packumentCache full:https://registry.npmjs.org/create-angular cache-miss
+18 http fetch GET 200 https://registry.npmjs.org/create-angular 138ms (cache miss)
+19 silly packumentCache full:https://registry.npmjs.org/create-angular set size:undefined disposed:false
+20 silly placeDep ROOT create-angular@0.0.4 OK for:  want: 0.0.4
+21 silly reify moves {}
+22 silly audit bulk request { 'create-angular': [ '0.0.4' ] }
+23 http cache create-angular@https://registry.npmjs.org/create-angular/-/create-angular-0.0.4.tgz 1ms (cache hit)
+24 silly tarball no local data for create-angular@https://registry.npmjs.org/create-angular/-/create-angular-0.0.4.tgz. Extracting by manifest.
+25 http fetch POST 200 https://registry.npmjs.org/-/npm/v1/security/advisories/bulk 141ms
+26 silly audit report {}
+27 http fetch GET 200 https://registry.npmjs.org/create-angular/-/create-angular-0.0.4.tgz 169ms (cache miss)
+28 warn deprecated create-angular@0.0.4:  Use @angular/create instead. For more information see: https://github.com/angular/angular-cli/blob/main/packages/angular/create/README.md
+29 verbose stack Error: command failed
+29 verbose stack     at promiseSpawn (/usr/local/lib/node_modules/npm/node_modules/@npmcli/promise-spawn/lib/index.js:22:22)
+29 verbose stack     at spawnWithShell (/usr/local/lib/node_modules/npm/node_modules/@npmcli/promise-spawn/lib/index.js:124:10)
+29 verbose stack     at promiseSpawn (/usr/local/lib/node_modules/npm/node_modules/@npmcli/promise-spawn/lib/index.js:12:12)
+29 verbose stack     at runScriptPkg (/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/run-script-pkg.js:79:13)
+29 verbose stack     at runScript (/usr/local/lib/node_modules/npm/node_modules/@npmcli/run-script/lib/run-script.js:9:12)
+29 verbose stack     at run (/usr/local/lib/node_modules/npm/node_modules/libnpmexec/lib/run-script.js:57:10)
+29 verbose stack     at async exec (/usr/local/lib/node_modules/npm/node_modules/libnpmexec/lib/index.js:305:10)
+29 verbose stack     at async Init.execCreate (/usr/local/lib/node_modules/npm/lib/commands/init.js:143:5)
+29 verbose stack     at async Init.exec (/usr/local/lib/node_modules/npm/lib/commands/init.js:46:14)
+29 verbose stack     at async Npm.exec (/usr/local/lib/node_modules/npm/lib/npm.js:208:9)
+30 error code 1
+31 error path /home/node
+32 error command failed
+33 error command sh -c "create-angular" frontend --routing --style=scss
+34 verbose cwd /home/node
+35 verbose os Linux 6.8.0-1034-azure
+36 verbose node v22.17.0
+37 verbose npm  v11.4.2
+38 verbose exit 1
+39 verbose code 1
+40 error A complete log of this run can be found in: /home/node/.npm/_logs/2025-09-11T08_13_39_527Z-debug-0.log

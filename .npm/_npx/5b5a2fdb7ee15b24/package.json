@@ -1,0 +1,10 @@
+{
+  "dependencies": {
+    "@angular/create": "^20.3.0"
+  },
+  "_npx": {
+    "packages": [
+      "@angular/create@latest"
+    ]
+  }
+}
