@@ -1,40 +1,32 @@
 # Backend (Express.js + PostgreSQL)
 
-This is the backend for the migrated COBOL application, implemented with Express.js, Sequelize (ORM), and PostgreSQL.
-
 ## Features
-- Full CRUD for Customer entity
-- Validation & business rules from legacy extraction
-- Modular MVC structure
-- Robust error handling
-- Environment-ready for development & production
+- Secure REST API for Customer management, login, dashboard, and reporting.
+- Production-ready Express.js structure: modular, scalable, uses Sequelize ORM.
+- Validation and business rules enforced from extracted schema files.
 
-## Quick Start
+## Getting Started
 
-1. Install dependencies:
-   npm install
-2. Set PostgreSQL credentials in :
-   DB_URL=postgres://user:password@localhost:5432/dbname
-   PORT=3000
-3. Start the backend:
-   npm start
-4. API endpoints:
-   - POST   /api/customers   Create customer
-   - GET    /api/customers   List customers
-   - GET    /api/customers/:id   Get customer by ID
-   - PUT    /api/customers/:id Update customer
-   - DELETE /api/customers/:id Remove customer
+1. **Install dependencies**
+    cd backend
+    npm install
+2. **Set **
+    DB_URL=postgres://username:password@localhost:5432/dbname
+    PORT=3000
+3. **Start the server**
+    npm start
+4. **API Endpoints**
+    - /api/customers: CRUD for customers
+    - /api/auth/login: (To be implemented if needed)
 
-## Structure
+## Project Structure
+- models/ - Data models
+- controllers/ - API endpoints
+- services/ - Business logic
+- routes/ - Route definitions
+- validators/ - Schema validation
+- middlewares/ - Error handling and request validation
 
-- config/       Sequelize DB config
-- models/       ORM models
-- validators/   Request validation
-- middlewares/  Error & validation handlers
-- services/     Business logic
-- controllers/  REST handlers
-- routes/       API routes
+## License
+MIT
 
----
-
-Extend with additional entities and features as extracted from COBOL application.
