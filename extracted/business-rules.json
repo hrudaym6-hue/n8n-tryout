@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "file": "n8n-tryout/extracted/COUSR02C_sample.cbl",
   "rules": [
     {
@@ -51,5 +52,14 @@
       "isConfigurable": false,
       "relatedDomainConcepts": ["Transaction", "Date Validation"]
     }
+=======
+  "rules": [
+    { "rule": "If ORDER-AMOUNT is not greater than zero, reject order.", "condition": "ORDER-AMOUNT <= 0", "action": "Reject order" },
+    { "rule": "If PRODUCT-CODE does not exist in PRODUCT-MASTER, reject product line.", "condition": "PRODUCT-CODE not in PRODUCT-MASTER", "action": "Reject line" },
+    { "rule": "If SHIPPING-DATE earlier than ORDER-DATE, abort transaction.", "condition": "SHIPPING-DATE < ORDER-DATE", "action": "Abort" },
+    { "rule": "If ORDER-QTY exceeds INVENTORY-QTY, prohibit order.", "condition": "ORDER-QTY > INVENTORY-QTY", "action": "Prohibit order" },
+    { "rule": "If CUSTOMER-ID invalid, halt processing.", "condition": "CUSTOMER-ID not matches ^[0-9]{8}$", "action": "Halt" },
+    { "rule": "Employee ID must be present in all employee operations.", "condition": "EMPLOYEE-ID is NULL", "action": "Reject operation" }
+>>>>>>> 7e856f8 (Backend: Node.js + Postgres implementation with extracted entities, business rules, and validation rules)
   ]
 }

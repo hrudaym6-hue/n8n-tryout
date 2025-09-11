@@ -1,4 +1,5 @@
 {
+<<<<<<< HEAD
   "file": "n8n-tryout/extracted/COUSR02C_sample.cbl",
   "entities": {
     "functions": [
@@ -46,5 +47,20 @@
       }
     ],
     "constants": []
+=======
+  "EXAMPLE1.CBL": {
+    "variables": [
+      { "name": "WS-NUMBER", "type": "int", "source": "Working Storage", "desc": "Used for arithmetic operations" },
+      { "name": "WS-NAME", "type": "varchar(20)", "source": "Working Storage", "desc": "User name for display" },
+      { "name": "WS-RESULT", "type": "int", "source": "Working Storage", "desc": "Result holder" }
+    ]
+  },
+  "EMPLOYEES.CBL": {
+    "variables": [
+      { "name": "EMPLOYEE-NAME", "type": "varchar(20)", "source": "Working Storage", "desc": "Employee name" },
+      { "name": "EMPLOYEE-ID", "type": "int", "source": "Working Storage", "desc": "Employee ID" },
+      { "name": "DEPARTMENT", "type": "varchar(10)", "source": "Working Storage", "desc": "Department" }
+    ]
+>>>>>>> 7e856f8 (Backend: Node.js + Postgres implementation with extracted entities, business rules, and validation rules)
   }
 }
