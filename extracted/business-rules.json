@@ -1,0 +1,55 @@
+{
+  "file": "n8n-tryout/extracted/COUSR02C_sample.cbl",
+  "rules": [
+    {
+      "description": "If the customer code is not found in master file, display Customer Not Found message and terminate process.",
+      "type": "validation",
+      "condition": "customer code is not found in customer master file",
+      "outcome": "display message Customer Not Found and terminate process",
+      "location": { "function": "COUSR02C-PROCESS", "line": 75 },
+      "variablesInvolved": ["CUSTOMER-CODE", "CUSTOMER-MASTER-FILE", "CUSTOMER-NOT-FOUND"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer", "Customer Master"]
+    },
+    {
+      "description": "If the customer account is blocked, display a warning and prevent further processing.",
+      "type": "validation",
+      "condition": "customer account is marked as blocked",
+      "outcome": "display warning and prevent customer transaction processing",
+      "location": { "function": "COUSR02C-PROCESS", "line": 92 },
+      "variablesInvolved": ["BLOCKED-FLAG", "CUSTOMER-CODE"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer", "Account Status"]
+    },
+    {
+      "description": "If total transaction amount exceeds credit limit, display error and halt execution.",
+      "type": "validation",
+      "condition": "total transaction amount > customer credit limit",
+      "outcome": "display error and stop processing",
+      "location": { "function": "COUSR02C-PROCESS", "line": 110 },
+      "variablesInvolved": ["TRANSACTION-AMOUNT", "CREDIT-LIMIT"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Customer", "Credit Limit", "Transaction"]
+    },
+    {
+      "description": "Calculate available balance after each approved transaction.",
+      "type": "calculation",
+      "condition": "on successful transaction approval",
+      "outcome": "deduct transaction amount from available balance",
+      "location": { "function": "COUSR02C-UPDATE-BALANCE", "line": 128 },
+      "variablesInvolved": ["AVAILABLE-BALANCE", "TRANSACTION-AMOUNT"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Customer", "Balance", "Transaction"]
+    },
+    {
+      "description": "If the transaction date is prior to the current system date, display error and skip transaction.",
+      "type": "validation",
+      "condition": "transaction date < current system date",
+      "outcome": "display error and skip processing of the transaction",
+      "location": { "function": "COUSR02C-PROCESS", "line": 145 },
+      "variablesInvolved": ["TRANSACTION-DATE", "SYSTEM-DATE"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Transaction", "Date Validation"]
+    }
+  ]
+}

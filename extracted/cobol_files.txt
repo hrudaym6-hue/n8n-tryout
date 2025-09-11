@@ -1,0 +1,5 @@
+n8n-tryout/compressed/cbl/COUSR02C.cbl
+n8n-tryout/compressed/cbl/COADM01C.cbl
+n8n-tryout/compressed/cbl/COUSR00C.cbl
+n8n-tryout/compressed/cbl/COUSR03C.cbl
+n8n-tryout/compressed/cbl/COUSR01C.cbl

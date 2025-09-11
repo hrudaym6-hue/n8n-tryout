@@ -1,0 +1,50 @@
+{
+  "file": "n8n-tryout/extracted/COUSR02C_sample.cbl",
+  "entities": {
+    "functions": [
+      {
+        "name": "COUSR02C",
+        "params": [],
+        "return_type": "None",
+        "access": "public",
+        "location": "Identification Division, Procedure Division",
+        "relationships": [],
+        "description": "Main entry procedure - typical for a COBOL program"
+      }
+    ],
+    "variables": [
+      {
+        "name": "WS-NAME",
+        "type": "PIC X(20)",
+        "scope": "Working-Storage Section",
+        "default": "Spaces",
+        "location": "Working-Storage Section",
+        "usage": "Stores the name value; used in DISPLAY statements"
+      },
+      {
+        "name": "WS-AGE",
+        "type": "PIC 99",
+        "scope": "Working-Storage Section",
+        "default": "Zeros",
+        "location": "Working-Storage Section",
+        "usage": "Stores age value; used in computations and DISPLAY statements"
+      }
+    ],
+    "classes": [],
+    "modules": [
+      {
+        "name": "COUSR02C_sample.cbl",
+        "imports": [],
+        "exports": [],
+        "internal_structure": [
+          "Identification Division",
+          "Environment Division",
+          "Data Division",
+          "Working-Storage Section",
+          "Procedure Division"
+        ]
+      }
+    ],
+    "constants": []
+  }
+}
