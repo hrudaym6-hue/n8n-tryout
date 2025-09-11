@@ -1,0 +1,25 @@
+{
+  "CUSTOMER-ID": {
+    "required": true,
+    "format": "^[0-9]{8}$",
+    "error": "INVALID CUSTOMER ID"
+  },
+  "ORDER-AMOUNT": {
+    "min": 0.01,
+    "error": "ORDER AMOUNT MUST BE GREATER THAN ZERO"
+  },
+  "PRODUCT-CODE": {
+    "required": true,
+    "exists_in": "PRODUCT-MASTER",
+    "error": "PRODUCT CODE NOT FOUND"
+  },
+  "SHIPPING-DATE": {
+    "must_be_after": "ORDER-DATE",
+    "error": "SHIPPING DATE MUST BE ON OR AFTER ORDER DATE"
+  },
+  "ORDER-QTY": {
+    "min": 1,
+    "max_from": "INVENTORY-QTY",
+    "error": "ORDER QUANTITY EXCEEDS INVENTORY, ORDER QUANTITY INVALID"
+  }
+}

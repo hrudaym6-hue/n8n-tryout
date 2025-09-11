@@ -1,0 +1,10 @@
+const express = require('express');
+const app = express();
+const accountRoutes = require('./routes/accountRoutes');
+const userRoutes = require('./routes/userRoutes');
+const transactionRoutes = require('./routes/transactionRoutes');
+app.use(express.json());
+app.use('/api/accounts', accountRoutes);
+app.use('/api/users', userRoutes);
+app.use('/api/transactions', transactionRoutes);
+module.exports = app;
