@@ -1,0 +1,67 @@
+[
+  {
+    "file": "compressed/cbl/ACCOUNT-MGMT.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view my account details so that I can verify and review my information.",
+        "component": "AccountDetailsView",
+        "trigger": "Access account details page",
+        "expectedBehavior": "Displays user account information: name, number, type, balance.",
+        "location": { "line": 21 },
+        "route": "/account/details",
+        "dependencies": ["SELECT user data from DB"],
+        "validationStates": ["Account must exist"]
+      },
+      {
+        "story": "As a user, I want to update my contact details so that my account stays up to date.",
+        "component": "AccountEditForm",
+        "trigger": "Submit 'Update Contact Details' form",
+        "expectedBehavior": "Updates contact details and displays confirmation message.",
+        "location": { "line": 88 },
+        "route": "/account/edit",
+        "dependencies": ["UPDATE contact info in DB"],
+        "validationStates": ["Required fields: phone, email", "Email format validated", "Display error if invalid"]
+      }
+    ]
+  },
+  {
+    "file": "compressed/cbl/LOGIN-USER.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to log in with my username and password so that I can access my personal dashboard.",
+        "component": "LoginForm",
+        "trigger": "Submit login credentials",
+        "expectedBehavior": "Validates credentials and redirects to dashboard if successful.",
+        "location": { "line": 17 },
+        "route": "/login",
+        "dependencies": ["SELECT user where username/password match"],
+        "validationStates": ["Username/password required", "Invalid credentials error", "Lock after 3 failed attempts"]
+      }
+    ]
+  },
+  {
+    "file": "compressed/cbl/TRANSACTION.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view my recent transactions so that I can keep track of my spending.",
+        "component": "TransactionList",
+        "trigger": "Open transaction history page",
+        "expectedBehavior": "Displays a list of recent transactions, sorted by date.",
+        "location": { "line": 25 },
+        "route": "/transaction/history",
+        "dependencies": ["SELECT transactions for user from DB"],
+        "validationStates": ["Only show transactions for logged in user"]
+      },
+      {
+        "story": "As a user, I want to initiate a new transfer so that I can send money to another account.",
+        "component": "TransferForm",
+        "trigger": "Submit transfer form",
+        "expectedBehavior": "Validates amount and recipient, processes transfer, and displays result.",
+        "location": { "line": 68 },
+        "route": "/transaction/transfer",
+        "dependencies": ["UPDATE balances in DB", "INSERT transfer transaction"],
+        "validationStates": ["Amount > 0", "Recipient account validated", "Insufficient funds error"]
+      }
+    ]
+  }
+]
