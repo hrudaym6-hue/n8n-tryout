@@ -1,0 +1,55 @@
+{
+  "file": "n8n-tryout/src/USERINT.CBL",
+  "userStories": [
+    {
+      "story": "As a user, I want to log in using my user ID and password so that I can access the application features.",
+      "component": "Login Screen",
+      "trigger": "Enter user ID and password, then press Login key/button",
+      "expectedBehavior": "System validates credentials and grants access if correct, else displays Invalid user or password message.",
+      "location": { "line": 17 },
+      "route": "/login",
+      "dependencies": ["USER-MASTER data store"],
+      "validationStates": ["User ID required", "Password required", "Invalid input displays error"]
+    },
+    {
+      "story": "As a user, I want to view my main dashboard upon successful login so that I can see my options clearly.",
+      "component": "Main Dashboard",
+      "trigger": "Successful login",
+      "expectedBehavior": "System loads the dashboard with user-specific menu options.",
+      "location": { "line": 50 },
+      "route": "/dashboard",
+      "dependencies": ["Session state", "User access roles"],
+      "validationStates": []
+    },
+    {
+      "story": "As a user, I want to log out from my account so that I can secure my session.",
+      "component": "Logout Button",
+      "trigger": "Select Logout from dashboard",
+      "expectedBehavior": "System terminates session and returns to login screen.",
+      "location": { "line": 95 },
+      "route": "/logout",
+      "dependencies": ["Session termination routine"],
+      "validationStates": []
+    },
+    {
+      "story": "As a user, I want to be notified if caps lock is on when entering my password, so that I can avoid login errors.",
+      "component": "Password Entry Field",
+      "trigger": "Focus on password field",
+      "expectedBehavior": "Displays warning if caps lock is active.",
+      "location": { "line": 21 },
+      "route": "/login",
+      "dependencies": ["Keyboard state capture"],
+      "validationStates": ["Caps Lock warning"]
+    },
+    {
+      "story": "As a user, I want to be shown an error message if I submit the login form with empty fields so that I know what is missing.",
+      "component": "Login Screen",
+      "trigger": "Submit login form with missing data",
+      "expectedBehavior": "Error message indicating missing fields.",
+      "location": { "line": 27 },
+      "route": "/login",
+      "dependencies": ["Form validation logic"],
+      "validationStates": ["User ID required", "Password required"]
+    }
+  ]
+}

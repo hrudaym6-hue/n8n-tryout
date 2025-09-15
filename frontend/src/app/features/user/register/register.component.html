@@ -1,0 +1,18 @@
+<h2>User Registration</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <label>Username</label>
+  <input formControlName="username" type="text" required />
+  <app-error-message [error]="form.controls.username.errors?.required ? 'Username required.' : null"></app-error-message>
+
+  <label>Email</label>
+  <input formControlName="email" type="email" required />
+  <app-error-message [error]="form.controls.email.errors?.email ? 'Invalid email.' : null"></app-error-message>
+
+  <label>Password</label>
+  <input formControlName="password" type="password" required />
+  <app-error-message [error]="form.controls.password.errors?.passwordStrength ? 'Password too weak.' : null"></app-error-message>
+
+  <button type="submit" [disabled]="loading || form.invalid">Register</button>
+</form>
+<app-error-message [error]="error"></app-error-message>
+<div *ngIf="success" class="success">{{ success }}</div>

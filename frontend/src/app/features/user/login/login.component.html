@@ -1,0 +1,11 @@
+<h2>Login</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <label>Username</label>
+  <input formControlName="username" required />
+
+  <label>Password</label>
+  <input formControlName="password" type="password" required />
+
+  <button type="submit" [disabled]="loading || form.invalid">Login</button>
+</form>
+<app-error-message [error]="error"></app-error-message>

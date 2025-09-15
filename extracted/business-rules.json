@@ -1,0 +1,45 @@
+{
+  "file": "src/mainframe/PROCESS_ORDERS.CBL",
+  "rules": [
+    {
+      "description": "An order is considered valid if the order amount is greater than zero.",
+      "type": "validation",
+      "condition": "ORDER-AMOUNT > 0",
+      "outcome": "Order proceeds to processing.",
+      "location": { "function": "VALIDATE-ORDER", "line": 114 },
+      "variablesInvolved": ["ORDER-AMOUNT"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Order Validation", "Order Processing"]
+    },
+    {
+      "description": "Orders flagged as priority ship must be assigned expedited shipping.",
+      "type": "assignment",
+      "condition": "PRIORITY-SHIP = Y",
+      "outcome": "Expedited shipping assigned.",
+      "location": { "function": "PROCESS-SHIPPING", "line": 209 },
+      "variablesInvolved": ["PRIORITY-SHIP", "SHIPPING-METHOD"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Shipping", "Order Priority"]
+    },
+    {
+      "description": "If the customer is a loyalty member, apply a 5% discount to the order total.",
+      "type": "calculation",
+      "condition": "LOYALTY-MEMBER = Y",
+      "outcome": "Order total reduced by 5%.",
+      "location": { "function": "APPLY-DISCOUNTS", "line": 292 },
+      "variablesInvolved": ["LOYALTY-MEMBER", "ORDER-TOTAL", "DISCOUNT-AMOUNT"],
+      "isConfigurable": true,
+      "relatedDomainConcepts": ["Loyalty Program", "Discount"]
+    },
+    {
+      "description": "Backordered items should not be included in the shipping calculation.",
+      "type": "exclusion",
+      "condition": "ITEM-STATUS = BACKORDERED",
+      "outcome": "Item excluded from shipping calculation.",
+      "location": { "function": "CALCULATE-SHIPPING", "line": 342 },
+      "variablesInvolved": ["ITEM-STATUS", "ITEM-ID", "SHIPPING-COST"],
+      "isConfigurable": false,
+      "relatedDomainConcepts": ["Inventory", "Shipping"]
+    }
+  ]
+}

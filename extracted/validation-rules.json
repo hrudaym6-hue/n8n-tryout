@@ -1,0 +1,62 @@
+[  
+  {  
+    "file": "src/main.cbl",  
+    "validations": [  
+      {  
+        "description": "Ensures that the ACCOUNT-NUMBER field is provided (not empty) before processing a transaction.",  
+        "type": "required field",  
+        "condition": "ACCOUNT-NUMBER is empty or not present",  
+        "failureOutcome": "Processing is halted and an error message is displayed: ACCOUNT NUMBER MISSING",  
+        "location": { "function": "PROCESS-TRANSACTION", "line": 47 },  
+        "field": "ACCOUNT-NUMBER",  
+        "isConfigurable": false,  
+        "relatedDomainConcepts": [ "bank account", "transaction" ]  
+      },  
+      {  
+        "description": "Checks that the TRANSACTION-AMOUNT does not exceed the MAX-TRANSACTION-LIMIT value.",  
+        "type": "range check",  
+        "condition": "TRANSACTION-AMOUNT > MAX-TRANSACTION-LIMIT",  
+        "failureOutcome": "Transaction is rejected and error message AMOUNT EXCEEDS LIMIT is displayed.",  
+        "location": { "function": "PROCESS-TRANSACTION", "line": 59 },  
+        "field": "TRANSACTION-AMOUNT",  
+        "isConfigurable": true,  
+        "relatedDomainConcepts": [ "transaction amount", "bank account" ]  
+      },  
+      {  
+        "description": "Ensures that the TRANSACTION-TYPE is either DEPOSIT or WITHDRAWAL.",  
+        "type": "format check (enumeration)",  
+        "condition": "TRANSACTION-TYPE is not DEPOSIT or WITHDRAWAL",  
+        "failureOutcome": "Transaction is rejected and error message INVALID TRANSACTION TYPE is displayed.",  
+        "location": { "function": "PROCESS-TRANSACTION", "line": 70 },  
+        "field": "TRANSACTION-TYPE",  
+        "isConfigurable": false,  
+        "relatedDomainConcepts": [ "transaction type" ]  
+      }  
+    ]  
+  },  
+  {  
+    "file": "src/login.cbl",  
+    "validations": [  
+      {  
+        "description": "Validates that the USER-ID field is provided during login.",  
+        "type": "required field",  
+        "condition": "USER-ID is empty",  
+        "failureOutcome": "Login process is halted and error message USER ID REQUIRED is displayed.",  
+        "location": { "function": "LOGIN-USER", "line": 15 },  
+        "field": "USER-ID",  
+        "isConfigurable": false,  
+        "relatedDomainConcepts": [ "user identity", "login" ]  
+      },  
+      {  
+        "description": "Requires PASSWORD to be provided and to be at least 8 characters.",  
+        "type": "required field and length check",  
+        "condition": "PASSWORD is missing or PASSWORD length < 8",  
+        "failureOutcome": "Login fails and error message INVALID PASSWORD is displayed.",  
+        "location": { "function": "LOGIN-USER", "line": 23 },  
+        "field": "PASSWORD",  
+        "isConfigurable": true,  
+        "relatedDomainConcepts": [ "user authentication", "login" ]  
+      }  
+    ]  
+  }  
+]

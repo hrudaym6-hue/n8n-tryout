@@ -1,7 +1,9 @@
 const { Pool } = require('pg');
 require('dotenv').config();
 
-const pool = new Pool({ connectionString: process.env.DATABASE_URL });
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+});
 
 const createTables = async () => {
   await pool.query();
@@ -10,4 +12,7 @@ const createTables = async () => {
   await pool.query();
 };
 
-module.exports = { pool, createTables };
+module.exports = {
+  pool,
+  createTables,
+};

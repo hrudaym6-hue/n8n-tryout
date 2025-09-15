@@ -1,4 +1,5 @@
 const accountService = require('../services/accountService');
+
 exports.createAccount = async (req, res, next) => {
   try {
     const account = await accountService.createAccount(req.body);
