@@ -1,8 +1,12 @@
 import { Component } from '@angular/core';
+import { RouterOutlet, RouterLink } from '@angular/router';
+import { CommonModule } from '@angular/common';
 import { AuthService } from './core/auth.service';
 
 @Component({
   selector: 'app-root',
+  standalone: true,
+  imports: [RouterOutlet, RouterLink, CommonModule],
   template: `
     <nav>
       <a routerLink="/register">Register</a>
