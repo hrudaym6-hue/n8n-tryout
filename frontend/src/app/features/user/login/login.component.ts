@@ -1,11 +1,14 @@
 import { Component } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { ApiService } from '../../../core/api.service';
+import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
+import { CommonModule } from '@angular/common';
 import { AuthService } from '../../../core/auth.service';
 import { Router } from '@angular/router';
+import { environment } from '../../../../environments/environment';
 
 @Component({
   selector: 'app-login',
+  standalone: true,
+  imports: [CommonModule, ReactiveFormsModule],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -16,30 +19,55 @@ export class LoginComponent {
 
   constructor(
     private fb: FormBuilder,
-    private api: ApiService,
     private auth: AuthService,
     private router: Router
   ) {
     this.form = this.fb.group({
-      username: ['', Validators.required],
+      user_id: ['', Validators.required],
       password: ['', Validators.required]
     });
   }
 
-  submit() {
-    if (this.form.invalid) return;
+  async submit() {
+    console.log('Submit method called');
+    console.log('Form valid:', this.form.valid);
+    console.log('Form value:', this.form.value);
+    
+    if (this.form.invalid) {
+      console.log('Form is invalid, not submitting');
+      return;
+    }
+    
     this.loading = true;
     this.error = null;
-    this.api.post<any>('/api/users/login', this.form.value).subscribe({
-      next: res => {
-        this.auth.setToken(res.token);
-        this.router.navigate(['/']);
-      },
-      error: err => {
-        this.error = err.error?.message || 'Login failed';
-        this.loading = false;
-      },
-      complete: () => this.loading = false
-    });
+    
+    try {
+      console.log('Making direct fetch request to login...');
+      const response = await fetch(`${environment.apiUrl}/api/users/login`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(this.form.value)
+      });
+      
+      console.log('Login response status:', response.status);
+      
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+      
+      const data = await response.json();
+      console.log('Login success:', data);
+      
+      this.auth.setToken(data.token);
+      this.router.navigate(['/dashboard']);
+      
+    } catch (error) {
+      console.error('Login error:', error);
+      this.error = 'Login failed. Please check your credentials.';
+    } finally {
+      this.loading = false;
+    }
   }
 }

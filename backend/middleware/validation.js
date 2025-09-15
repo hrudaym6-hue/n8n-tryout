@@ -11,12 +11,12 @@ const loginSchema = Joi.object({
 });
 // Account creation
 const accountSchema = Joi.object({
-  user_id: Joi.number().required(),
+  user_id: Joi.string().required(),
   account_number: Joi.string().alphanum().required()
 });
 // Order creation
 const orderSchema = Joi.object({
-  user_id: Joi.number().required(),
+  user_id: Joi.string().required(),
   amount: Joi.number().greater(0).required(),
   backordered: Joi.boolean().default(false)
 });

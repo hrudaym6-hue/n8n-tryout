@@ -1,5 +1,6 @@
 require('dotenv').config();
 const express = require('express');
+const cors = require('cors');
 const { createTables } = require('./models');
 const userRoutes = require('./routes/userRoutes');
 const accountRoutes = require('./routes/accountRoutes');
@@ -7,6 +8,7 @@ const orderRoutes = require('./routes/orderRoutes');
 const transactionRoutes = require('./routes/transactionRoutes');
 const app = express();
 
+app.use(cors());
 app.use(express.json());
 
 // Route setup
@@ -27,7 +29,7 @@ const PORT = process.env.PORT || 3000;
 createTables()
   .then(() => {
     app.listen(PORT, () => {
-      console.log();
+      console.log(`Server running on port ${PORT}`);
     });
   })
   .catch(err => {
