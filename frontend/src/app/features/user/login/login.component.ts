@@ -6,6 +6,7 @@ import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
+  standalone: false,
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.css']
 })
@@ -21,7 +22,7 @@ export class LoginComponent {
     private router: Router
   ) {
     this.form = this.fb.group({
-      username: ['', Validators.required],
+      user_id: ['', Validators.required],
       password: ['', Validators.required]
     });
   }

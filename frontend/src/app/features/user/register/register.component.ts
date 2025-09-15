@@ -5,6 +5,7 @@ import { passwordValidator } from '../validators/password.validator';
 
 @Component({
   selector: 'app-register',
+  standalone: false,
   templateUrl: './register.component.html',
   styleUrls: ['./register.component.css']
 })
@@ -16,7 +17,7 @@ export class RegisterComponent {
 
   constructor(private fb: FormBuilder, private api: ApiService) {
     this.form = this.fb.group({
-      username: ['', [Validators.required, Validators.minLength(4)]],
+      user_id: ['', [Validators.required, Validators.minLength(4)]],
       password: ['', [Validators.required, passwordValidator]],
       email: ['', [Validators.required, Validators.email]]
     });

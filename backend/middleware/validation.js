@@ -2,6 +2,7 @@ const Joi = require('joi');
 // User creation
 const userSchema = Joi.object({
   user_id: Joi.string().min(3).max(255).required(),
+  email: Joi.string().email().required(),
   password: Joi.string().min(8).max(255).pattern(/^(?=.*[A-Z])(?=.*[a-z])(?=.*[0-9]).{8,}$/).required(),
   loyalty_level: Joi.string().optional()
 });
