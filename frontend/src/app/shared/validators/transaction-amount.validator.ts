@@ -1,0 +1,1 @@
+import { AbstractControl, ValidationErrors } from '@angular/forms';\nexport function transactionAmountValidator(control: AbstractControl): ValidationErrors | null {\n  const value = control.value;\n  if (value < 0.01) return { minTransactionAmount: true };\n  if (value > 100000) return { maxTransactionAmount: true };\n  return null;\n}

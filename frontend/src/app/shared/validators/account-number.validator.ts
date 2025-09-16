@@ -1,0 +1,1 @@
+import { AbstractControl, ValidationErrors } from '@angular/forms';\nexport function accountNumberValidator(control: AbstractControl): ValidationErrors | null {\n  const value = control.value;\n  if (typeof value === 'string' && value.length !== 10) {\n    return { accountNumberLength: true };\n  }\n  return null;\n}
