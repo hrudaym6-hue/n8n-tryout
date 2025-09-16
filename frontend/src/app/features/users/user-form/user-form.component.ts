@@ -1,1 +1,61 @@
-import { Component, OnInit } from '@angular/core';\nimport { FormBuilder, FormGroup, Validators } from '@angular/forms';\nimport { UserService } from '../../../core/services/user.service';\nimport { ActivatedRoute, Router } from '@angular/router';\nimport { User } from '../../../core/models/user.model';\n\n@Component({\n  selector: 'app-user-form',\n  templateUrl: './user-form.component.html',\n  styleUrls: ['./user-form.component.scss']\n})\nexport class UserFormComponent implements OnInit {\n  form!: FormGroup;\n  editMode = false;\n  userId?: number;\n  loading = false;\n  error?: string;\n\n  constructor(\n    private fb: FormBuilder, private userService: UserService,\n    private route: ActivatedRoute, private router: Router\n  ) {}\n\n  ngOnInit(): void {\n    this.form = this.fb.group({\n      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(128)]],\n      email: ['', [Validators.required, Validators.email]]\n    });\n\n    this.userId = Number(this.route.snapshot.paramMap.get('id'));\n    this.editMode = Boolean(this.userId);\n\n    if (this.editMode) {\n      this.loading = true;\n      this.userService.getUser(this.userId!).subscribe({\n        next: (user) => {\n          this.form.patchValue(user);\n          this.loading = false;\n        },\n        error: () => { this.error = 'User not found'; this.loading = false; }\n      });\n    }\n  }\n\n  submit(): void {\n    if (this.form.invalid) return;\n    this.loading = true;\n    const user: User = this.form.value;\n    if (this.editMode) {\n      this.userService.updateUser(this.userId!, user).subscribe({\n        next: () => this.router.navigate(['/users']),\n        error: (err) => { this.error = err.error.error || 'Update failed'; this.loading = false; }\n      });\n    } else {\n      this.userService.addUser(user).subscribe({\n        next: () => this.router.navigate(['/users']),\n        error: (err) => { this.error = err.error.error || 'Creation failed'; this.loading = false; }\n      });\n    }\n  }\n}
+import { Component, OnInit } from '@angular/core';
+import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { UserService } from '../../../core/services/user.service';
+import { ActivatedRoute, Router } from '@angular/router';
+import { User } from '../../../core/models/user.model';
+
+@Component({
+  selector: 'app-user-form',
+  templateUrl: './user-form.component.html',
+  styleUrls: ['./user-form.component.scss']
+})
+export class UserFormComponent implements OnInit {
+  form!: FormGroup;
+  editMode = false;
+  userId?: number;
+  loading = false;
+  error?: string;
+
+  constructor(
+    private fb: FormBuilder, private userService: UserService,
+    private route: ActivatedRoute, private router: Router
+  ) {}
+
+  ngOnInit(): void {
+    this.form = this.fb.group({
+      name: ['', [Validators.required, Validators.minLength(2), Validators.maxLength(128)]],
+      email: ['', [Validators.required, Validators.email]]
+    });
+
+    this.userId = Number(this.route.snapshot.paramMap.get('id'));
+    this.editMode = Boolean(this.userId);
+
+    if (this.editMode) {
+      this.loading = true;
+      this.userService.getUser(this.userId!).subscribe({
+        next: (user) => {
+          this.form.patchValue(user);
+          this.loading = false;
+        },
+        error: () => { this.error = 'User not found'; this.loading = false; }
+      });
+    }
+  }
+
+  submit(): void {
+    if (this.form.invalid) return;
+    this.loading = true;
+    const user: User = this.form.value;
+    if (this.editMode) {
+      this.userService.updateUser(this.userId!, user).subscribe({
+        next: () => this.router.navigate(['/users']),
+        error: (err) => { this.error = err.error.error || 'Update failed'; this.loading = false; }
+      });
+    } else {
+      this.userService.addUser(user).subscribe({
+        next: () => this.router.navigate(['/users']),
+        error: (err) => { this.error = err.error.error || 'Creation failed'; this.loading = false; }
+      });
+    }
+  }
+}

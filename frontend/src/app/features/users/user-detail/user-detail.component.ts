@@ -1,1 +1,25 @@
-import { Component, OnInit } from '@angular/core';\nimport { ActivatedRoute } from '@angular/router';\nimport { UserService } from '../../../core/services/user.service';\nimport { User } from '../../../core/models/user.model';\n\n@Component({\n  selector: 'app-user-detail',\n  templateUrl: './user-detail.component.html',\n  styleUrls: ['./user-detail.component.scss']\n})\nexport class UserDetailComponent implements OnInit {\n  user?: User;\n  loading = true;\n  error?: string;\n\n  constructor(private route: ActivatedRoute, private userService: UserService) {}\n\n  ngOnInit(): void {\n    const userId = Number(this.route.snapshot.paramMap.get('id'));\n    this.userService.getUser(userId).subscribe({\n      next: (user) => { this.user = user; this.loading = false; },\n      error: () => { this.error = 'User not found'; this.loading = false; }\n    });\n  }\n}
+import { Component, OnInit } from '@angular/core';
+import { ActivatedRoute } from '@angular/router';
+import { UserService } from '../../../core/services/user.service';
+import { User } from '../../../core/models/user.model';
+
+@Component({
+  selector: 'app-user-detail',
+  templateUrl: './user-detail.component.html',
+  styleUrls: ['./user-detail.component.scss']
+})
+export class UserDetailComponent implements OnInit {
+  user?: User;
+  loading = true;
+  error?: string;
+
+  constructor(private route: ActivatedRoute, private userService: UserService) {}
+
+  ngOnInit(): void {
+    const userId = Number(this.route.snapshot.paramMap.get('id'));
+    this.userService.getUser(userId).subscribe({
+      next: (user) => { this.user = user; this.loading = false; },
+      error: () => { this.error = 'User not found'; this.loading = false; }
+    });
+  }
+}

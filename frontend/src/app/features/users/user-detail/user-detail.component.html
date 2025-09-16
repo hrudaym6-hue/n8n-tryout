@@ -1,1 +1,11 @@
-<h2>User Details</h2>\n<p *ngIf="loading">Loading...</p>\n<div *ngIf="user">\n  <p><strong>ID:</strong> {{ user.id }}</p>\n  <p><strong>Name:</strong> {{ user.name }}</p>\n  <p><strong>Email:</strong> {{ user.email }}</p>\n  <p><strong>Accounts:</strong> {{ user.accounts?.length || 0 }}</p>\n  <button routerLink="/users">Back to List</button>\n  <button [routerLink]="['/users', user.id, 'edit']">Edit</button>\n</div>\n<p *ngIf="error">{{ error }}</p>
+<h2>User Details</h2>
+<p *ngIf="loading">Loading...</p>
+<div *ngIf="user">
+  <p><strong>ID:</strong> {{ user.id }}</p>
+  <p><strong>Name:</strong> {{ user.name }}</p>
+  <p><strong>Email:</strong> {{ user.email }}</p>
+  <p><strong>Accounts:</strong> {{ user.accounts?.length || 0 }}</p>
+  <button routerLink="/users">Back to List</button>
+  <button [routerLink]="['/users', user.id, 'edit']">Edit</button>
+</div>
+<p *ngIf="error">{{ error }}</p>

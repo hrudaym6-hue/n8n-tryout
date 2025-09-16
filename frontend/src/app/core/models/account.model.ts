@@ -1,1 +1,16 @@
-import { Transaction } from './transaction.model';\nimport { User } from './user.model';\n\nexport type AccountType = 'savings' | 'checking';\nexport type AccountStatus = 'active' | 'inactive';\n\nexport interface Account {\n  id?: number;\n  userId: number;\n  accountNumber: string;\n  type: AccountType;\n  status: AccountStatus;\n  balance: number;\n  user?: User;\n  transactions?: Transaction[];\n}
+import { Transaction } from './transaction.model';
+import { User } from './user.model';
+
+export type AccountType = 'savings' | 'checking';
+export type AccountStatus = 'active' | 'inactive';
+
+export interface Account {
+  id?: number;
+  userId: number;
+  accountNumber: string;
+  type: AccountType;
+  status: AccountStatus;
+  balance: number;
+  user?: User;
+  transactions?: Transaction[];
+}

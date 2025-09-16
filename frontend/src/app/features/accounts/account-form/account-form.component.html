@@ -1,0 +1,42 @@
+<h2>{{ editMode ? 'Edit Account' : 'Add Account' }}</h2>
+<form [formGroup]="form" (ngSubmit)="submit()">
+  <div>
+    <label>User ID</label>
+    <input type="number" formControlName="userId" />
+    <span *ngIf="form.controls['userId'].touched && form.controls['userId'].invalid">
+      User ID is required.
+    </span>
+  </div>
+  <div>
+    <label>Account Number</label>
+    <input formControlName="accountNumber" />
+    <span *ngIf="form.controls['accountNumber'].touched && form.controls['accountNumber'].invalid">
+      Account number must be exactly 10 digits.
+    </span>
+  </div>
+  <div>
+    <label>Type</label>
+    <select formControlName="type">
+      <option value="savings">Savings</option>
+      <option value="checking">Checking</option>
+    </select>
+  </div>
+  <div>
+    <label>Status</label>
+    <select formControlName="status">
+      <option value="active">Active</option>
+      <option value="inactive">Inactive</option>
+    </select>
+  </div>
+  <div>
+    <label>Balance</label>
+    <input type="number" step="0.01" formControlName="balance" />
+    <span *ngIf="form.controls['balance'].touched && form.controls['balance'].invalid">
+      Balance must be 0 or greater.
+    </span>
+  </div>
+  <button type="submit" [disabled]="form.invalid || loading">{{ editMode ? 'Save' : 'Create' }}</button>
+  <button type="button" routerLink="/accounts">Cancel</button>
+  <p *ngIf="error">{{ error }}</p>
+  <p *ngIf="loading">Saving...</p>
+</form>

@@ -1,1 +1,37 @@
-import { Component, OnInit } from '@angular/core';\nimport { UserService } from '../../../core/services/user.service';\nimport { User } from '../../../core/models/user.model';\nimport { Router } from '@angular/router';\n\n@Component({\n  selector: 'app-user-list',\n  templateUrl: './user-list.component.html',\n  styleUrls: ['./user-list.component.scss']\n})\nexport class UserListComponent implements OnInit {\n  users: User[] = [];\n  loading = true;\n  error?: string;\n\n  constructor(private userService: UserService, private router: Router) {}\n\n  ngOnInit(): void {\n    this.loadUsers();\n  }\n\n  loadUsers(): void {\n    this.loading = true;\n    this.userService.getUsers().subscribe({\n      next: (users) => { this.users = users; this.loading = false; },\n      error: (err) => { this.loading = false; this.error = 'Failed to load users'; }\n    });\n  }\n\n  deleteUser(id: number) {\n    if (confirm('Delete this user?')) {\n      this.userService.deleteUser(id).subscribe({\n        next: () => this.loadUsers()\n      });\n    }\n  }\n}
+import { Component, OnInit } from '@angular/core';
+import { UserService } from '../../../core/services/user.service';
+import { User } from '../../../core/models/user.model';
+import { Router } from '@angular/router';
+
+@Component({
+  selector: 'app-user-list',
+  templateUrl: './user-list.component.html',
+  styleUrls: ['./user-list.component.scss']
+})
+export class UserListComponent implements OnInit {
+  users: User[] = [];
+  loading = true;
+  error?: string;
+
+  constructor(private userService: UserService, private router: Router) {}
+
+  ngOnInit(): void {
+    this.loadUsers();
+  }
+
+  loadUsers(): void {
+    this.loading = true;
+    this.userService.getUsers().subscribe({
+      next: (users) => { this.users = users; this.loading = false; },
+      error: (err) => { this.loading = false; this.error = 'Failed to load users'; }
+    });
+  }
+
+  deleteUser(id: number) {
+    if (confirm('Delete this user?')) {
+      this.userService.deleteUser(id).subscribe({
+        next: () => this.loadUsers()
+      });
+    }
+  }
+}

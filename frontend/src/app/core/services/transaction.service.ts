@@ -1,1 +1,15 @@
-import { Injectable } from '@angular/core';\nimport { HttpClient } from '@angular/common/http';\nimport { environment } from '../../../environments/environment';\nimport { Observable } from 'rxjs';\nimport { Transaction } from '../models/transaction.model';\n\n@Injectable({ providedIn: 'root' })\nexport class TransactionService {\n  private apiUrl = ;\n  constructor(private http: HttpClient) {}\n\n  getTransactions(): Observable<Transaction[]> { return this.http.get<Transaction[]>(this.apiUrl); }\n  getTransaction(id: number): Observable<Transaction> { return this.http.get<Transaction>(); }\n  addTransaction(transaction: Transaction): Observable<Transaction> { return this.http.post<Transaction>(this.apiUrl, transaction); }\n}
+import { Injectable } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+import { environment } from '../../../environments/environment';
+import { Observable } from 'rxjs';
+import { Transaction } from '../models/transaction.model';
+
+@Injectable({ providedIn: 'root' })
+export class TransactionService {
+  private apiUrl = `${environment.apiUrl}/transactions`;
+  constructor(private http: HttpClient) {}
+
+  getTransactions(): Observable<Transaction[]> { return this.http.get<Transaction[]>(this.apiUrl); }
+  getTransaction(id: number): Observable<Transaction> { return this.http.get<Transaction>(`${this.apiUrl}/${id}`); }
+  addTransaction(transaction: Transaction): Observable<Transaction> { return this.http.post<Transaction>(this.apiUrl, transaction); }
+}

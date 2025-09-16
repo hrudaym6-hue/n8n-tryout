@@ -1,1 +1,18 @@
-import { NgModule } from '@angular/core';\nimport { BrowserModule } from '@angular/platform-browser';\nimport { HttpClientModule } from '@angular/common/http';\nimport { ReactiveFormsModule } from '@angular/forms';\nimport { AppRoutingModule } from './app-routing.module';\nimport { AppComponent } from './app.component';\n\n@NgModule({\n  declarations: [AppComponent],\n  imports: [\n    BrowserModule,\n    HttpClientModule,\n    ReactiveFormsModule,\n    AppRoutingModule\n  ],\n  bootstrap: [AppComponent]\n})\nexport class AppModule { }
+import { NgModule } from '@angular/core';
+import { BrowserModule } from '@angular/platform-browser';
+import { HttpClientModule } from '@angular/common/http';
+import { ReactiveFormsModule } from '@angular/forms';
+import { AppRoutingModule } from './app-routing.module';
+import { AppComponent } from './app.component';
+
+@NgModule({
+  declarations: [AppComponent],
+  imports: [
+    BrowserModule,
+    HttpClientModule,
+    ReactiveFormsModule,
+    AppRoutingModule
+  ],
+  bootstrap: [AppComponent]
+})
+export class AppModule { }

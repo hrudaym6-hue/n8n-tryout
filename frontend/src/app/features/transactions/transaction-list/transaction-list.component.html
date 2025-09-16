@@ -1,0 +1,27 @@
+<h2>Transactions</h2>
+<button routerLink="/transactions/add">Add Transaction</button>
+<table *ngIf="transactions.length > 0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Account ID</th>
+      <th>Type</th>
+      <th>Amount</th>
+      <th>Approved</th>
+      <th>Account</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let transaction of transactions">
+      <td>{{ transaction.id }}</td>
+      <td>{{ transaction.accountId }}</td>
+      <td>{{ transaction.type }}</td>
+      <td>${{ transaction.amount | number:'1.2-2' }}</td>
+      <td>{{ transaction.approvedByManager ? 'Yes' : 'No' }}</td>
+      <td>{{ transaction.account?.accountNumber || 'N/A' }}</td>
+    </tr>
+  </tbody>
+</table>
+<p *ngIf="!transactions.length">No transactions found.</p>
+<p *ngIf="loading">Loading...</p>
+<p *ngIf="error">{{ error }}</p>

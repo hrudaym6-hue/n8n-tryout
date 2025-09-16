@@ -1,1 +1,11 @@
-import { Account } from './account.model';\nexport type TransactionType = 'deposit' | 'withdrawal';\n\nexport interface Transaction {\n  id?: number;\n  accountId: number;\n  type: TransactionType;\n  amount: number;\n  approvedByManager?: boolean;\n  account?: Account;\n}
+import { Account } from './account.model';
+export type TransactionType = 'deposit' | 'withdrawal';
+
+export interface Transaction {
+  id?: number;
+  accountId: number;
+  type: TransactionType;
+  amount: number;
+  approvedByManager?: boolean;
+  account?: Account;
+}

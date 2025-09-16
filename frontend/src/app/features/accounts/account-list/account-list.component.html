@@ -1,0 +1,33 @@
+<h2>Accounts</h2>
+<button routerLink="/accounts/add">Add Account</button>
+<table *ngIf="accounts.length > 0">
+  <thead>
+    <tr>
+      <th>ID</th>
+      <th>Account Number</th>
+      <th>Type</th>
+      <th>Status</th>
+      <th>Balance</th>
+      <th>User</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    <tr *ngFor="let account of accounts">
+      <td>{{ account.id }}</td>
+      <td>{{ account.accountNumber }}</td>
+      <td>{{ account.type }}</td>
+      <td>{{ account.status }}</td>
+      <td>${{ account.balance | number:'1.2-2' }}</td>
+      <td>{{ account.user?.name || 'N/A' }}</td>
+      <td>
+        <button [routerLink]="[account.id]">Details</button>
+        <button [routerLink]="[account.id, 'edit']">Edit</button>
+        <button (click)="deleteAccount(account.id!)">Delete</button>
+      </td>
+    </tr>
+  </tbody>
+</table>
+<p *ngIf="!accounts.length">No accounts found.</p>
+<p *ngIf="loading">Loading...</p>
+<p *ngIf="error">{{ error }}</p>
