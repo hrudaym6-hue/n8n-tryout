@@ -1,3 +1,30 @@
 {
-  "validationRules": []
+  "validationRules": [
+    {
+      "entity": "User",
+      "rules": {
+        "name": "string, min 2 chars, max 128 chars, required",
+        "email": "valid email format, required, unique"
+      }
+    },
+    {
+      "entity": "Account",
+      "rules": {
+        "userId": "number, required",
+        "accountNumber": "string, exactly 10 chars, required, unique",
+        "type": "enum ['savings', 'checking'], required",
+        "status": "enum ['active', 'inactive'], optional, default 'active'",
+        "balance": "decimal, min 0, optional, default 0.00"
+      }
+    },
+    {
+      "entity": "Transaction",
+      "rules": {
+        "accountId": "number, required",
+        "type": "enum ['deposit', 'withdrawal'], required",
+        "amount": "decimal, min 0.01, max 100000, required",
+        "approvedByManager": "boolean, optional, nullable"
+      }
+    }
+  ]
 }

@@ -17,3 +17,15 @@ exports.getTransaction = async (req, res) => {
   if (!tx) return res.status(404).json({ error: 'Not found' });
   res.json(tx);
 };
+exports.updateTransaction = async (req, res) => {
+  try {
+    await transactionService.updateTransaction(req.params.id, req.body);
+    res.json({ message: 'Updated' });
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+};
+exports.deleteTransaction = async (req, res) => {
+  await transactionService.deleteTransaction(req.params.id);
+  res.status(204).send();
+};

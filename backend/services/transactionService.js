@@ -30,4 +30,11 @@ async function getTransactionById(id) {
   return Transaction.findByPk(id, { include: [{ model: Account, as: 'account' }] });
 }
 
-module.exports = { createTransaction, getAllTransactions, getTransactionById };
+async function updateTransaction(id, data) {
+  return Transaction.update(data, { where: { id } });
+}
+async function deleteTransaction(id) {
+  return Transaction.destroy({ where: { id } });
+}
+
+module.exports = { createTransaction, getAllTransactions, getTransactionById, updateTransaction, deleteTransaction };

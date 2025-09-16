@@ -1,3 +1,32 @@
 {
-  "businessRules": []
+  "businessRules": [
+    {
+      "rule": "withdrawal_manager_approval",
+      "description": "Withdrawals over $10,000 require manager approval",
+      "implementation": "transactionService.createTransaction",
+      "condition": "amount > 10000 && type === 'withdrawal'",
+      "action": "require approvedByManager === true"
+    },
+    {
+      "rule": "prevent_negative_balance",
+      "description": "Withdrawals cannot result in negative account balance",
+      "implementation": "transactionService.createTransaction",
+      "condition": "type === 'withdrawal'",
+      "action": "check account.balance >= amount"
+    },
+    {
+      "rule": "inactive_account_restriction",
+      "description": "Inactive accounts cannot perform transactions",
+      "implementation": "transactionService.createTransaction",
+      "condition": "account.status === 'inactive'",
+      "action": "throw error 'Cannot create transactions for inactive accounts'"
+    },
+    {
+      "rule": "balance_update",
+      "description": "Account balance is automatically updated based on transaction type",
+      "implementation": "transactionService.createTransaction",
+      "condition": "transaction created successfully",
+      "action": "increment/decrement account balance by transaction amount"
+    }
+  ]
 }
