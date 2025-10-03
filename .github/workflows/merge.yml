@@ -17,5 +17,4 @@ on:
 
           with:
             token: ${{ secrets.ACC_TKN }}
-
             merge-method: squash
