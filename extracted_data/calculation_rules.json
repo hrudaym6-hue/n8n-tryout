@@ -1,0 +1,1082 @@
+[
+  {
+    "file": "app/cbl/COBIL00C.cbl",
+    "rules": [
+      {
+        "description": "Increment transaction ID by 1 to generate next unique transaction identifier",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Transaction ID is incremented to ensure uniqueness for new bill payment transaction",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 217
+        },
+        "variablesInvolved": ["WS-TRAN-ID-NUM"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "unique identifier generation"]
+      },
+      {
+        "description": "Calculate new account balance by subtracting transaction amount from current balance",
+        "type": "calculation",
+        "condition": "CONF-PAY-YES",
+        "outcome": "Account current balance is reduced by the bill payment amount",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 234
+        },
+        "variablesInvolved": ["ACCT-CURR-BAL", "TRAN-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account balance", "bill payment"]
+      },
+      {
+        "description": "Validate account has positive balance before allowing bill payment",
+        "type": "validation",
+        "condition": "ACCT-CURR-BAL <= 0",
+        "outcome": "Display error message 'You have nothing to pay...' if balance is zero or negative",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 198
+        },
+        "variablesInvolved": ["ACCT-CURR-BAL", "WS-ERR-FLG", "WS-MESSAGE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account balance", "payment validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN01C.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction ID is not zero before processing",
+        "type": "validation",
+        "condition": "TRAN-ID = 0 OR TRAN-ID = SPACES",
+        "outcome": "Display error message prompting user to enter a valid transaction ID",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 180
+        },
+        "variablesInvolved": ["TRAN-ID", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction validation", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN02C.cbl",
+    "rules": [
+      {
+        "description": "Validate card number exists in cross-reference file",
+        "type": "validation",
+        "condition": "INVALID KEY on XREF-FILE read",
+        "outcome": "Set validation failure reason to 100 with message 'INVALID CARD NUMBER FOUND'",
+        "location": {
+          "function": "1500-A-LOOKUP-XREF",
+          "line": 385
+        },
+        "variablesInvolved": ["DALYTRAN-CARD-NUM", "FD-XREF-CARD-NUM", "WS-VALIDATION-FAIL-REASON", "WS-VALIDATION-FAIL-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card validation", "transaction processing"]
+      },
+      {
+        "description": "Validate account record exists for the card",
+        "type": "validation",
+        "condition": "INVALID KEY on ACCOUNT-FILE read",
+        "outcome": "Set validation failure reason to 101 with message 'ACCOUNT RECORD NOT FOUND'",
+        "location": {
+          "function": "1500-B-LOOKUP-ACCT",
+          "line": 397
+        },
+        "variablesInvolved": ["XREF-ACCT-ID", "FD-ACCT-ID", "WS-VALIDATION-FAIL-REASON", "WS-VALIDATION-FAIL-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "transaction processing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN03C.cbl",
+    "rules": [
+      {
+        "description": "Validate account ID is numeric",
+        "type": "validation",
+        "condition": "ACCTIDIN is not numeric",
+        "outcome": "Display error message if account ID contains non-numeric characters",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 169
+        },
+        "variablesInvolved": ["ACCTIDIN", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["input validation", "account identification"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03A.CBL",
+    "rules": [
+      {
+        "description": "Accumulate transaction amounts to calculate total",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Running total of transaction amounts is accumulated",
+        "location": {
+          "function": "4000-TRNXFILE-GET",
+          "line": 429
+        },
+        "variablesInvolved": ["TRNX-AMT", "WS-TOTAL-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction totaling", "statement generation"]
+      },
+      {
+        "description": "Assign accumulated total to statement total amount field",
+        "type": "assignment",
+        "condition": "",
+        "outcome": "Total transaction amount is assigned to statement line for display",
+        "location": {
+          "function": "4000-TRNXFILE-GET",
+          "line": 434
+        },
+        "variablesInvolved": ["WS-TOTAL-AMT", "WS-TRN-AMT", "ST-TOTAL-TRAMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["statement generation", "transaction totaling"]
+      },
+      {
+        "description": "Assign account balance to statement display field",
+        "type": "assignment",
+        "condition": "",
+        "outcome": "Current account balance is assigned to statement for display",
+        "location": {
+          "function": "5000-CREATE-STATEMENT",
+          "line": 484
+        },
+        "variablesInvolved": ["ACCT-CURR-BAL", "ST-CURR-BAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["statement generation", "account balance"]
+      },
+      {
+        "description": "Assign FICO credit score to statement display field",
+        "type": "assignment",
+        "condition": "",
+        "outcome": "Customer FICO score is assigned to statement for display",
+        "location": {
+          "function": "5000-CREATE-STATEMENT",
+          "line": 485
+        },
+        "variablesInvolved": ["CUST-FICO-CREDIT-SCORE", "ST-FICO-SCORE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["statement generation", "credit score"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate SSN first part is not 0, 666, or 900-999",
+        "type": "validation",
+        "condition": "INVALID-SSN-PART1",
+        "outcome": "Reject SSN if first three digits are invalid values",
+        "location": {
+          "function": "2100-EDIT-ACCOUNT-INPUTS",
+          "line": 121
+        },
+        "variablesInvolved": ["WS-EDIT-US-SSN-PART1-N", "WS-EDIT-US-SSN-PART1-FLGS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["SSN validation", "customer identification"]
+      },
+      {
+        "description": "Validate account status is Y or N",
+        "type": "validation",
+        "condition": "FLG-ACCT-STATUS-ISVALID",
+        "outcome": "Account status must be either 'Y' (active) or 'N' (inactive)",
+        "location": {
+          "function": "2100-EDIT-ACCOUNT-INPUTS",
+          "line": 193
+        },
+        "variablesInvolved": ["WS-EDIT-ACCT-STATUS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account status", "account validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate expiration month is between 1 and 12",
+        "type": "validation",
+        "condition": "VALUES 1 THRU 12",
+        "outcome": "Credit card expiration month must be valid calendar month",
+        "location": {
+          "function": "2100-EDIT-INPUTS",
+          "line": 95
+        },
+        "variablesInvolved": ["WS-EDIT-CARD-MONTH-NUM"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit card validation", "expiration date"]
+      },
+      {
+        "description": "Validate expiration year is 2020 or later",
+        "type": "validation",
+        "condition": "VALUES 2020 THRU 2099",
+        "outcome": "Credit card expiration year must be current or future year",
+        "location": {
+          "function": "2100-EDIT-INPUTS",
+          "line": 100
+        },
+        "variablesInvolved": ["WS-EDIT-CARD-YEAR-NUM"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit card validation", "expiration date"]
+      },
+      {
+        "description": "Validate card status is Y or N",
+        "type": "validation",
+        "condition": "VALUES 'Y', 'N'",
+        "outcome": "Card status must be either 'Y' (active) or 'N' (inactive)",
+        "location": {
+          "function": "2100-EDIT-INPUTS",
+          "line": 108
+        },
+        "variablesInvolved": ["WS-EDIT-CARD-STATUS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card status", "card validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "rules": [
+      {
+        "description": "Validate user type is A (admin) or U (user)",
+        "type": "validation",
+        "condition": "VALUES 'A', 'U'",
+        "outcome": "User type must be either admin or regular user",
+        "location": {
+          "function": "2100-EDIT-INPUTS",
+          "line": 95
+        },
+        "variablesInvolved": ["WS-EDIT-USER-TYPE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user type validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+    "rules": [
+      {
+        "description": "Count number of authorizations for display summary",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Accumulate count of authorization records for summary reporting",
+        "location": {
+          "function": "2000-PROCESS-AUTH-SUM",
+          "line": 195
+        },
+        "variablesInvolved": ["WS-AUTH-COUNT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization summary", "record counting"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+    "rules": [
+      {
+        "description": "Map decline reason code 1 to insufficient funds message",
+        "type": "assignment",
+        "condition": "WS-DECLINE-REASON = '1'",
+        "outcome": "Assign 'Insufficient Funds' as decline reason description",
+        "location": {
+          "function": "3000-FORMAT-OUTPUT",
+          "line": 58
+        },
+        "variablesInvolved": ["WS-DECLINE-REASON", "WS-DECLINE-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons"]
+      },
+      {
+        "description": "Map decline reason code 2 to card not active message",
+        "type": "assignment",
+        "condition": "WS-DECLINE-REASON = '2'",
+        "outcome": "Assign 'Card Not Active' as decline reason description",
+        "location": {
+          "function": "3000-FORMAT-OUTPUT",
+          "line": 60
+        },
+        "variablesInvolved": ["WS-DECLINE-REASON", "WS-DECLINE-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons"]
+      },
+      {
+        "description": "Map decline reason code 3 to account closed message",
+        "type": "assignment",
+        "condition": "WS-DECLINE-REASON = '3'",
+        "outcome": "Assign 'Account Closed' as decline reason description",
+        "location": {
+          "function": "3000-FORMAT-OUTPUT",
+          "line": 62
+        },
+        "variablesInvolved": ["WS-DECLINE-REASON", "WS-DECLINE-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons"]
+      },
+      {
+        "description": "Map decline reason code 4 to card fraud message",
+        "type": "assignment",
+        "condition": "WS-DECLINE-REASON = '4'",
+        "outcome": "Assign 'Card Fraud' as decline reason description",
+        "location": {
+          "function": "3000-FORMAT-OUTPUT",
+          "line": 64
+        },
+        "variablesInvolved": ["WS-DECLINE-REASON", "WS-DECLINE-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons", "fraud detection"]
+      },
+      {
+        "description": "Map decline reason code 5 to merchant fraud message",
+        "type": "assignment",
+        "condition": "WS-DECLINE-REASON = '5'",
+        "outcome": "Assign 'Merchant Fraud' as decline reason description",
+        "location": {
+          "function": "3000-FORMAT-OUTPUT",
+          "line": 66
+        },
+        "variablesInvolved": ["WS-DECLINE-REASON", "WS-DECLINE-REASON-DESC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons", "fraud detection"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+    "rules": [
+      {
+        "description": "Mark transaction as fraud by setting fraud flag",
+        "type": "assignment",
+        "condition": "User selects fraud marking action",
+        "outcome": "Authorization detail record is marked with fraud flag",
+        "location": {
+          "function": "4000-MARK-FRAUD",
+          "line": 285
+        },
+        "variablesInvolved": ["PAUDTL-FRAUD-FLAG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["fraud detection", "authorization"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "rules": [
+      {
+        "description": "Approve authorization if available amount is sufficient",
+        "type": "validation",
+        "condition": "WS-AVAILABLE-AMT >= WS-TRANSACTION-AMT",
+        "outcome": "Authorization is approved when account has sufficient funds",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 650
+        },
+        "variablesInvolved": ["WS-AVAILABLE-AMT", "WS-TRANSACTION-AMT", "WS-DECLINE-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "fund availability"]
+      },
+      {
+        "description": "Decline authorization for insufficient funds",
+        "type": "assignment",
+        "condition": "WS-AVAILABLE-AMT < WS-TRANSACTION-AMT",
+        "outcome": "Set decline flag and insufficient fund reason",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 655
+        },
+        "variablesInvolved": ["WS-DECLINE-FLG", "WS-DECLINE-REASON-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons", "insufficient funds"]
+      },
+      {
+        "description": "Decline authorization for inactive card",
+        "type": "assignment",
+        "condition": "CARD-ACTIVE-STATUS <> 'Y'",
+        "outcome": "Set decline flag and card not active reason",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 660
+        },
+        "variablesInvolved": ["CARD-ACTIVE-STATUS", "WS-DECLINE-FLG", "WS-DECLINE-REASON-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons", "card status"]
+      },
+      {
+        "description": "Decline authorization for closed account",
+        "type": "assignment",
+        "condition": "ACCT-ACTIVE-STATUS <> 'Y'",
+        "outcome": "Set decline flag and account closed reason",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 665
+        },
+        "variablesInvolved": ["ACCT-ACTIVE-STATUS", "WS-DECLINE-FLG", "WS-DECLINE-REASON-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "decline reasons", "account status"]
+      },
+      {
+        "description": "Calculate available amount from account balance and credit limit",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Determine available funds by subtracting balance from credit limit",
+        "location": {
+          "function": "5600-READ-PROFILE-DATA",
+          "line": 620
+        },
+        "variablesInvolved": ["ACCT-CREDIT-LIMIT", "ACCT-CURR-BAL", "WS-AVAILABLE-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "credit limit", "available balance"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+    "rules": [
+      {
+        "description": "Calculate day difference between current date and authorization date",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Compute number of days since authorization to determine if expired",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 185
+        },
+        "variablesInvolved": ["CURRENT-YYDDD", "WS-AUTH-DATE", "WS-DAY-DIFF"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization expiry", "date calculation"]
+      },
+      {
+        "description": "Mark authorization as qualified for deletion if expired",
+        "type": "validation",
+        "condition": "WS-DAY-DIFF > WS-EXPIRY-DAYS",
+        "outcome": "Set qualified for delete flag when authorization has exceeded expiry period",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 190
+        },
+        "variablesInvolved": ["WS-DAY-DIFF", "WS-EXPIRY-DAYS", "WS-QUALIFY-DELETE-FLAG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization expiry", "data retention"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction type code is 2 characters",
+        "type": "validation",
+        "condition": "Length of transaction type code",
+        "outcome": "Transaction type code must be exactly 2 characters",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 180
+        },
+        "variablesInvolved": ["TRAN-TYPE-CD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CSUTLDTC.cbl",
+    "rules": [
+      {
+        "description": "Validate date value using CEEDAYS API",
+        "type": "validation",
+        "condition": "CEEDAYS feedback code analysis",
+        "outcome": "Return validation result indicating if date is valid or specific error",
+        "location": {
+          "function": "A000-MAIN",
+          "line": 128
+        },
+        "variablesInvolved": ["WS-DATE-TO-TEST", "WS-DATE-FORMAT", "FEEDBACK-CODE", "WS-RESULT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "data quality"]
+      },
+      {
+        "description": "Detect insufficient date data",
+        "type": "validation",
+        "condition": "FC-INSUFFICIENT-DATA",
+        "outcome": "Return 'Insufficient' message when date data is incomplete",
+        "location": {
+          "function": "A000-MAIN",
+          "line": 131
+        },
+        "variablesInvolved": ["FEEDBACK-TOKEN-VALUE", "WS-RESULT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "input validation"]
+      },
+      {
+        "description": "Detect invalid month in date",
+        "type": "validation",
+        "condition": "FC-INVALID-MONTH",
+        "outcome": "Return 'Invalid month' message when month is not 1-12",
+        "location": {
+          "function": "A000-MAIN",
+          "line": 139
+        },
+        "variablesInvolved": ["FEEDBACK-TOKEN-VALUE", "WS-RESULT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "month validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT04C.cbl",
+    "rules": [
+      {
+        "description": "Calculate interest on account balances",
+        "type": "calculation",
+        "condition": "",
+        "outcome": "Compute interest charges based on balance and transaction categories",
+        "location": {
+          "function": "2000-PROCESS-ACCOUNT",
+          "line": 350
+        },
+        "variablesInvolved": ["ACCT-CURR-BAL", "TRANCAT-BAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["interest calculation", "account balance"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "rules": [
+      {
+        "description": "Validate account ID is numeric",
+        "type": "validation",
+        "condition": "ACCTIDIN is not numeric",
+        "outcome": "Display error if account ID contains non-numeric characters",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 145
+        },
+        "variablesInvolved": ["ACCTIDIN", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["input validation", "account identification"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction ID is provided",
+        "type": "validation",
+        "condition": "TRAN-ID is zero or spaces",
+        "outcome": "Display error prompting user to enter transaction ID",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 165
+        },
+        "variablesInvolved": ["TRAN-ID", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction validation", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN02C.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction amount is positive",
+        "type": "validation",
+        "condition": "TRAN-AMT <= 0",
+        "outcome": "Display error if transaction amount is zero or negative",
+        "location": {
+          "function": "EDIT-TRANSACTION",
+          "line": 245
+        },
+        "variablesInvolved": ["TRAN-AMT", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction validation", "amount validation"]
+      },
+      {
+        "description": "Validate transaction date format",
+        "type": "validation",
+        "condition": "Date format validation",
+        "outcome": "Ensure transaction date is valid YYYY-MM-DD format",
+        "location": {
+          "function": "EDIT-TRANSACTION",
+          "line": 260
+        },
+        "variablesInvolved": ["TRAN-ORIG-TS", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction validation", "date validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "rules": [
+      {
+        "description": "Validate account number is numeric",
+        "type": "validation",
+        "condition": "ACCTID is not numeric",
+        "outcome": "Display error if account number contains non-numeric characters",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 155
+        },
+        "variablesInvolved": ["ACCTID", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "input validation"]
+      },
+      {
+        "description": "Validate account number is not zero",
+        "type": "validation",
+        "condition": "ACCTID = 0",
+        "outcome": "Display error if account number is zero",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 160
+        },
+        "variablesInvolved": ["ACCTID", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "rules": [
+      {
+        "description": "Validate card number is 16 digits",
+        "type": "validation",
+        "condition": "Length of card number",
+        "outcome": "Card number must be exactly 16 characters",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 145
+        },
+        "variablesInvolved": ["CARDNUM", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card validation", "input validation"]
+      },
+      {
+        "description": "Validate account number is 11 digits",
+        "type": "validation",
+        "condition": "Length of account number",
+        "outcome": "Account number must be exactly 11 digits",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 150
+        },
+        "variablesInvolved": ["ACCTID", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "rules": [
+      {
+        "description": "Validate selection action is S or U",
+        "type": "validation",
+        "condition": "VALUES 'S', 'U'",
+        "outcome": "Selection action must be either 'S' (select) or 'U' (update)",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 175
+        },
+        "variablesInvolved": ["SELOPT", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["selection validation", "user action"]
+      },
+      {
+        "description": "Validate only one card is selected",
+        "type": "validation",
+        "condition": "Count of selected cards",
+        "outcome": "User can select only one card at a time for action",
+        "location": {
+          "function": "EDIT-SELECTIONS",
+          "line": 195
+        },
+        "variablesInvolved": ["WS-SEL-COUNT", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["selection validation", "user interface"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CORPT00C.cbl",
+    "rules": [
+      {
+        "description": "Validate report date format",
+        "type": "validation",
+        "condition": "Date format validation",
+        "outcome": "Ensure report date is in valid format before submission",
+        "location": {
+          "function": "VALIDATE-DATE",
+          "line": 185
+        },
+        "variablesInvolved": ["RPT-DATE", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "report generation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "rules": [
+      {
+        "description": "Process account records sequentially from file",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Read and process each account record until end of file",
+        "location": {
+          "function": "PROCESS-ACCOUNTS",
+          "line": 120
+        },
+        "variablesInvolved": ["ACCOUNT-RECORD", "END-OF-FILE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "account management"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT02C.cbl",
+    "rules": [
+      {
+        "description": "Process customer records from sequential file",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Read and process customer records for batch operations",
+        "location": {
+          "function": "PROCESS-CUSTOMERS",
+          "line": 135
+        },
+        "variablesInvolved": ["CUSTOMER-RECORD", "END-OF-FILE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "customer management"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT03C.cbl",
+    "rules": [
+      {
+        "description": "Process card records from sequential file",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Read and process card records for batch operations",
+        "location": {
+          "function": "PROCESS-CARDS",
+          "line": 140
+        },
+        "variablesInvolved": ["CARD-RECORD", "END-OF-FILE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "card management"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBCUS01C.cbl",
+    "rules": [
+      {
+        "description": "Read customer records sequentially",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Process customer data from sequential file",
+        "location": {
+          "function": "READ-CUSTOMERS",
+          "line": 110
+        },
+        "variablesInvolved": ["CUSTOMER-RECORD", "END-OF-FILE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "customer data"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03B.CBL",
+    "rules": [
+      {
+        "description": "Route file operations based on operation type",
+        "type": "transformation",
+        "condition": "EVALUATE LK-M03B-OPER",
+        "outcome": "Perform OPEN, READ, CLOSE, or WRITE based on operation code",
+        "location": {
+          "function": "1000-TRNXFILE-PROC",
+          "line": 135
+        },
+        "variablesInvolved": ["LK-M03B-OPER", "LK-M03B-DD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "transaction processing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "rules": [
+      {
+        "description": "Validate user credentials for sign-on",
+        "type": "validation",
+        "condition": "User ID and password provided",
+        "outcome": "Authenticate user before granting system access",
+        "location": {
+          "function": "VALIDATE-SIGNON",
+          "line": 155
+        },
+        "variablesInvolved": ["USER-ID", "USER-PWD", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authentication", "user security"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "rules": [
+      {
+        "description": "Display main menu options",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Present available menu options to authenticated user",
+        "location": {
+          "function": "DISPLAY-MENU",
+          "line": 125
+        },
+        "variablesInvolved": ["MENU-OPTIONS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "menu navigation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "rules": [
+      {
+        "description": "Verify admin privileges for restricted functions",
+        "type": "validation",
+        "condition": "USER-TYPE = 'A'",
+        "outcome": "Allow admin functions only for users with admin type",
+        "location": {
+          "function": "CHECK-ADMIN",
+          "line": 145
+        },
+        "variablesInvolved": ["USER-TYPE", "WS-ERR-FLG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "admin privileges"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "rules": [
+      {
+        "description": "List users based on filter criteria",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Retrieve and display users matching search criteria",
+        "location": {
+          "function": "LIST-USERS",
+          "line": 165
+        },
+        "variablesInvolved": ["USER-FILTER", "USER-LIST"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "search filtering"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "rules": [
+      {
+        "description": "Delete user record after confirmation",
+        "type": "transformation",
+        "condition": "CONFIRM-DELETE = 'Y'",
+        "outcome": "Remove user record from system",
+        "location": {
+          "function": "DELETE-USER",
+          "line": 195
+        },
+        "variablesInvolved": ["USER-ID", "CONFIRM-DELETE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "data deletion"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "rules": [
+      {
+        "description": "View user details for selected user",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Display complete user information",
+        "location": {
+          "function": "VIEW-USER",
+          "line": 175
+        },
+        "variablesInvolved": ["USER-ID", "USER-RECORD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "data viewing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBSWAIT.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+    "rules": [
+      {
+        "description": "Load authorization data from sequential file to IMS database",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Insert authorization summary and detail records into IMS",
+        "location": {
+          "function": "2000-LOAD-AUTH-DATA",
+          "line": 225
+        },
+        "variablesInvolved": ["PENDING-AUTH-SUMMARY", "PENDING-AUTH-DETAILS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["data loading", "authorization data"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+    "rules": [
+      {
+        "description": "Unload authorization data from IMS database to sequential file",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Extract authorization records from IMS for processing",
+        "location": {
+          "function": "2000-UNLOAD-AUTH-DATA",
+          "line": 235
+        },
+        "variablesInvolved": ["PENDING-AUTH-SUMMARY", "PENDING-AUTH-DETAILS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["data extraction", "authorization data"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+    "rules": [
+      {
+        "description": "Unload IMS database segments to output files",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Extract root and child segments for data processing",
+        "location": {
+          "function": "2000-UNLOAD-SEGMENTS",
+          "line": 245
+        },
+        "variablesInvolved": ["ROOT-SEG-KEY", "CHILD-SEG-REC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["database operations", "data extraction"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/COACCT01.cbl",
+    "rules": [
+      {
+        "description": "Process account inquiry requests from MQ",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Retrieve account data and send response via MQ",
+        "location": {
+          "function": "3000-PROCESS-ACCOUNT-INQ",
+          "line": 285
+        },
+        "variablesInvolved": ["WS-ACCT-ID", "WS-ACCT-RESPONSE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["message queue processing", "account inquiry"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/CODATE01.cbl",
+    "rules": [
+      {
+        "description": "Process date validation requests from MQ",
+        "type": "transformation",
+        "condition": "",
+        "outcome": "Validate date format and send response via MQ",
+        "location": {
+          "function": "3000-PROCESS-DATE-VAL",
+          "line": 295
+        },
+        "variablesInvolved": ["WS-DATE-INPUT", "WS-DATE-RESPONSE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["message queue processing", "date validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction type filter is alphanumeric",
+        "type": "validation",
+        "condition": "Filter contains invalid characters",
+        "outcome": "Transaction type filter must contain only letters and numbers",
+        "location": {
+          "function": "EDIT-FILTERS",
+          "line": 385
+        },
+        "variablesInvolved": ["WS-TYPEFILTER", "WS-EDIT-TTYP-FLAG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "input validation"]
+      },
+      {
+        "description": "Validate description filter is alphanumeric",
+        "type": "validation",
+        "condition": "Filter contains invalid characters",
+        "outcome": "Description filter must contain only letters and numbers",
+        "location": {
+          "function": "EDIT-FILTERS",
+          "line": 395
+        },
+        "variablesInvolved": ["WS-DESCFILTER", "WS-EDIT-DESC-FLAG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "input validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction type code is alphanumeric",
+        "type": "validation",
+        "condition": "Type code contains invalid characters",
+        "outcome": "Transaction type code must contain only letters and numbers",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 425
+        },
+        "variablesInvolved": ["TTUP-UPDATE-TTYP-TYPE", "WS-EDIT-TTYP-FLAG"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "input validation"]
+      },
+      {
+        "description": "Validate transaction type description is not blank",
+        "type": "validation",
+        "condition": "Description is spaces or empty",
+        "outcome": "Transaction type description must be provided",
+        "location": {
+          "function": "EDIT-INPUTS",
+          "line": 435
+        },
+        "variablesInvolved": ["TTUP-UPDATE-TTYP-TYPE-DESC", "WS-EDIT-DESC-FLAGS"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "input validation"]
+      }
+    ]
+  }
+]
