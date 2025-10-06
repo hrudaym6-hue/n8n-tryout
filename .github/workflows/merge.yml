@@ -1,24 +1,33 @@
-name: Auto Merge Pull Request on Push
+name: Auto Merge PR on Push
 
 on:
   push:
+
+permissions:
+  contents: write
+  pull-requests: write
 
 jobs:
   automerge:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Find related pull request
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Find related PR
         id: find_pr
         uses: juliangruber/find-pull-request-action@v1
         with:
           github_token: ${{ secrets.ACC_TKN }}
 
-      - name: Merge the pull request
+      - name: Merge the PR using GitHub CLI
         if: steps.find_pr.outputs.number != ''
-        uses: peter-evans/merge-pull-request@v2
-        with:
-          token: ${{ secrets.ACC_TKN }}
-          pull-request: ${{ steps.find_pr.outputs.number }}
-          merge-method: squash
+        env:
+          GH_TOKEN: ${{ secrets.ACC_TKN }}
+        run: |
+          echo "Merging PR #${{ steps.find_pr.outputs.number }}"
+          gh pr merge ${{ steps.find_pr.outputs.number }} --squash --repo ${{ github.repository }} --delete-branch --auto
           
