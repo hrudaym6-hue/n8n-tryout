@@ -1,0 +1,108 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Transaction History</h1>
+    <a routerLink="/dashboard" class="back-btn">← Back to Dashboard</a>
+  </div>
+
+  <div class="search-section">
+    <div class="search-row">
+      <div class="search-box">
+        <label for="accountId">Account ID:</label>
+        <input
+          type="text"
+          id="accountId"
+          [(ngModel)]="searchAccountId"
+          placeholder="Enter account number"
+          maxlength="11"
+        />
+      </div>
+      <div class="search-box">
+        <label for="cardNumber">Card Number:</label>
+        <input
+          type="text"
+          id="cardNumber"
+          [(ngModel)]="searchCardNumber"
+          placeholder="Enter card number"
+          maxlength="16"
+        />
+      </div>
+    </div>
+    <div class="search-row">
+      <div class="search-box">
+        <label for="startDate">Start Date:</label>
+        <input
+          type="date"
+          id="startDate"
+          [(ngModel)]="startDate"
+        />
+      </div>
+      <div class="search-box">
+        <label for="endDate">End Date:</label>
+        <input
+          type="date"
+          id="endDate"
+          [(ngModel)]="endDate"
+        />
+      </div>
+    </div>
+    <div class="search-buttons">
+      <button class="search-btn" (click)="onSearch()" [disabled]="isLoading()">Search</button>
+      <button class="clear-btn" (click)="onClearSearch()" [disabled]="isLoading()">Clear</button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading transactions...</div>
+  } @else {
+    @if (transactions().length === 0) {
+      <div class="no-results">
+        <p>No transactions found.</p>
+      </div>
+    } @else {
+      <div class="results-info">
+        <p>Showing {{ transactions().length }} of {{ totalRecords() }} transactions</p>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Card Number</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Merchant</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (txn of transactions(); track txn.transaction_id) {
+              <tr>
+                <td>{{ txn.transaction_id }}</td>
+                <td>{{ formatDate(txn.process_date) }}</td>
+                <td>{{ maskCardNumber(txn.card_number) }}</td>
+                <td>{{ txn.type_description || txn.transaction_type_code }}</td>
+                <td>{{ txn.transaction_description }}</td>
+                <td>{{ txn.merchant_name }}</td>
+                <td [class.amount-debit]="txn.transaction_amount < 0" [class.amount-credit]="txn.transaction_amount > 0">
+                  {{ formatCurrency(txn.transaction_amount) }}
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage() === 1">Previous</button>
+        <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage() === totalPages()">Next</button>
+      </div>
+    }
+  }
+</div>

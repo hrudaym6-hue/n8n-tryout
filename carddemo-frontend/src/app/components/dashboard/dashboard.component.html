@@ -1,0 +1,35 @@
+<div class="dashboard-container">
+  <header class="dashboard-header">
+    <div class="header-content">
+      <h1>CardDemo Authorization System</h1>
+      <div class="user-info">
+        <span class="user-name">
+          {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}
+          @if (isAdmin()) {
+            <span class="badge admin-badge">Admin</span>
+          } @else {
+            <span class="badge user-badge">User</span>
+          }
+        </span>
+        <button class="logout-btn" (click)="logout()">Logout</button>
+      </div>
+    </div>
+  </header>
+
+  <main class="dashboard-main">
+    <h2>Main Menu</h2>
+    <p class="welcome-text">Welcome! Please select an option from the menu below:</p>
+
+    <div class="menu-grid">
+      @for (item of availableMenuItems(); track item.route) {
+        <a [routerLink]="item.route" class="menu-card">
+          <div class="menu-icon">{{ item.icon }}</div>
+          <h3>{{ item.title }}</h3>
+          @if (item.adminOnly) {
+            <span class="admin-only-badge">Admin Only</span>
+          }
+        </a>
+      }
+    </div>
+  </main>
+</div>

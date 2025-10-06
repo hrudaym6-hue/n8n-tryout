@@ -1,0 +1,79 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Account Details</h1>
+    <a routerLink="/accounts" class="back-btn">← Back to Accounts</a>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading account details...</div>
+  } @else if (account()) {
+    <div class="detail-card">
+      <h2>Account Information</h2>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Account ID:</label>
+          <span>{{ account()!.account_id }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Customer ID:</label>
+          <span>{{ account()!.customer_id }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Customer Name:</label>
+          <span>{{ account()!.first_name }} {{ account()!.last_name }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Email:</label>
+          <span>{{ account()!.email || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Phone:</label>
+          <span>{{ account()!.phone_number || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Status:</label>
+          <span [class]="account()!.account_status === 'Y' ? 'status-active' : 'status-inactive'">
+            {{ account()!.account_status === 'Y' ? 'Active' : 'Inactive' }}
+          </span>
+        </div>
+        <div class="detail-item">
+          <label>Open Date:</label>
+          <span>{{ formatDate(account()!.account_open_date) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Expiry Date:</label>
+          <span>{{ formatDate(account()!.account_expiry_date) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Credit Limit:</label>
+          <span class="highlight">{{ formatCurrency(account()!.credit_limit) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Current Balance:</label>
+          <span class="highlight">{{ formatCurrency(account()!.current_balance) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Available Credit:</label>
+          <span class="highlight">{{ formatCurrency(account()!.credit_limit - account()!.current_balance) }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Cash Credit Limit:</label>
+          <span>{{ formatCurrency(account()!.cash_credit_limit) }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <a [routerLink]="['/cards']" [queryParams]="{accountId: account()!.account_id}" class="btn btn-primary">
+          View Cards
+        </a>
+        <a [routerLink]="['/transactions']" [queryParams]="{accountId: account()!.account_id}" class="btn btn-primary">
+          View Transactions
+        </a>
+      </div>
+    </div>
+  }
+</div>
