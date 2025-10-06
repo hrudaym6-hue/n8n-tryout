@@ -1,45 +1,672 @@
-{
-  "file": "src/mainframe/PROCESS_ORDERS.CBL",
-  "rules": [
-    {
-      "description": "An order is considered valid if the order amount is greater than zero.",
-      "type": "validation",
-      "condition": "ORDER-AMOUNT > 0",
-      "outcome": "Order proceeds to processing.",
-      "location": { "function": "VALIDATE-ORDER", "line": 114 },
-      "variablesInvolved": ["ORDER-AMOUNT"],
-      "isConfigurable": false,
-      "relatedDomainConcepts": ["Order Validation", "Order Processing"]
-    },
-    {
-      "description": "Orders flagged as priority ship must be assigned expedited shipping.",
-      "type": "assignment",
-      "condition": "PRIORITY-SHIP = Y",
-      "outcome": "Expedited shipping assigned.",
-      "location": { "function": "PROCESS-SHIPPING", "line": 209 },
-      "variablesInvolved": ["PRIORITY-SHIP", "SHIPPING-METHOD"],
-      "isConfigurable": false,
-      "relatedDomainConcepts": ["Shipping", "Order Priority"]
-    },
-    {
-      "description": "If the customer is a loyalty member, apply a 5% discount to the order total.",
-      "type": "calculation",
-      "condition": "LOYALTY-MEMBER = Y",
-      "outcome": "Order total reduced by 5%.",
-      "location": { "function": "APPLY-DISCOUNTS", "line": 292 },
-      "variablesInvolved": ["LOYALTY-MEMBER", "ORDER-TOTAL", "DISCOUNT-AMOUNT"],
-      "isConfigurable": true,
-      "relatedDomainConcepts": ["Loyalty Program", "Discount"]
-    },
-    {
-      "description": "Backordered items should not be included in the shipping calculation.",
-      "type": "exclusion",
-      "condition": "ITEM-STATUS = BACKORDERED",
-      "outcome": "Item excluded from shipping calculation.",
-      "location": { "function": "CALCULATE-SHIPPING", "line": 342 },
-      "variablesInvolved": ["ITEM-STATUS", "ITEM-ID", "SHIPPING-COST"],
-      "isConfigurable": false,
-      "relatedDomainConcepts": ["Inventory", "Shipping"]
-    }
-  ]
-}
+[
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "rules": [
+      {
+        "description": "Calculate available credit by subtracting credit balance from credit limit for authorization decisions",
+        "type": "calculation",
+        "condition": "FOUND-PAUT-SMRY-SEG",
+        "outcome": "WS-AVAILABLE-AMT = PA-CREDIT-LIMIT - PA-CREDIT-BALANCE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 666},
+        "variablesInvolved": ["PA-CREDIT-LIMIT", "PA-CREDIT-BALANCE", "WS-AVAILABLE-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Credit Limit", "Available Credit", "Authorization Decision"]
+      },
+      {
+        "description": "Decline authorization if transaction amount exceeds available credit from pending auth summary",
+        "type": "validation",
+        "condition": "WS-TRANSACTION-AMT > WS-AVAILABLE-AMT",
+        "outcome": "SET DECLINE-AUTH TO TRUE, SET INSUFFICIENT-FUND TO TRUE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 668},
+        "variablesInvolved": ["WS-TRANSACTION-AMT", "WS-AVAILABLE-AMT", "DECLINE-AUTH", "INSUFFICIENT-FUND"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Decision", "Insufficient Funds", "Credit Limit"]
+      },
+      {
+        "description": "Calculate available credit from account master when no pending auth summary exists",
+        "type": "calculation",
+        "condition": "FOUND-ACCT-IN-MSTR",
+        "outcome": "WS-AVAILABLE-AMT = ACCT-CREDIT-LIMIT - ACCT-CURR-BAL",
+        "location": {"function": "6000-MAKE-DECISION", "line": 674},
+        "variablesInvolved": ["ACCT-CREDIT-LIMIT", "ACCT-CURR-BAL", "WS-AVAILABLE-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Credit Limit", "Available Credit", "Account Balance"]
+      },
+      {
+        "description": "Decline authorization if transaction exceeds available credit from account master",
+        "type": "validation",
+        "condition": "WS-TRANSACTION-AMT > WS-AVAILABLE-AMT",
+        "outcome": "SET DECLINE-AUTH TO TRUE, SET INSUFFICIENT-FUND TO TRUE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 676},
+        "variablesInvolved": ["WS-TRANSACTION-AMT", "WS-AVAILABLE-AMT", "DECLINE-AUTH", "INSUFFICIENT-FUND"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Decision", "Insufficient Funds", "Account Validation"]
+      },
+      {
+        "description": "Decline authorization if account not found in master",
+        "type": "validation",
+        "condition": "NOT FOUND-ACCT-IN-MSTR",
+        "outcome": "SET DECLINE-AUTH TO TRUE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 681},
+        "variablesInvolved": ["FOUND-ACCT-IN-MSTR", "DECLINE-AUTH"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Decision", "Account Validation"]
+      },
+      {
+        "description": "Set authorization response code to declined with code 05",
+        "type": "assignment",
+        "condition": "DECLINE-AUTH",
+        "outcome": "MOVE '05' TO PA-RL-AUTH-RESP-CODE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 688},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-CODE", "AUTH-RESP-DECLINED"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Response", "Decline Code"]
+      },
+      {
+        "description": "Set approved amount to zero for declined authorizations",
+        "type": "assignment",
+        "condition": "DECLINE-AUTH",
+        "outcome": "MOVE 0 TO PA-RL-APPROVED-AMT and WS-APPROVED-AMT",
+        "location": {"function": "6000-MAKE-DECISION", "line": 689},
+        "variablesInvolved": ["PA-RL-APPROVED-AMT", "WS-APPROVED-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Decision", "Approved Amount"]
+      },
+      {
+        "description": "Set authorization response code to approved with code 00",
+        "type": "assignment",
+        "condition": "NOT DECLINE-AUTH",
+        "outcome": "MOVE '00' TO PA-RL-AUTH-RESP-CODE",
+        "location": {"function": "6000-MAKE-DECISION", "line": 693},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-CODE", "AUTH-RESP-APPROVED"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Response", "Approval Code"]
+      },
+      {
+        "description": "Set approved amount to transaction amount for approved authorizations",
+        "type": "assignment",
+        "condition": "NOT DECLINE-AUTH",
+        "outcome": "MOVE PA-RQ-TRANSACTION-AMT TO PA-RL-APPROVED-AMT",
+        "location": {"function": "6000-MAKE-DECISION", "line": 694},
+        "variablesInvolved": ["PA-RQ-TRANSACTION-AMT", "PA-RL-APPROVED-AMT", "WS-APPROVED-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Decision", "Approved Amount"]
+      },
+      {
+        "description": "Set decline reason code 3100 for card not found in xref",
+        "type": "assignment",
+        "condition": "CARD-NFOUND-XREF",
+        "outcome": "MOVE '3100' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 704},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "CARD-NFOUND-XREF"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Card Validation"]
+      },
+      {
+        "description": "Set decline reason code 3100 for account not found in master",
+        "type": "assignment",
+        "condition": "NFOUND-ACCT-IN-MSTR",
+        "outcome": "MOVE '3100' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 704},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "NFOUND-ACCT-IN-MSTR"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Account Validation"]
+      },
+      {
+        "description": "Set decline reason code 3100 for customer not found in master",
+        "type": "assignment",
+        "condition": "NFOUND-CUST-IN-MSTR",
+        "outcome": "MOVE '3100' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 704},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "NFOUND-CUST-IN-MSTR"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Customer Validation"]
+      },
+      {
+        "description": "Set decline reason code 4100 for insufficient funds",
+        "type": "assignment",
+        "condition": "INSUFFICIENT-FUND",
+        "outcome": "MOVE '4100' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 706},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "INSUFFICIENT-FUND"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Insufficient Funds"]
+      },
+      {
+        "description": "Set decline reason code 4200 for inactive card",
+        "type": "assignment",
+        "condition": "CARD-NOT-ACTIVE",
+        "outcome": "MOVE '4200' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 708},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "CARD-NOT-ACTIVE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Card Status"]
+      },
+      {
+        "description": "Set decline reason code 4300 for closed account",
+        "type": "assignment",
+        "condition": "ACCOUNT-CLOSED",
+        "outcome": "MOVE '4300' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 710},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "ACCOUNT-CLOSED"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Account Status"]
+      },
+      {
+        "description": "Set decline reason code 5100 for card fraud",
+        "type": "assignment",
+        "condition": "CARD-FRAUD",
+        "outcome": "MOVE '5100' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 712},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "CARD-FRAUD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Fraud Detection"]
+      },
+      {
+        "description": "Set decline reason code 5200 for merchant fraud",
+        "type": "assignment",
+        "condition": "MERCHANT-FRAUD",
+        "outcome": "MOVE '5200' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 714},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON", "MERCHANT-FRAUD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Fraud Detection"]
+      },
+      {
+        "description": "Set decline reason code 9000 for other decline reasons",
+        "type": "assignment",
+        "condition": "OTHER",
+        "outcome": "MOVE '9000' TO PA-RL-AUTH-RESP-REASON",
+        "location": {"function": "6000-MAKE-DECISION", "line": 716},
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Decline Reason", "Generic Error"]
+      },
+      {
+        "description": "Increment authorization counter when processing authorization",
+        "type": "accumulation",
+        "condition": "Authorization processed",
+        "outcome": "ADD 1 TO PA-AUTHS-COUNT",
+        "location": {"function": "8000-PROCESS-COUNTERS", "line": 814},
+        "variablesInvolved": ["PA-AUTHS-COUNT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Tracking", "Counter Management"]
+      },
+      {
+        "description": "Add authorized amount to total authorization amount",
+        "type": "accumulation",
+        "condition": "Authorization processed",
+        "outcome": "ADD WS-APPROVED-AMT TO PA-AUTHS-TOTAL-AMT",
+        "location": {"function": "8000-PROCESS-COUNTERS", "line": 815},
+        "variablesInvolved": ["WS-APPROVED-AMT", "PA-AUTHS-TOTAL-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Authorization Tracking", "Amount Accumulation"]
+      },
+      {
+        "description": "Transform date from YYDDD to 99999 minus YYDDD format",
+        "type": "transformation",
+        "condition": "Date transformation needed",
+        "outcome": "COMPUTE PA-AUTH-DATE-9C = 99999 - WS-YYDDD",
+        "location": {"function": "8000-PROCESS-COUNTERS", "line": 875},
+        "variablesInvolved": ["WS-YYDDD", "PA-AUTH-DATE-9C"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Date Transformation", "Julian Date"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+    "rules": [
+      {
+        "description": "Check if card has expired by comparing expiration date with current date",
+        "type": "validation",
+        "condition": "CARD-EXPIRAION-DATE < WS-CURRENT-DATE",
+        "outcome": "Card is expired",
+        "location": {"function": "3000-CHECK-CARD-EXPIRY", "line": 282},
+        "variablesInvolved": ["CARD-EXPIRAION-DATE", "WS-CURRENT-DATE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Expiration", "Date Validation"]
+      },
+      {
+        "description": "Calculate days until card expiration",
+        "type": "calculation",
+        "condition": "Card not expired",
+        "outcome": "COMPUTE WS-DAYS-TO-EXPIRY = (CARD-EXPIRAION-DATE - WS-CURRENT-DATE) / 1",
+        "location": {"function": "3000-CHECK-CARD-EXPIRY", "line": 290},
+        "variablesInvolved": ["CARD-EXPIRAION-DATE", "WS-CURRENT-DATE", "WS-DAYS-TO-EXPIRY"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Expiration", "Date Calculation"]
+      },
+      {
+        "description": "Set expiration warning flag if card expires within configured days threshold",
+        "type": "validation",
+        "condition": "WS-DAYS-TO-EXPIRY <= P-EXPIRY-DAYS",
+        "outcome": "SET CARD-EXPIRING-SOON TO TRUE",
+        "location": {"function": "3000-CHECK-CARD-EXPIRY", "line": 293},
+        "variablesInvolved": ["WS-DAYS-TO-EXPIRY", "P-EXPIRY-DAYS", "CARD-EXPIRING-SOON"],
+        "isConfigurable": true,
+        "relatedDomainConcepts": ["Card Expiration", "Warning Threshold"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "rules": [
+      {
+        "description": "Set default current cycle debit to 2525.00 when actual value is zero",
+        "type": "assignment",
+        "condition": "ACCT-CURR-CYC-DEBIT EQUAL TO ZERO",
+        "outcome": "MOVE 2525.00 TO OUT-ACCT-CURR-CYC-DEBIT",
+        "location": {"function": "1300-POPUL-ACCT-RECORD", "line": 237},
+        "variablesInvolved": ["ACCT-CURR-CYC-DEBIT", "OUT-ACCT-CURR-CYC-DEBIT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Balance", "Default Value"]
+      },
+      {
+        "description": "Set hardcoded current cycle debit value 1005.00 for array position 1",
+        "type": "assignment",
+        "condition": "Populating array record",
+        "outcome": "MOVE 1005.00 TO ARR-ACCT-CURR-CYC-DEBIT(1)",
+        "location": {"function": "1400-POPUL-ARRAY-RECORD", "line": 256},
+        "variablesInvolved": ["ARR-ACCT-CURR-CYC-DEBIT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Balance", "Test Data"]
+      },
+      {
+        "description": "Set hardcoded current cycle debit value 1525.00 for array position 2",
+        "type": "assignment",
+        "condition": "Populating array record",
+        "outcome": "MOVE 1525.00 TO ARR-ACCT-CURR-CYC-DEBIT(2)",
+        "location": {"function": "1400-POPUL-ARRAY-RECORD", "line": 258},
+        "variablesInvolved": ["ARR-ACCT-CURR-CYC-DEBIT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Balance", "Test Data"]
+      },
+      {
+        "description": "Set negative current balance -1025.00 for array position 3",
+        "type": "assignment",
+        "condition": "Populating array record",
+        "outcome": "MOVE -1025.00 TO ARR-ACCT-CURR-BAL(3)",
+        "location": {"function": "1400-POPUL-ARRAY-RECORD", "line": 259},
+        "variablesInvolved": ["ARR-ACCT-CURR-BAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Balance", "Negative Balance"]
+      },
+      {
+        "description": "Set negative current cycle debit -2500.00 for array position 3",
+        "type": "assignment",
+        "condition": "Populating array record",
+        "outcome": "MOVE -2500.00 TO ARR-ACCT-CURR-CYC-DEBIT(3)",
+        "location": {"function": "1400-POPUL-ARRAY-RECORD", "line": 260},
+        "variablesInvolved": ["ARR-ACCT-CURR-CYC-DEBIT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Balance", "Negative Balance"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "rules": [
+      {
+        "description": "User ID must not be empty for authentication",
+        "type": "validation",
+        "condition": "USRIDI OF CSGN01AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error message 'User ID can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 226},
+        "variablesInvolved": ["USRIDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Authentication", "Input Validation"]
+      },
+      {
+        "description": "Password must not be empty for authentication",
+        "type": "validation",
+        "condition": "PASSWDI OF CSGN01AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error message 'Password can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 233},
+        "variablesInvolved": ["PASSWDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Authentication", "Input Validation"]
+      },
+      {
+        "description": "Validate user credentials match stored user ID and password",
+        "type": "validation",
+        "condition": "WS-USER-ID NOT = SEC-USR-ID OR WS-USER-PWD NOT = SEC-USR-PWD",
+        "outcome": "Authentication fails with error message",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 246},
+        "variablesInvolved": ["WS-USER-ID", "SEC-USR-ID", "WS-USER-PWD", "SEC-USR-PWD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Authentication", "Credential Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "rules": [
+      {
+        "description": "First name must not be empty when adding new user",
+        "type": "validation",
+        "condition": "FNAMEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'First Name can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 160},
+        "variablesInvolved": ["FNAMEI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "Last name must not be empty when adding new user",
+        "type": "validation",
+        "condition": "LNAMEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'Last Name can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 168},
+        "variablesInvolved": ["LNAMEI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "User ID must not be empty when adding new user",
+        "type": "validation",
+        "condition": "USRIDI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'User ID can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 176},
+        "variablesInvolved": ["USRIDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "Password must not be empty when adding new user",
+        "type": "validation",
+        "condition": "PASSWDI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'Password can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 184},
+        "variablesInvolved": ["PASSWDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "User type must not be empty when adding new user",
+        "type": "validation",
+        "condition": "USRTYPEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'User Type can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 192},
+        "variablesInvolved": ["USRTYPEI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "User Type"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "rules": [
+      {
+        "description": "First name must not be empty when updating user",
+        "type": "validation",
+        "condition": "FNAMEI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'First Name can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 160},
+        "variablesInvolved": ["FNAMEI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "Last name must not be empty when updating user",
+        "type": "validation",
+        "condition": "LNAMEI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'Last Name can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 168},
+        "variablesInvolved": ["LNAMEI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "User ID must not be empty when updating user",
+        "type": "validation",
+        "condition": "USRIDI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'User ID can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 176},
+        "variablesInvolved": ["USRIDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      },
+      {
+        "description": "Password must not be empty when updating user",
+        "type": "validation",
+        "condition": "PASSWDI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'Password can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 184},
+        "variablesInvolved": ["PASSWDI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "rules": [
+      {
+        "description": "User ID must not be empty when deleting user",
+        "type": "validation",
+        "condition": "USRIDINI OF COUSR3AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'User ID can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 145},
+        "variablesInvolved": ["USRIDINI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["User Management", "Input Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "rules": [
+      {
+        "description": "Card number must be exactly 16 digits",
+        "type": "validation",
+        "condition": "CARD-NUM-CHECK-N NOT NUMERIC OR LENGTH NOT 16",
+        "outcome": "Set validation error flag",
+        "location": {"function": "1200-EDIT-CARD", "line": 650},
+        "variablesInvolved": ["CARD-NUM-CHECK-N", "FLG-CARDFILTER-NOT-OK"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Validation", "Input Format"]
+      },
+      {
+        "description": "Card expiration month must be between 1 and 12",
+        "type": "validation",
+        "condition": "CARD-MONTH-CHECK-N NOT 1 THRU 12",
+        "outcome": "Set validation error flag",
+        "location": {"function": "1250-EDIT-EXPIRY-MON", "line": 898},
+        "variablesInvolved": ["CARD-MONTH-CHECK-N", "FLG-CARDEXPMON-NOT-OK"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Validation", "Date Validation"]
+      },
+      {
+        "description": "Card expiration year must be valid 4-digit year",
+        "type": "validation",
+        "condition": "CARD-YEAR-CHECK-N NOT VALID-YEAR",
+        "outcome": "Set validation error flag",
+        "location": {"function": "1260-EDIT-EXPIRY-YEAR", "line": 934},
+        "variablesInvolved": ["CARD-YEAR-CHECK-N", "FLG-CARDEXPYEAR-NOT-OK"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Validation", "Date Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "rules": [
+      {
+        "description": "Card name must contain only alphabetic characters and spaces",
+        "type": "validation",
+        "condition": "CARD-NAME-CHECK contains non-alphabetic characters after conversion",
+        "outcome": "Set validation error flag",
+        "location": {"function": "1230-EDIT-NAME", "line": 824},
+        "variablesInvolved": ["CCUP-NEW-CRDNAME", "CARD-NAME-CHECK", "FLG-CARDNAME-NOT-OK"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Validation", "Name Validation"]
+      },
+      {
+        "description": "Card status must be Y or N",
+        "type": "validation",
+        "condition": "FLG-YES-NO-VALID",
+        "outcome": "Set FLG-CARDSTATUS-ISVALID TO TRUE",
+        "location": {"function": "1240-EDIT-CARDSTATUS", "line": 863},
+        "variablesInvolved": ["CCUP-NEW-CRDSTCD", "FLG-YES-NO-CHECK", "FLG-CARDSTATUS-ISVALID"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Status", "Input Validation"]
+      },
+      {
+        "description": "Card expiration month must be between 1 and 12",
+        "type": "validation",
+        "condition": "VALID-MONTH",
+        "outcome": "Set FLG-CARDEXPMON-ISVALID TO TRUE",
+        "location": {"function": "1250-EDIT-EXPIRY-MON", "line": 898},
+        "variablesInvolved": ["CCUP-NEW-EXPMON", "CARD-MONTH-CHECK", "FLG-CARDEXPMON-ISVALID"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Expiration", "Date Validation"]
+      },
+      {
+        "description": "Card expiration year must be valid",
+        "type": "validation",
+        "condition": "VALID-YEAR",
+        "outcome": "Set FLG-CARDEXPYEAR-ISVALID TO TRUE",
+        "location": {"function": "1260-EDIT-EXPIRY-YEAR", "line": 934},
+        "variablesInvolved": ["CCUP-NEW-EXPYEAR", "CARD-YEAR-CHECK", "FLG-CARDEXPYEAR-ISVALID"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Card Expiration", "Date Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate SSN part 1 is not 0, 666, or 900-999",
+        "type": "validation",
+        "condition": "INVALID-SSN-PART1",
+        "outcome": "Set validation error flag",
+        "location": {"function": "WS-GENERIC-EDITS", "line": 121},
+        "variablesInvolved": ["WS-EDIT-US-SSN-PART1-N"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["SSN Validation", "Customer Data"]
+      },
+      {
+        "description": "Validate US phone number area code is numeric 3 digits",
+        "type": "validation",
+        "condition": "WS-EDIT-US-PHONE-NUMA-N NOT NUMERIC",
+        "outcome": "Set validation error flag",
+        "location": {"function": "WS-GENERIC-EDITS", "line": 87},
+        "variablesInvolved": ["WS-EDIT-US-PHONE-NUMA-N", "FLG-EDIT-US-PHONEA-NOT-OK"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Phone Validation", "Input Format"]
+      },
+      {
+        "description": "Validate credit limit is numeric using TEST-NUMVAL-C",
+        "type": "validation",
+        "condition": "FUNCTION TEST-NUMVAL-C(ACUP-NEW-CREDIT-LIMIT-X) = 0",
+        "outcome": "COMPUTE ACUP-NEW-CREDIT-LIMIT-N = FUNCTION NUMVAL-C",
+        "location": {"function": "1100-RECEIVE-MAP", "line": 1078},
+        "variablesInvolved": ["ACUP-NEW-CREDIT-LIMIT-X", "ACUP-NEW-CREDIT-LIMIT-N"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Validation", "Numeric Validation"]
+      },
+      {
+        "description": "Validate cash limit is numeric using TEST-NUMVAL-C",
+        "type": "validation",
+        "condition": "FUNCTION TEST-NUMVAL-C(ACUP-NEW-CASH-CREDIT-LIMIT-X) = 0",
+        "outcome": "COMPUTE ACUP-NEW-CASH-CREDIT-LIMIT-N = FUNCTION NUMVAL-C",
+        "location": {"function": "1100-RECEIVE-MAP", "line": 1092},
+        "variablesInvolved": ["ACUP-NEW-CASH-CREDIT-LIMIT-X", "ACUP-NEW-CASH-CREDIT-LIMIT-N"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Validation", "Numeric Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "rules": [
+      {
+        "description": "Account number must be non-zero 11 digit number",
+        "type": "validation",
+        "condition": "Account number is zeroes or not numeric",
+        "outcome": "Display error 'Account number must be a non zero 11 digit number'",
+        "location": {"function": "1200-EDIT-ACCT", "line": 126},
+        "variablesInvolved": ["SEARCHED-ACCT-ZEROES", "SEARCHED-ACCT-NOT-NUMERIC"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Account Validation", "Input Format"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "rules": [
+      {
+        "description": "Menu option must be numeric and within valid range",
+        "type": "validation",
+        "condition": "WS-OPTION IS NOT NUMERIC OR WS-OPTION > CDEMO-MENU-OPT-COUNT OR WS-OPTION = ZEROS",
+        "outcome": "Display error 'Please enter a valid option number'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 127},
+        "variablesInvolved": ["WS-OPTION", "CDEMO-MENU-OPT-COUNT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Menu Navigation", "Input Validation"]
+      },
+      {
+        "description": "Regular users cannot access admin-only menu options",
+        "type": "validation",
+        "condition": "CDEMO-USRTYP-USER AND CDEMO-MENU-OPT-USRTYPE(WS-OPTION) = 'A'",
+        "outcome": "Display error 'No access - Admin Only option'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 136},
+        "variablesInvolved": ["CDEMO-USRTYP-USER", "CDEMO-MENU-OPT-USRTYPE", "WS-OPTION"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Access Control", "User Type"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "rules": [
+      {
+        "description": "Transaction ID must not be empty for viewing transaction details",
+        "type": "validation",
+        "condition": "TRNIDINI OF COTRN1AI = SPACES OR LOW-VALUES",
+        "outcome": "Display error 'Tran ID can NOT be empty'",
+        "location": {"function": "PROCESS-ENTER-KEY", "line": 147},
+        "variablesInvolved": ["TRNIDINI"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Transaction Validation", "Input Validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN03C.cbl",
+    "rules": [
+      {
+        "description": "Filter transactions by date range using start and end dates",
+        "type": "validation",
+        "condition": "TRAN-PROC-TS (1:10) >= WS-START-DATE AND TRAN-PROC-TS (1:10) <= WS-END-DATE",
+        "outcome": "Include transaction in report",
+        "location": {"function": "MAIN PROCEDURE", "line": 173},
+        "variablesInvolved": ["TRAN-PROC-TS", "WS-START-DATE", "WS-END-DATE"],
+        "isConfigurable": true,
+        "relatedDomainConcepts": ["Transaction Filtering", "Date Range"]
+      },
+      {
+        "description": "Accumulate transaction amount to page total",
+        "type": "accumulation",
+        "condition": "Transaction processed",
+        "outcome": "ADD TRAN-AMT TO WS-PAGE-TOTAL and WS-ACCOUNT-TOTAL",
+        "location": {"function": "1100-WRITE-TRANSACTION-REPORT", "line": 287},
+        "variablesInvolved": ["TRAN-AMT", "WS-PAGE-TOTAL", "WS-ACCOUNT-TOTAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Transaction Totals", "Amount Accumulation"]
+      },
+      {
+        "description": "Add page total to grand total when page ends",
+        "type": "accumulation",
+        "condition": "Page total calculated",
+        "outcome": "ADD WS-PAGE-TOTAL TO WS-GRAND-TOTAL",
+        "location": {"function": "1110-WRITE-PAGE-TOTALS", "line": 297},
+        "variablesInvolved": ["WS-PAGE-TOTAL", "WS-GRAND-TOTAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["Report Totals", "Amount Accumulation"]
+      }
+    ]
+  }
+]
