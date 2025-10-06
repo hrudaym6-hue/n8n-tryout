@@ -1,0 +1,100 @@
+<div class="page-container">
+  <div class="page-header">
+    <h1>Card Management</h1>
+    <a routerLink="/dashboard" class="back-btn">← Back to Dashboard</a>
+  </div>
+
+  <div class="search-section">
+    <div class="search-box">
+      <label for="accountId">Search by Account ID:</label>
+      <input
+        type="text"
+        id="accountId"
+        [(ngModel)]="searchAccountId"
+        placeholder="Enter account number"
+        maxlength="11"
+      />
+    </div>
+    <div class="search-box">
+      <label for="cardNumber">Search by Card Number:</label>
+      <input
+        type="text"
+        id="cardNumber"
+        [(ngModel)]="searchCardNumber"
+        placeholder="Enter 16-digit card number"
+        maxlength="16"
+      />
+    </div>
+    <div class="search-buttons">
+      <button class="search-btn" (click)="onSearch()" [disabled]="isLoading()">Search</button>
+      <button class="clear-btn" (click)="onClearSearch()" [disabled]="isLoading()">Clear</button>
+    </div>
+  </div>
+
+  @if (errorMessage()) {
+    <div class="error-alert">{{ errorMessage() }}</div>
+  }
+
+  @if (isLoading()) {
+    <div class="loading">Loading cards...</div>
+  } @else {
+    @if (cards().length === 0) {
+      <div class="no-results">
+        <p>No cards found.</p>
+      </div>
+    } @else {
+      <div class="results-info">
+        <p>Showing {{ cards().length }} of {{ totalRecords() }} cards</p>
+      </div>
+
+      <div class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Card Number</th>
+              <th>Account ID</th>
+              <th>Cardholder Name</th>
+              <th>Card Type</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Primary</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (card of cards(); track card.card_number) {
+              <tr>
+                <td>{{ maskCardNumber(card.card_number) }}</td>
+                <td>{{ card.account_id }}</td>
+                <td>{{ card.embossed_name }}</td>
+                <td>{{ card.card_type }}</td>
+                <td>{{ card.expiry_month }}/{{ card.expiry_year }}</td>
+                <td>
+                  <span [class]="card.card_status === 'Y' ? 'status-active' : 'status-inactive'">
+                    {{ getStatusLabel(card.card_status) }}
+                  </span>
+                </td>
+                <td>
+                  @if (card.is_primary === 'Y') {
+                    <span class="badge-primary">Yes</span>
+                  } @else {
+                    <span class="badge-secondary">No</span>
+                  }
+                </td>
+                <td>
+                  <button class="action-btn" (click)="viewCard(card.card_number)">View Details</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+      </div>
+
+      <div class="pagination">
+        <button (click)="previousPage()" [disabled]="currentPage() === 1">Previous</button>
+        <span>Page {{ currentPage() }} of {{ totalPages() }}</span>
+        <button (click)="nextPage()" [disabled]="currentPage() === totalPages()">Next</button>
+      </div>
+    }
+  }
+</div>
