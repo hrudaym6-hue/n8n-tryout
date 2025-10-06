@@ -14,25 +14,22 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
 
       - name: Find related PR
         id: find_pr
         uses: juliangruber/find-pull-request-action@v1
         with:
-          github-token: ${{ secrets.ACC_TKN }}
+          github-token: ${{ secrets.ACC_TKN || secrets.GITHUB_TOKEN }}
 
       - name: Merge PR using GitHub CLI
         if: steps.find_pr.outputs.number != ''
         env:
-          GH_TOKEN: ${{ secrets.ACC_TKN }}
+          GH_TOKEN: ${{ secrets.ACC_TKN || secrets.GITHUB_TOKEN }}
         run: |
           echo "Found PR #${{ steps.find_pr.outputs.number }}"
           gh pr merge ${{ steps.find_pr.outputs.number }} \
             --squash \
             --delete-branch \
             --repo ${{ github.repository }} \
-            --admin \
             --auto
             
