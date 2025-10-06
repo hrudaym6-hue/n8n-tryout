@@ -1,4 +1,4 @@
-name: Auto Merge Pull Requests
+name: Auto Merge Pull Request on Push
 
 on:
   push:
@@ -6,27 +6,17 @@ on:
 jobs:
   automerge:
     runs-on: ubuntu-latest
-    steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
 
+    steps:
       - name: Find related pull request
         id: find_pr
         uses: juliangruber/find-pull-request-action@v1
         with:
           github_token: ${{ secrets.ACC_TKN }}
 
-      - name: Enable auto-merge for PR
-        if: steps.find_pr.outputs.number != ''
-        uses: peter-evans/enable-pull-request-automerge@v3
-        with:
-          token: ${{ secrets.ACC_TKN }}
-          pull-request-number: ${{ steps.find_pr.outputs.number }}
-          merge-method: squash
-
       - name: Merge the pull request
         if: steps.find_pr.outputs.number != ''
-        uses: peter-evans/merge-pull-request@v3
+        uses: peter-evans/merge-pull-request@v2
         with:
           token: ${{ secrets.ACC_TKN }}
           pull-request: ${{ steps.find_pr.outputs.number }}
