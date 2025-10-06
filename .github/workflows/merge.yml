@@ -1,11 +1,13 @@
-name: Auto Merge PR on PR creation
+name: Auto Merge PRs
 
+# Trigger on PR events and manual run
 on:
   pull_request:
     types:
       - opened
       - reopened
       - synchronize
+  workflow_dispatch:
 
 permissions:
   contents: write
@@ -16,20 +18,21 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout code
+      # Checkout code (optional, not strictly needed for merging)
+      - name: Checkout repository
         uses: actions/checkout@v4
 
+      # Merge PR automatically
       - name: Merge PR immediately
         if: github.event.pull_request.state == 'open'
         env:
           GH_TOKEN: ${{ secrets.ACC_TKN }}
         run: |
           pr_number=${{ github.event.pull_request.number }}
-          echo "Merging PR #$pr_number"
+          echo "Auto-merging PR #$pr_number"
           gh pr merge $pr_number \
             --squash \
             --delete-branch \
             --repo ${{ github.repository }} \
-            --auto \
             --admin
             
