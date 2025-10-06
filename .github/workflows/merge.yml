@@ -21,13 +21,18 @@ jobs:
         id: find_pr
         uses: juliangruber/find-pull-request-action@v1
         with:
-          github_token: ${{ secrets.ACC_TKN }}
+          github-token: ${{ secrets.ACC_TKN }}
 
-      - name: Merge the PR using GitHub CLI
+      - name: Merge PR using GitHub CLI
         if: steps.find_pr.outputs.number != ''
         env:
           GH_TOKEN: ${{ secrets.ACC_TKN }}
         run: |
-          echo "Merging PR #${{ steps.find_pr.outputs.number }}"
-          gh pr merge ${{ steps.find_pr.outputs.number }} --squash --repo ${{ github.repository }} --delete-branch --auto
-          
+          echo "Found PR #${{ steps.find_pr.outputs.number }}"
+          gh pr merge ${{ steps.find_pr.outputs.number }} \
+            --squash \
+            --delete-branch \
+            --repo ${{ github.repository }} \
+            --admin \
+            --auto
+            
