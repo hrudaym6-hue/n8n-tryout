@@ -1,62 +1,882 @@
-[  
-  {  
-    "file": "src/main.cbl",  
-    "validations": [  
-      {  
-        "description": "Ensures that the ACCOUNT-NUMBER field is provided (not empty) before processing a transaction.",  
-        "type": "required field",  
-        "condition": "ACCOUNT-NUMBER is empty or not present",  
-        "failureOutcome": "Processing is halted and an error message is displayed: ACCOUNT NUMBER MISSING",  
-        "location": { "function": "PROCESS-TRANSACTION", "line": 47 },  
-        "field": "ACCOUNT-NUMBER",  
-        "isConfigurable": false,  
-        "relatedDomainConcepts": [ "bank account", "transaction" ]  
-      },  
-      {  
-        "description": "Checks that the TRANSACTION-AMOUNT does not exceed the MAX-TRANSACTION-LIMIT value.",  
-        "type": "range check",  
-        "condition": "TRANSACTION-AMOUNT > MAX-TRANSACTION-LIMIT",  
-        "failureOutcome": "Transaction is rejected and error message AMOUNT EXCEEDS LIMIT is displayed.",  
-        "location": { "function": "PROCESS-TRANSACTION", "line": 59 },  
-        "field": "TRANSACTION-AMOUNT",  
-        "isConfigurable": true,  
-        "relatedDomainConcepts": [ "transaction amount", "bank account" ]  
-      },  
-      {  
-        "description": "Ensures that the TRANSACTION-TYPE is either DEPOSIT or WITHDRAWAL.",  
-        "type": "format check (enumeration)",  
-        "condition": "TRANSACTION-TYPE is not DEPOSIT or WITHDRAWAL",  
-        "failureOutcome": "Transaction is rejected and error message INVALID TRANSACTION TYPE is displayed.",  
-        "location": { "function": "PROCESS-TRANSACTION", "line": 70 },  
-        "field": "TRANSACTION-TYPE",  
-        "isConfigurable": false,  
-        "relatedDomainConcepts": [ "transaction type" ]  
-      }  
-    ]  
-  },  
-  {  
-    "file": "src/login.cbl",  
-    "validations": [  
-      {  
-        "description": "Validates that the USER-ID field is provided during login.",  
-        "type": "required field",  
-        "condition": "USER-ID is empty",  
-        "failureOutcome": "Login process is halted and error message USER ID REQUIRED is displayed.",  
-        "location": { "function": "LOGIN-USER", "line": 15 },  
-        "field": "USER-ID",  
-        "isConfigurable": false,  
-        "relatedDomainConcepts": [ "user identity", "login" ]  
-      },  
-      {  
-        "description": "Requires PASSWORD to be provided and to be at least 8 characters.",  
-        "type": "required field and length check",  
-        "condition": "PASSWORD is missing or PASSWORD length < 8",  
-        "failureOutcome": "Login fails and error message INVALID PASSWORD is displayed.",  
-        "location": { "function": "LOGIN-USER", "line": 23 },  
-        "field": "PASSWORD",  
-        "isConfigurable": true,  
-        "relatedDomainConcepts": [ "user authentication", "login" ]  
-      }  
-    ]  
-  }  
+[
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "validations": [
+      {
+        "description": "User ID must not be empty",
+        "type": "required field",
+        "condition": "USERIDI OF COSGN0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error message 'Please enter User ID' and return to sign-on screen",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 118 },
+        "field": "USERIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "security", "login"]
+      },
+      {
+        "description": "Password must not be empty",
+        "type": "required field",
+        "condition": "PASSWDI OF COSGN0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error message 'Please enter a Password' and return to sign-on screen",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 123 },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "security", "login"]
+      },
+      {
+        "description": "User credentials must match records in USRSEC file",
+        "type": "business rule validation",
+        "condition": "SEC-USR-ID NOT = USERIDI OR SEC-USR-PWD NOT = PASSWDI",
+        "failureOutcome": "Display error 'Invalid User ID and/or Password' and return to sign-on screen",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 241 },
+        "field": "SEC-USR-ID, SEC-USR-PWD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "credential validation", "security"]
+      },
+      {
+        "description": "User record must exist in security file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND)",
+        "failureOutcome": "Display error 'Invalid User ID and/or Password'",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 233 },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "data integrity"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "validations": [
+      {
+        "description": "User ID must not be empty for list operation",
+        "type": "required field",
+        "condition": "USERIDI OF COUSR0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Please enter User ID' and set error flag",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 155 },
+        "field": "USERIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "search criteria"]
+      },
+      {
+        "description": "Password must not be empty for authentication",
+        "type": "required field",
+        "condition": "PASSWDI OF COUSR0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Please enter a Password' and set error flag",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 160 },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "security"]
+      },
+      {
+        "description": "Selection action must be valid (S or U)",
+        "type": "format check",
+        "condition": "User selection not 'S' or 'U'",
+        "failureOutcome": "Display error 'Invalid selection. Valid value is S or U'",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 236 },
+        "field": "USRSELI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "action validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "validations": [
+      {
+        "description": "First name must not be empty",
+        "type": "required field",
+        "condition": "FNAMEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'First Name can NOT be empty...' and set cursor to field",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 118 },
+        "field": "FNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "user data"]
+      },
+      {
+        "description": "Last name must not be empty",
+        "type": "required field",
+        "condition": "LNAMEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Last Name can NOT be empty...' and set cursor to field",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 124 },
+        "field": "LNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "user data"]
+      },
+      {
+        "description": "User ID must not be empty",
+        "type": "required field",
+        "condition": "USERIDI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'User ID can NOT be empty...' and set cursor to field",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 130 },
+        "field": "USERIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "user identity"]
+      },
+      {
+        "description": "Password must not be empty",
+        "type": "required field",
+        "condition": "PASSWDI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Password can NOT be empty...' and set cursor to field",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 136 },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "security"]
+      },
+      {
+        "description": "User type must not be empty",
+        "type": "required field",
+        "condition": "USRTYPEI OF COUSR1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'User Type can NOT be empty...' and set cursor to field",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 142 },
+        "field": "USRTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "user role"]
+      },
+      {
+        "description": "User ID must be unique",
+        "type": "business rule validation",
+        "condition": "WS-RESP-CD = DFHRESP(DUPKEY) OR DFHRESP(DUPREC)",
+        "failureOutcome": "Display error 'User ID already exist...'",
+        "location": { "function": "WRITE-USER-SEC-FILE", "line": 260 },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user registration", "data integrity", "unique constraint"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "validations": [
+      {
+        "description": "User ID must not be empty for user update",
+        "type": "required field",
+        "condition": "USRIDINI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'User ID can NOT be empty...' and return to screen",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 146 },
+        "field": "USRIDINI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update"]
+      },
+      {
+        "description": "First name must not be empty during update",
+        "type": "required field",
+        "condition": "FNAMEI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'First Name can NOT be empty...'",
+        "location": { "function": "UPDATE-USER-INFO", "line": 186 },
+        "field": "FNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "data validation"]
+      },
+      {
+        "description": "Last name must not be empty during update",
+        "type": "required field",
+        "condition": "LNAMEI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Last Name can NOT be empty...'",
+        "location": { "function": "UPDATE-USER-INFO", "line": 192 },
+        "field": "LNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "data validation"]
+      },
+      {
+        "description": "Password must not be empty during update",
+        "type": "required field",
+        "condition": "PASSWDI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Password can NOT be empty...'",
+        "location": { "function": "UPDATE-USER-INFO", "line": 198 },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "security"]
+      },
+      {
+        "description": "User type must not be empty during update",
+        "type": "required field",
+        "condition": "USRTYPEI OF COUSR2AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'User Type can NOT be empty...'",
+        "location": { "function": "UPDATE-USER-INFO", "line": 204 },
+        "field": "USRTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user role"]
+      },
+      {
+        "description": "User record must exist for update operation",
+        "type": "cross-reference validation",
+        "condition": "User not found in USRSEC file (WS-RESP-CD = DFHRESP(NOTFND))",
+        "failureOutcome": "Display error 'User ID not found'",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 217 },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "data integrity"]
+      },
+      {
+        "description": "User data must be modified before update",
+        "type": "business rule validation",
+        "condition": "USR-MODIFIED-NO is true (no changes detected)",
+        "failureOutcome": "Display message 'Please modify to update ...'",
+        "location": { "function": "UPDATE-USER-INFO", "line": 236 },
+        "field": "User fields",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "change detection"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "validations": [
+      {
+        "description": "Transaction ID must be numeric",
+        "type": "data type validation",
+        "condition": "TRNIDINI OF COTRN0AI IS NOT NUMERIC",
+        "failureOutcome": "Display error 'Tran ID must be Numeric ...' and set error flag",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 209 },
+        "field": "TRNIDINI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction search", "data format"]
+      },
+      {
+        "description": "Selection action must be 'S' (view) or 's'",
+        "type": "format check",
+        "condition": "CDEMO-CT00-TRN-SEL-FLG not 'S' or 's'",
+        "failureOutcome": "Display error 'Invalid selection. Valid value is S'",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 186 },
+        "field": "CDEMO-CT00-TRN-SEL-FLG",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "transaction selection"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "validations": [
+      {
+        "description": "Transaction ID must not be empty for detail view",
+        "type": "required field",
+        "condition": "TRNIDINI OF COTRN1AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Display error 'Tran ID can NOT be empty...' and return to screen",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 147 },
+        "field": "TRNIDINI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction details", "required field"]
+      },
+      {
+        "description": "Transaction must exist in TRANSACT file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND)",
+        "failureOutcome": "Display error 'Transaction ID NOT found...'",
+        "location": { "function": "READ-TRANSACT-FILE", "line": 283 },
+        "field": "TRAN-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "data integrity"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "validations": [
+      {
+        "description": "Account ID filter must be numeric",
+        "type": "data type validation",
+        "condition": "CC-ACCT-ID IS NOT NUMERIC",
+        "failureOutcome": "Display error 'ACCOUNT FILTER,IF SUPPLIED MUST BE A 11 DIGIT NUMBER' and set input error flag",
+        "location": { "function": "1210-EDIT-ACCOUNT", "line": 740 },
+        "field": "CC-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account search", "data format"]
+      },
+      {
+        "description": "Account ID must not be empty or zero",
+        "type": "required field",
+        "condition": "CC-ACCT-ID EQUAL LOW-VALUES OR SPACES OR ZEROS",
+        "failureOutcome": "Set input error flag and display 'Account number not provided'",
+        "location": { "function": "1210-EDIT-ACCOUNT", "line": 725 },
+        "field": "CC-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account search", "required data"]
+      },
+      {
+        "description": "Account status must be Y or N",
+        "type": "format check",
+        "condition": "FLG-YES-NO-CHECK not 'Y' or 'N'",
+        "failureOutcome": "Display error 'Account Active Status must be Y or N'",
+        "location": { "function": "1240-EDIT-ACCT-STATUS", "line": 503 },
+        "field": "ACUP-NEW-ACTIVE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account status", "data format"]
+      },
+      {
+        "description": "Credit limit must be supplied and not blank",
+        "type": "required field",
+        "condition": "ACUP-NEW-CREDIT-LIMIT EQUAL LOW-VALUES OR SPACES",
+        "failureOutcome": "Display error 'Credit Limit must be supplied'",
+        "location": { "function": "1250-EDIT-CREDIT-LIMIT", "line": 505 },
+        "field": "ACUP-NEW-CREDIT-LIMIT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit", "account data"]
+      },
+      {
+        "description": "Credit limit must be numeric",
+        "type": "data type validation",
+        "condition": "ACUP-NEW-CREDIT-LIMIT IS NOT NUMERIC",
+        "failureOutcome": "Display error 'Credit Limit is not valid'",
+        "location": { "function": "1250-EDIT-CREDIT-LIMIT", "line": 507 },
+        "field": "ACUP-NEW-CREDIT-LIMIT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit", "data format"]
+      },
+      {
+        "description": "Customer first name must contain only alphabetic characters and spaces",
+        "type": "format check",
+        "condition": "Name contains non-alphabetic characters after INSPECT conversion",
+        "failureOutcome": "Display error 'First Name can only contain alphabets and spaces'",
+        "location": { "function": "1310-EDIT-FNAME", "line": 82 },
+        "field": "ACUP-NEW-CUST-FIRST-NAME",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "name validation"]
+      },
+      {
+        "description": "Customer last name must contain only alphabetic characters and spaces",
+        "type": "format check",
+        "condition": "Name contains non-alphabetic characters after INSPECT conversion",
+        "failureOutcome": "Display error 'Last Name can only contain alphabets and spaces'",
+        "location": { "function": "1330-EDIT-LNAME", "line": 99 },
+        "field": "ACUP-NEW-CUST-LAST-NAME",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "name validation"]
+      },
+      {
+        "description": "Phone number must be exactly 10 digits",
+        "type": "format check",
+        "condition": "Phone number length not equal to 10 after removing non-numeric characters",
+        "failureOutcome": "Display error 'Phone number must be 10 digits'",
+        "location": { "function": "1370-EDIT-PHONE-1", "line": 82 },
+        "field": "ACUP-NEW-CUST-PHONE-NUM-1",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "phone validation"]
+      },
+      {
+        "description": "Phone number area code must be valid North American area code",
+        "type": "business rule validation",
+        "condition": "Area code not found in AREA-CODE-TABLE",
+        "failureOutcome": "Display error 'Area code is not valid'",
+        "location": { "function": "1370-EDIT-PHONE-1", "line": 115 },
+        "field": "WS-PHONE-AREA-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "phone validation", "area code"]
+      },
+      {
+        "description": "SSN must be exactly 9 digits",
+        "type": "format check",
+        "condition": "SSN length not equal to 9 or contains non-numeric characters",
+        "failureOutcome": "Display error 'SSN must be a 9 digit number'",
+        "location": { "function": "1410-EDIT-SSN", "line": 117 },
+        "field": "ACUP-NEW-CUST-SSN-X",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "SSN validation", "personal identification"]
+      },
+      {
+        "description": "SSN must not be all zeros",
+        "type": "business rule validation",
+        "condition": "ACUP-NEW-CUST-SSN = ZEROS",
+        "failureOutcome": "Display error 'SSN must be a 9 digit number'",
+        "location": { "function": "1410-EDIT-SSN", "line": 132 },
+        "field": "ACUP-NEW-CUST-SSN",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "SSN validation"]
+      },
+      {
+        "description": "FICO score must be numeric",
+        "type": "data type validation",
+        "condition": "ACUP-NEW-CUST-FICO-SCORE-X IS NOT NUMERIC",
+        "failureOutcome": "Display error 'FICO score must be numeric'",
+        "location": { "function": "1430-EDIT-FICO", "line": 146 },
+        "field": "ACUP-NEW-CUST-FICO-SCORE-X",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer data", "credit score"]
+      },
+      {
+        "description": "Account must exist in account master file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND)",
+        "failureOutcome": "Display error 'Did not find this account in account master file'",
+        "location": { "function": "2110-FETCH-ACCT-DATA", "line": 500 },
+        "field": "ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "data integrity"]
+      },
+      {
+        "description": "Customer must exist in customer master file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND)",
+        "failureOutcome": "Display error 'Did not find associated customer in master file'",
+        "location": { "function": "2120-FETCH-CUST-DATA", "line": 501 },
+        "field": "CUST-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer validation", "data integrity"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "validations": [
+      {
+        "description": "Account ID filter must be numeric 11 digit number",
+        "type": "data type validation",
+        "condition": "CC-ACCT-ID IS NOT NUMERIC",
+        "failureOutcome": "Display error 'ACCOUNT FILTER,IF SUPPLIED MUST BE A 11 DIGIT NUMBER' and set input error flag",
+        "location": { "function": "1210-EDIT-ACCOUNT", "line": 740 },
+        "field": "CC-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account search", "data format"]
+      },
+      {
+        "description": "Account ID must not be empty or zero",
+        "type": "required field",
+        "condition": "CC-ACCT-ID EQUAL LOW-VALUES OR SPACES OR ZEROS",
+        "failureOutcome": "Display error 'Account number not provided' and set input error flag",
+        "location": { "function": "1210-EDIT-ACCOUNT", "line": 725 },
+        "field": "CC-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account search", "required data"]
+      },
+      {
+        "description": "Card number filter must be numeric 16 digit number",
+        "type": "data type validation",
+        "condition": "CC-CARD-NUM IS NOT NUMERIC",
+        "failureOutcome": "Display error 'CARD ID FILTER,IF SUPPLIED MUST BE A 16 DIGIT NUMBER' and set input error flag",
+        "location": { "function": "1220-EDIT-CARD", "line": 784 },
+        "field": "CC-CARD-NUM",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card search", "data format"]
+      },
+      {
+        "description": "Card number must not be empty or zero",
+        "type": "required field",
+        "condition": "CC-CARD-NUM EQUAL LOW-VALUES OR SPACES OR ZEROS",
+        "failureOutcome": "Display error 'Card number not provided' and set input error flag",
+        "location": { "function": "1220-EDIT-CARD", "line": 768 },
+        "field": "CC-CARD-NUM",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card search", "required data"]
+      },
+      {
+        "description": "Card name must not be empty",
+        "type": "required field",
+        "condition": "CCUP-NEW-CRDNAME EQUAL LOW-VALUES OR SPACES OR ZEROS",
+        "failureOutcome": "Display error 'Card name not provided' and set input error flag",
+        "location": { "function": "1230-EDIT-NAME", "line": 811 },
+        "field": "CCUP-NEW-CRDNAME",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card data", "required field"]
+      },
+      {
+        "description": "Card name must contain only alphabetic characters and spaces",
+        "type": "format check",
+        "condition": "Card name contains non-alphabetic characters after INSPECT conversion",
+        "failureOutcome": "Display error 'Card name can only contain alphabets and spaces' and set input error flag",
+        "location": { "function": "1230-EDIT-NAME", "line": 823 },
+        "field": "CCUP-NEW-CRDNAME",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card data", "name validation"]
+      },
+      {
+        "description": "Card active status must be Y or N",
+        "type": "format check",
+        "condition": "CCUP-NEW-CRDSTCD not 'Y' or 'N'",
+        "failureOutcome": "Display error 'Card Active Status must be Y or N' and set input error flag",
+        "location": { "function": "1240-EDIT-CARDSTATUS", "line": 850 },
+        "field": "CCUP-NEW-CRDSTCD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card status", "data format"]
+      },
+      {
+        "description": "Card expiry month must be between 1 and 12",
+        "type": "range check",
+        "condition": "CARD-MONTH-CHECK-N not in range 1 THRU 12",
+        "failureOutcome": "Display error 'Card expiry month must be between 1 and 12' and set input error flag",
+        "location": { "function": "1250-EDIT-EXPIRY-MON", "line": 877 },
+        "field": "CCUP-NEW-EXPMON",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card expiration", "date validation"]
+      },
+      {
+        "description": "Card expiry year must be in valid range (1950-2099)",
+        "type": "range check",
+        "condition": "CARD-YEAR-CHECK-N not in range 1950 THRU 2099",
+        "failureOutcome": "Display error 'Invalid card expiry year' and set input error flag",
+        "location": { "function": "1260-EDIT-EXPIRY-YEAR", "line": 96 },
+        "field": "CCUP-NEW-EXPYEAR",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card expiration", "date validation"]
+      },
+      {
+        "description": "Card record must exist for the account/card combination",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND)",
+        "failureOutcome": "Display error 'Did not find cards for this search condition'",
+        "location": { "function": "2100-FETCH-CARD-DATA", "line": 203 },
+        "field": "CARD-RECORD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card validation", "data integrity"]
+      },
+      {
+        "description": "Changes must be detected before update",
+        "type": "business rule validation",
+        "condition": "CCUP-NEW-CARDDATA EQUAL CCUP-OLD-CARDDATA",
+        "failureOutcome": "Display error 'No change detected with respect to values fetched'",
+        "location": { "function": "1200-EDIT-MAP-INPUTS", "line": 680 },
+        "field": "CCUP-NEW-CARDDATA",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["data modification", "change detection"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "validations": [
+      {
+        "description": "Transaction amount must not exceed available credit limit",
+        "type": "business rule validation",
+        "condition": "WS-TRANSACTION-AMT > WS-AVAILABLE-AMT",
+        "failureOutcome": "Authorization declined with response code '05' and reason '4100' (insufficient funds), approved amount set to 0",
+        "location": { "function": "6000-MAKE-DECISION", "line": 668 },
+        "field": "WS-TRANSACTION-AMT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit", "authorization decision", "transaction amount", "insufficient funds"]
+      },
+      {
+        "description": "Card must exist in card cross-reference file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND) after reading CCXREF file",
+        "failureOutcome": "Set CARD-NFOUND-XREF flag, log error 'CARD NOT FOUND IN XREF', decline authorization with reason '3100'",
+        "location": { "function": "5100-READ-XREF-RECORD", "line": 490 },
+        "field": "XREF-CARD-NUM",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card validation", "authorization", "data integrity"]
+      },
+      {
+        "description": "Account must exist in account master file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND) after reading account file",
+        "failureOutcome": "Set NFOUND-ACCT-IN-MSTR flag, log error 'ACCT NOT FOUND IN XREF', decline authorization with reason '3100'",
+        "location": { "function": "5200-READ-ACCT-RECORD", "line": 538 },
+        "field": "WS-CARD-RID-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account validation", "authorization", "data integrity"]
+      },
+      {
+        "description": "Customer must exist in customer master file",
+        "type": "cross-reference validation",
+        "condition": "WS-RESP-CD = DFHRESP(NOTFND) after reading customer file",
+        "failureOutcome": "Set NFOUND-CUST-IN-MSTR flag, log error 'CUST NOT FOUND IN XREF', decline authorization with reason '3100'",
+        "location": { "function": "5300-READ-CUST-RECORD", "line": 586 },
+        "field": "WS-CARD-RID-CUST-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["customer validation", "authorization", "data integrity"]
+      },
+      {
+        "description": "MQ request message must be retrieved successfully",
+        "type": "business rule validation",
+        "condition": "WS-COMPCODE NOT = MQCC-OK AND WS-REASON NOT = MQRC-NO-MSG-AVAILABLE",
+        "failureOutcome": "Set error flag, log error 'FAILED TO READ REQUEST MQ'",
+        "location": { "function": "3100-GET-REQUEST", "line": 416 },
+        "field": "WS-COMPCODE, WS-REASON",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["message queue", "MQ operations", "error handling"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+    "validations": [
+      {
+        "description": "User ID must not be empty",
+        "type": "required field",
+        "condition": "USERIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Set INPUT-ERROR flag and display error message",
+        "location": { "function": "1000-PROCESS-INPUTS", "line": 100 },
+        "field": "USERIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "required field"]
+      },
+      {
+        "description": "Password must not be empty",
+        "type": "required field",
+        "condition": "PASSWDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Set INPUT-ERROR flag and display error message",
+        "location": { "function": "1000-PROCESS-INPUTS", "line": 105 },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "required field"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "validations": [
+      {
+        "description": "Account filter must be valid when provided",
+        "type": "format check",
+        "condition": "Account filter validation flag FLG-ACCTFILTER-NOT-OK",
+        "failureOutcome": "Set input error and display appropriate error message",
+        "location": { "function": "2000-RECEIVE-MAP", "line": 61 },
+        "field": "WS-EDIT-ACCT-FLAG",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account search", "filter validation"]
+      },
+      {
+        "description": "Card filter must be valid when provided",
+        "type": "format check",
+        "condition": "Card filter validation flag FLG-CARDFILTER-NOT-OK",
+        "failureOutcome": "Set input error and display appropriate error message",
+        "location": { "function": "2000-RECEIVE-MAP", "line": 65 },
+        "field": "WS-EDIT-CARD-FLAG",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card search", "filter validation"]
+      },
+      {
+        "description": "Only one record can be selected for view or update",
+        "type": "business rule validation",
+        "condition": "WS-EDIT-SELECT-COUNTER > 1",
+        "failureOutcome": "Display error 'PLEASE SELECT ONLY ONE RECORD TO VIEW OR UPDATE'",
+        "location": { "function": "YYYY-STORE-PFKEY", "line": 123 },
+        "field": "WS-EDIT-SELECT-COUNTER",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "record selection"]
+      },
+      {
+        "description": "Selection action must be S (view) or U (update)",
+        "type": "format check",
+        "condition": "WS-EDIT-SELECT not 'S' or 'U'",
+        "failureOutcome": "Display error 'INVALID ACTION CODE'",
+        "location": { "function": "YYYY-STORE-PFKEY", "line": 125 },
+        "field": "WS-EDIT-SELECT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "action validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "validations": [
+      {
+        "description": "Account file must open successfully",
+        "type": "business rule validation",
+        "condition": "ACCTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Display 'ERROR OPENING ACCTFILE', perform IO status display, and abend program",
+        "location": { "function": "0000-ACCTFILE-OPEN", "line": 320 },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      },
+      {
+        "description": "Account file read must be successful",
+        "type": "business rule validation",
+        "condition": "ACCTFILE-STATUS NOT = '00' AND NOT = '10'",
+        "failureOutcome": "Display 'ERROR READING ACCOUNT FILE', perform IO status display, and abend program",
+        "location": { "function": "1000-ACCTFILE-GET-NEXT", "line": 167 },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      },
+      {
+        "description": "Output file write must be successful",
+        "type": "business rule validation",
+        "condition": "OUTFILE-STATUS NOT = '00' AND NOT = '10'",
+        "failureOutcome": "Display 'ACCOUNT FILE WRITE STATUS IS', perform IO status display, and abend program",
+        "location": { "function": "1350-WRITE-ACCT-RECORD", "line": 245 },
+        "field": "OUTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBCUS01C.cbl",
+    "validations": [
+      {
+        "description": "Customer file must open successfully",
+        "type": "business rule validation",
+        "condition": "CUSTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Display 'ERROR OPENING CUSTFILE', perform IO status display, and abend program",
+        "location": { "function": "0000-CUSTFILE-OPEN", "line": 121 },
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      },
+      {
+        "description": "Customer file read must be successful",
+        "type": "business rule validation",
+        "condition": "CUSTFILE-STATUS NOT = '00' AND NOT = '10'",
+        "failureOutcome": "Display 'ERROR READING CUSTOMER FILE', perform IO status display, and abend program",
+        "location": { "function": "1000-CUSTFILE-GET-NEXT", "line": 94 },
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      },
+      {
+        "description": "Customer file close must be successful",
+        "type": "business rule validation",
+        "condition": "CUSTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Display 'ERROR CLOSING CUSTOMER FILE', perform IO status display, and abend program",
+        "location": { "function": "9000-CUSTFILE-CLOSE", "line": 139 },
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file operations", "batch processing", "error handling"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/COACCT01.cbl",
+    "validations": [
+      {
+        "description": "Queue manager connection must be retrieved successfully",
+        "type": "business rule validation",
+        "condition": "WS-CICS-RESP1-CD NOT = DFHRESP(NORMAL)",
+        "failureOutcome": "Set error location 'CICS RETREIVE', build error message with response codes, perform error handling, and terminate",
+        "location": { "function": "1000-CONTROL", "line": 196 },
+        "field": "WS-CICS-RESP1-CD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["message queue", "CICS integration", "error handling"]
+      },
+      {
+        "description": "MQ request message must be retrieved successfully",
+        "type": "business rule validation",
+        "condition": "WS-COMPCODE NOT = MQCC-OK AND WS-REASON NOT = MQRC-NO-MSG-AVAILABLE",
+        "failureOutcome": "Set error flag, log error with code 'M003', message 'FAILED TO READ REQUEST MQ'",
+        "location": { "function": "3100-GET-REQUEST", "line": 416 },
+        "field": "WS-COMPCODE, WS-REASON",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["message queue", "MQ operations", "error handling"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "validations": [
+      {
+        "description": "Account ID must be provided for account view",
+        "type": "required field",
+        "condition": "Account ID is spaces, low-values, or zeros",
+        "failureOutcome": "Display 'Account number not provided' and return to search screen",
+        "location": { "function": "PROCESS-INPUTS", "line": 122 },
+        "field": "Account ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account view", "required field"]
+      },
+      {
+        "description": "Account ID must be numeric",
+        "type": "data type validation",
+        "condition": "Account ID is not numeric",
+        "failureOutcome": "Display 'Account number must be a non zero 11 digit number'",
+        "location": { "function": "VALIDATE-ACCOUNT-INPUT", "line": 128 },
+        "field": "Account ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account view", "data format"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "validations": [
+      {
+        "description": "Account ID or Card number must be provided for card search",
+        "type": "required field",
+        "condition": "Both account ID and card number are empty",
+        "failureOutcome": "Display 'No input received' error",
+        "location": { "function": "VALIDATE-SEARCH-CRITERIA", "line": 143 },
+        "field": "Account ID, Card number",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card search", "required field"]
+      },
+      {
+        "description": "Card number must be numeric if provided",
+        "type": "data type validation",
+        "condition": "Card number is not numeric",
+        "failureOutcome": "Display 'Card number if supplied must be a 16 digit number'",
+        "location": { "function": "VALIDATE-CARD-NUMBER", "line": 149 },
+        "field": "Card number",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card search", "data format"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "validations": [
+      {
+        "description": "Menu option must be numeric and within valid range",
+        "type": "range check",
+        "condition": "WS-OPTION IS NOT NUMERIC OR WS-OPTION > CDEMO-ADMIN-OPT-COUNT OR WS-OPTION = ZEROS",
+        "failureOutcome": "Display error 'Please enter a valid option number...'",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 131 },
+        "field": "WS-OPTION",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["admin menu", "user interface"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+    "validations": [
+      {
+        "description": "Only one action can be selected at a time",
+        "type": "business rule validation",
+        "condition": "WS-MORETHAN1ACTION is true (more than 1 action selected)",
+        "failureOutcome": "Display error 'Please select only 1 action'",
+        "location": { "function": "VALIDATE-SELECTIONS", "line": 258 },
+        "field": "WS-ACTIONS-REQUESTED",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type management", "user interface"]
+      },
+      {
+        "description": "Action code must be valid (D for delete or U for update)",
+        "type": "format check",
+        "condition": "WS-EDIT-SELECT not 'D' or 'U'",
+        "failureOutcome": "Display error 'Action code selected is invalid'",
+        "location": { "function": "VALIDATE-ACTION-CODE", "line": 260 },
+        "field": "WS-EDIT-SELECT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type management", "action validation"]
+      },
+      {
+        "description": "Changes must be detected before update",
+        "type": "business rule validation",
+        "condition": "NO-CHANGES-FOUND is true",
+        "failureOutcome": "Display 'No change detected with respect to database values.'",
+        "location": { "function": "CHECK-FOR-CHANGES", "line": 262 },
+        "field": "WS-DATACHANGED-FLAG",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type management", "change detection"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN01C.cbl",
+    "validations": [
+      {
+        "description": "Transaction file must open successfully for batch processing",
+        "type": "business rule validation",
+        "condition": "File status not successful on open",
+        "failureOutcome": "Display error and abend program",
+        "location": { "function": "OPEN-FILES", "line": 150 },
+        "field": "Transaction file status",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "validations": [
+      {
+        "description": "Menu selection must be valid option",
+        "type": "format check",
+        "condition": "Menu selection not in valid range",
+        "failureOutcome": "Display error 'Invalid menu selection'",
+        "location": { "function": "VALIDATE-SELECTION", "line": 180 },
+        "field": "Menu selection",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user interface", "menu navigation"]
+      }
+    ]
+  }
 ]
