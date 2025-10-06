@@ -1,0 +1,19 @@
+<h2>Create Order</h2>
+<form [formGroup]="form" (ngSubmit)="submit()" novalidate>
+  <label>User ID</label>
+  <input formControlName="user_id" required />
+  <app-error-message [error]="form.controls['user_id'].errors?.['required'] ? 'User ID required.' : null"></app-error-message>
+
+  <label>Amount</label>
+  <input formControlName="amount" type="number" required />
+  <app-error-message [error]="form.controls['amount'].errors?.['min'] ? 'Amount must be positive.' : null"></app-error-message>
+
+  <label>
+    Backordered
+    <input formControlName="backordered" type="checkbox" />
+  </label>
+
+  <button type="submit" [disabled]="loading || form.invalid">Create Order</button>
+</form>
+<app-error-message [error]="error"></app-error-message>
+<div *ngIf="success" class="success">{{ success }}</div>

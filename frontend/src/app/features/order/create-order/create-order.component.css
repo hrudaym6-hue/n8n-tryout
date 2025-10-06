@@ -1,0 +1,19 @@
+form {
+  max-width: 400px;
+  margin: auto;
+}
+label {
+  display: block;
+  margin-top: 12px;
+}
+input[type="text"], input[type="number"] {
+  width: 100%;
+  padding: 6px;
+}
+button {
+  margin-top: 18px;
+}
+.success {
+  color: green;
+  margin-top: 14px;
+}
