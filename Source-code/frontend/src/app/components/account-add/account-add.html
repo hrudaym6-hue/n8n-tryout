@@ -1,0 +1,281 @@
+<div class="account-add-container">
+  <h2>Add New Account</h2>
+
+  <div *ngIf="errorMessage" class="error-message">
+    {{ errorMessage }}
+  </div>
+
+  <div *ngIf="successMessage" class="success-message">
+    {{ successMessage }}
+  </div>
+
+  <form [formGroup]="accountForm" class="form-section">
+    <h3>Account Information</h3>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="accountId">Account ID <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId" 
+          placeholder="11 digits"
+          [class.invalid]="isFieldInvalid(accountForm, 'accountId')">
+        <div *ngIf="isFieldInvalid(accountForm, 'accountId')" class="field-error">
+          {{ getFieldError(accountForm, 'accountId') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="accountStatus">Status <span class="required">*</span></label>
+        <select id="accountStatus" formControlName="accountStatus">
+          <option value="A">Active</option>
+          <option value="I">Inactive</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="creditLimit">Credit Limit <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="creditLimit" 
+          formControlName="creditLimit" 
+          placeholder="0.00"
+          [class.invalid]="isFieldInvalid(accountForm, 'creditLimit')">
+        <div *ngIf="isFieldInvalid(accountForm, 'creditLimit')" class="field-error">
+          {{ getFieldError(accountForm, 'creditLimit') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cashCreditLimit">Cash Credit Limit <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="cashCreditLimit" 
+          formControlName="cashCreditLimit" 
+          placeholder="0.00"
+          [class.invalid]="isFieldInvalid(accountForm, 'cashCreditLimit')">
+        <div *ngIf="isFieldInvalid(accountForm, 'cashCreditLimit')" class="field-error">
+          {{ getFieldError(accountForm, 'cashCreditLimit') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="openDate">Open Date <span class="required">*</span></label>
+        <input 
+          type="date" 
+          id="openDate" 
+          formControlName="openDate"
+          [class.invalid]="isFieldInvalid(accountForm, 'openDate')">
+        <div *ngIf="isFieldInvalid(accountForm, 'openDate')" class="field-error">
+          {{ getFieldError(accountForm, 'openDate') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="expiryDate">Expiry Date <span class="required">*</span></label>
+        <input 
+          type="date" 
+          id="expiryDate" 
+          formControlName="expiryDate"
+          [class.invalid]="isFieldInvalid(accountForm, 'expiryDate')">
+        <div *ngIf="isFieldInvalid(accountForm, 'expiryDate')" class="field-error">
+          {{ getFieldError(accountForm, 'expiryDate') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="reissueDate">Reissue Date <span class="required">*</span></label>
+        <input 
+          type="date" 
+          id="reissueDate" 
+          formControlName="reissueDate"
+          [class.invalid]="isFieldInvalid(accountForm, 'reissueDate')">
+        <div *ngIf="isFieldInvalid(accountForm, 'reissueDate')" class="field-error">
+          {{ getFieldError(accountForm, 'reissueDate') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="groupId">Group ID <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="groupId" 
+          formControlName="groupId" 
+          placeholder="Group ID"
+          [class.invalid]="isFieldInvalid(accountForm, 'groupId')">
+        <div *ngIf="isFieldInvalid(accountForm, 'groupId')" class="field-error">
+          {{ getFieldError(accountForm, 'groupId') }}
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <form [formGroup]="customerForm" class="form-section">
+    <h3>Customer Information</h3>
+    
+    <div class="form-row">
+      <div class="form-group">
+        <label for="customerId">Customer ID <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="customerId" 
+          formControlName="customerId" 
+          placeholder="9 digits"
+          [class.invalid]="isFieldInvalid(customerForm, 'customerId')">
+        <div *ngIf="isFieldInvalid(customerForm, 'customerId')" class="field-error">
+          {{ getFieldError(customerForm, 'customerId') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="governmentId">Government ID <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="governmentId" 
+          formControlName="governmentId" 
+          placeholder="SSN or other ID"
+          [class.invalid]="isFieldInvalid(customerForm, 'governmentId')">
+        <div *ngIf="isFieldInvalid(customerForm, 'governmentId')" class="field-error">
+          {{ getFieldError(customerForm, 'governmentId') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="firstName">First Name <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="firstName" 
+          formControlName="firstName" 
+          placeholder="First Name"
+          [class.invalid]="isFieldInvalid(customerForm, 'firstName')">
+        <div *ngIf="isFieldInvalid(customerForm, 'firstName')" class="field-error">
+          {{ getFieldError(customerForm, 'firstName') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="middleName">Middle Name</label>
+        <input 
+          type="text" 
+          id="middleName" 
+          formControlName="middleName" 
+          placeholder="Middle Name (optional)">
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="lastName" 
+          formControlName="lastName" 
+          placeholder="Last Name"
+          [class.invalid]="isFieldInvalid(customerForm, 'lastName')">
+        <div *ngIf="isFieldInvalid(customerForm, 'lastName')" class="field-error">
+          {{ getFieldError(customerForm, 'lastName') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-group full-width">
+      <label for="address">Address <span class="required">*</span></label>
+      <input 
+        type="text" 
+        id="address" 
+        formControlName="address" 
+        placeholder="Street Address"
+        [class.invalid]="isFieldInvalid(customerForm, 'address')">
+      <div *ngIf="isFieldInvalid(customerForm, 'address')" class="field-error">
+        {{ getFieldError(customerForm, 'address') }}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="city">City <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="city" 
+          formControlName="city" 
+          placeholder="City"
+          [class.invalid]="isFieldInvalid(customerForm, 'city')">
+        <div *ngIf="isFieldInvalid(customerForm, 'city')" class="field-error">
+          {{ getFieldError(customerForm, 'city') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="state">State <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="state" 
+          formControlName="state" 
+          placeholder="XX"
+          maxlength="2"
+          [class.invalid]="isFieldInvalid(customerForm, 'state')">
+        <div *ngIf="isFieldInvalid(customerForm, 'state')" class="field-error">
+          {{ getFieldError(customerForm, 'state') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="zipCode">ZIP Code <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="zipCode" 
+          formControlName="zipCode" 
+          placeholder="12345"
+          maxlength="5"
+          [class.invalid]="isFieldInvalid(customerForm, 'zipCode')">
+        <div *ngIf="isFieldInvalid(customerForm, 'zipCode')" class="field-error">
+          {{ getFieldError(customerForm, 'zipCode') }}
+        </div>
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="form-group">
+        <label for="phoneNumber">Phone Number <span class="required">*</span></label>
+        <input 
+          type="text" 
+          id="phoneNumber" 
+          formControlName="phoneNumber" 
+          placeholder="1234567890"
+          maxlength="10"
+          [class.invalid]="isFieldInvalid(customerForm, 'phoneNumber')">
+        <div *ngIf="isFieldInvalid(customerForm, 'phoneNumber')" class="field-error">
+          {{ getFieldError(customerForm, 'phoneNumber') }}
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="creditScore">Credit Score <span class="required">*</span></label>
+        <input 
+          type="number" 
+          id="creditScore" 
+          formControlName="creditScore" 
+          placeholder="300-850"
+          [class.invalid]="isFieldInvalid(customerForm, 'creditScore')">
+        <div *ngIf="isFieldInvalid(customerForm, 'creditScore')" class="field-error">
+          {{ getFieldError(customerForm, 'creditScore') }}
+        </div>
+      </div>
+    </div>
+  </form>
+
+  <div class="form-actions">
+    <button class="btn btn-primary" (click)="onSubmit()" [disabled]="isSubmitting">
+      {{ isSubmitting ? 'Creating...' : 'Create Account' }}
+    </button>
+    <button class="btn btn-secondary" (click)="onClear()" [disabled]="isSubmitting">Clear</button>
+    <button class="btn btn-secondary" (click)="onBack()" [disabled]="isSubmitting">Cancel</button>
+  </div>
+</div>
