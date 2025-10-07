@@ -4,7 +4,9 @@ import { adminGuard } from './guards/admin.guard';
 import { Signin } from './components/signin/signin';
 import { MainMenu } from './components/main-menu/main-menu';
 import { AdminMenu } from './components/admin-menu/admin-menu';
+import { AccountList } from './components/account-list/account-list';
 import { AccountView } from './components/account-view/account-view';
+import { AccountAdd } from './components/account-add/account-add';
 import { AccountUpdate } from './components/account-update/account-update';
 import { CardList } from './components/card-list/card-list';
 import { CardUpdate } from './components/card-update/card-update';
@@ -27,7 +29,9 @@ export const routes: Routes = [
   { path: 'signin', component: Signin },
   { path: 'main-menu', component: MainMenu, canActivate: [authGuard] },
   { path: 'admin-menu', component: AdminMenu, canActivate: [adminGuard] },
+  { path: 'account-list', component: AccountList, canActivate: [authGuard] },
   { path: 'account-view', component: AccountView, canActivate: [authGuard] },
+  { path: 'account-add', component: AccountAdd, canActivate: [authGuard] },
   { path: 'account-update/:id', component: AccountUpdate, canActivate: [authGuard] },
   { path: 'card-list', component: CardList, canActivate: [authGuard] },
   { path: 'card-update/:cardNumber', component: CardUpdate, canActivate: [authGuard] },
