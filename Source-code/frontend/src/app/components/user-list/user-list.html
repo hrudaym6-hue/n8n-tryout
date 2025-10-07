@@ -1,0 +1,64 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>User Administration</h1>
+    </div>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="form-group">
+        <label for="searchCriteria">Search:</label>
+        <input 
+          type="text" 
+          id="searchCriteria" 
+          formControlName="searchCriteria" 
+          placeholder="Search by User ID or Name">
+      </div>
+      <button type="submit" [disabled]="isLoading">Search</button>
+      <button type="button" (click)="addUser()" class="add-button">Add User</button>
+    </form>
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (users.length > 0) {
+      <div class="users-table">
+        <table>
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>User Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (user of users; track user.userId) {
+              <tr>
+                <td>{{ user.userId }}</td>
+                <td>{{ user.firstName }}</td>
+                <td>{{ user.lastName }}</td>
+                <td>{{ user.userType === 'A' ? 'Admin' : 'Regular' }}</td>
+                <td>
+                  <button (click)="updateUser(user.userId)" class="action-button update">Update</button>
+                  <button (click)="deleteUser(user.userId)" class="action-button delete">Delete</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button (click)="previousPage()" [disabled]="currentPage === 0 || isLoading">Previous</button>
+          <span>Page {{ currentPage + 1 }}</span>
+          <button (click)="nextPage()" [disabled]="users.length < pageSize || isLoading">Next</button>
+        </div>
+      </div>
+    }
+
+    <div class="button-group">
+      <button (click)="onBack()" class="secondary-button">Back to Admin Menu</button>
+    </div>
+  </div>
+</div>

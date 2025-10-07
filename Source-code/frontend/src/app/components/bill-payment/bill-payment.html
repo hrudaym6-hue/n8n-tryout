@@ -1,0 +1,54 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>Bill Payment</h1>
+    </div>
+
+    <form [formGroup]="billPayForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId" 
+          maxlength="11"
+          placeholder="Enter Account ID"
+          [class.error]="billPayForm.get('accountId')?.invalid && billPayForm.get('accountId')?.touched">
+      </div>
+
+      @if (successMessage) {
+        <div class="success-message">{{ successMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      @if (paymentResult) {
+        <div class="payment-result">
+          <h3>Payment Details</h3>
+          <div class="detail-item">
+            <label>Transaction ID:</label>
+            <span>{{ paymentResult.transactionId }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Amount Paid:</label>
+            <span>{{ paymentResult.amount | currency }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Status:</label>
+            <span>{{ paymentResult.message }}</span>
+          </div>
+        </div>
+      }
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Processing...' : 'Process Payment' }}
+        </button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="onBack()" class="secondary-button">Back to Menu</button>
+      </div>
+    </form>
+  </div>
+</div>
