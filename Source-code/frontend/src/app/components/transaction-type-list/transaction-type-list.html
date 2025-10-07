@@ -1,0 +1,67 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>Transaction Type Maintenance</h1>
+    </div>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="form-group">
+        <label for="typeCode">Type Code:</label>
+        <input 
+          type="text" 
+          id="typeCode" 
+          formControlName="typeCode" 
+          placeholder="Search by code">
+      </div>
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <input 
+          type="text" 
+          id="description" 
+          formControlName="description" 
+          placeholder="Search by description">
+      </div>
+      <button type="submit" [disabled]="isLoading">Search</button>
+    </form>
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (transactionTypes.length > 0) {
+      <div class="transaction-types-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Type Code</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (type of transactionTypes; track type.typeCode) {
+              <tr>
+                <td>{{ type.typeCode }}</td>
+                <td>{{ type.description }}</td>
+                <td>
+                  <button (click)="updateTransactionType(type.typeCode)" class="action-button update">Update</button>
+                  <button (click)="deleteTransactionType(type.typeCode)" class="action-button delete">Delete</button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button (click)="previousPage()" [disabled]="currentPage === 0 || isLoading">Previous</button>
+          <span>Page {{ currentPage + 1 }}</span>
+          <button (click)="nextPage()" [disabled]="transactionTypes.length < pageSize || isLoading">Next</button>
+        </div>
+      </div>
+    }
+
+    <div class="button-group">
+      <button (click)="onBack()" class="secondary-button">Back to Admin Menu</button>
+    </div>
+  </div>
+</div>

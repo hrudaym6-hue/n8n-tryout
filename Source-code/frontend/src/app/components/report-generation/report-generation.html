@@ -1,0 +1,58 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>Transaction Report Generation</h1>
+    </div>
+
+    <form [formGroup]="reportForm" (ngSubmit)="onSubmit()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input 
+            type="date" 
+            id="startDate" 
+            formControlName="startDate">
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input 
+            type="date" 
+            id="endDate" 
+            formControlName="endDate">
+        </div>
+      </div>
+
+      @if (successMessage) {
+        <div class="success-message">{{ successMessage }}</div>
+      }
+
+      @if (errorMessage) {
+        <div class="error-message">{{ errorMessage }}</div>
+      }
+
+      @if (reportResult) {
+        <div class="report-result">
+          <h3>Report Status</h3>
+          <div class="detail-item">
+            <label>Job ID:</label>
+            <span>{{ reportResult.jobId }}</span>
+          </div>
+          <div class="detail-item">
+            <label>Message:</label>
+            <span>{{ reportResult.message }}</span>
+          </div>
+          <p class="help-text">Your report is being generated. You will be notified when it's ready for download.</p>
+        </div>
+      }
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isSubmitting">
+          {{ isSubmitting ? 'Generating...' : 'Generate Report' }}
+        </button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="onBack()" class="secondary-button">Back to Menu</button>
+      </div>
+    </form>
+  </div>
+</div>

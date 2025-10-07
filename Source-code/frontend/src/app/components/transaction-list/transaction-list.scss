@@ -1,0 +1,203 @@
+.page-container {
+  min-height: 100vh;
+  background: #f5f6fa;
+  padding: 20px;
+}
+
+.page-card {
+  max-width: 1100px;
+  margin: 0 auto;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  padding: 30px;
+}
+
+.page-header {
+  margin-bottom: 30px;
+  padding-bottom: 15px;
+  border-bottom: 3px solid #667eea;
+
+  h1 {
+    color: #333;
+    font-size: 24px;
+    margin: 0;
+  }
+}
+
+.search-form {
+  display: flex;
+  gap: 15px;
+  margin-bottom: 30px;
+  align-items: flex-end;
+
+  .form-group {
+    flex: 1;
+
+    label {
+      display: block;
+      color: #555;
+      font-weight: 600;
+      margin-bottom: 5px;
+    }
+
+    input {
+      width: 100%;
+      padding: 10px;
+      border: 2px solid #ddd;
+      border-radius: 4px;
+      font-size: 14px;
+
+      &:focus {
+        outline: none;
+        border-color: #667eea;
+      }
+    }
+  }
+
+  button {
+    padding: 10px 20px;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 14px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &[type="submit"] {
+      background: #667eea;
+
+      &:hover:not(:disabled) {
+        background: #5568d3;
+      }
+
+      &:disabled {
+        background: #ccc;
+        cursor: not-allowed;
+      }
+    }
+
+    &.add-button {
+      background: #27ae60;
+
+      &:hover {
+        background: #229954;
+      }
+    }
+  }
+}
+
+.error-message {
+  background: #fee;
+  color: #c33;
+  padding: 12px;
+  border-radius: 4px;
+  margin-bottom: 20px;
+}
+
+.transactions-table {
+  margin-bottom: 20px;
+
+  table {
+    width: 100%;
+    border-collapse: collapse;
+
+    thead {
+      background: #667eea;
+      color: white;
+
+      th {
+        padding: 12px;
+        text-align: left;
+        font-weight: 600;
+      }
+    }
+
+    tbody {
+      tr {
+        border-bottom: 1px solid #e9ecef;
+
+        &:hover {
+          background: #f8f9fa;
+        }
+
+        td {
+          padding: 12px;
+
+          &.negative {
+            color: #e74c3c;
+            font-weight: 600;
+          }
+        }
+      }
+    }
+  }
+
+  .view-button {
+    padding: 6px 12px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    font-size: 12px;
+    cursor: pointer;
+
+    &:hover {
+      background: #5568d3;
+    }
+  }
+}
+
+.pagination {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 15px;
+  margin-top: 20px;
+
+  button {
+    padding: 8px 16px;
+    background: #667eea;
+    color: white;
+    border: none;
+    border-radius: 4px;
+    cursor: pointer;
+
+    &:hover:not(:disabled) {
+      background: #5568d3;
+    }
+
+    &:disabled {
+      background: #ccc;
+      cursor: not-allowed;
+    }
+  }
+
+  span {
+    font-weight: 600;
+  }
+}
+
+.button-group {
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 2px solid #e9ecef;
+
+  .secondary-button {
+    padding: 12px 30px;
+    background: #95a5a6;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+
+    &:hover {
+      background: #7f8c8d;
+    }
+  }
+}

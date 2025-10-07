@@ -1,0 +1,77 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>Authorization Summary</h1>
+    </div>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId" 
+          maxlength="11"
+          placeholder="Enter Account ID">
+      </div>
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Searching...' : 'Search' }}
+      </button>
+    </form>
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (authorizations.length > 0) {
+      <div class="authorizations-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Authorization ID</th>
+              <th>Card Number</th>
+              <th>Amount</th>
+              <th>Merchant</th>
+              <th>City</th>
+              <th>Timestamp</th>
+              <th>Fraud Flag</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (auth of authorizations; track auth.authorizationId) {
+              <tr [class.fraud-alert]="auth.fraudFlag === 'Y'">
+                <td>{{ auth.authorizationId }}</td>
+                <td>{{ auth.cardNumber }}</td>
+                <td>{{ auth.amount | currency }}</td>
+                <td>{{ auth.merchantName }}</td>
+                <td>{{ auth.merchantCity }}</td>
+                <td>{{ auth.timestamp }}</td>
+                <td>
+                  <span [class.fraud-badge]="auth.fraudFlag === 'Y'">
+                    {{ auth.fraudFlag === 'Y' ? 'YES' : 'NO' }}
+                  </span>
+                </td>
+                <td>
+                  <button (click)="viewAuthorization(auth.authorizationId)" class="view-button">
+                    View Details
+                  </button>
+                </td>
+              </tr>
+            }
+          </tbody>
+        </table>
+
+        <div class="pagination">
+          <button (click)="previousPage()" [disabled]="currentPage === 0 || isLoading">Previous</button>
+          <span>Page {{ currentPage + 1 }}</span>
+          <button (click)="nextPage()" [disabled]="authorizations.length < pageSize || isLoading">Next</button>
+        </div>
+      </div>
+    }
+
+    <div class="button-group">
+      <button (click)="onBack()" class="secondary-button">Back to Admin Menu</button>
+    </div>
+  </div>
+</div>

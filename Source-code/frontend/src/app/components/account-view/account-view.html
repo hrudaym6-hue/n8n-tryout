@@ -1,0 +1,101 @@
+<div class="page-container">
+  <div class="page-card">
+    <div class="page-header">
+      <h1>Account Details</h1>
+    </div>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()" class="search-form">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId" 
+          maxlength="11"
+          placeholder="Enter Account ID">
+      </div>
+      <button type="submit" [disabled]="isLoading">
+        {{ isLoading ? 'Searching...' : 'Search' }}
+      </button>
+    </form>
+
+    @if (errorMessage) {
+      <div class="error-message">{{ errorMessage }}</div>
+    }
+
+    @if (accountDetail) {
+      <div class="account-details">
+        <div class="section">
+          <h3>Account Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Account ID:</label>
+              <span>{{ accountDetail.account.accountId }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Status:</label>
+              <span>{{ accountDetail.account.accountStatus }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Current Balance:</label>
+              <span>{{ accountDetail.account.currBalance | currency }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Credit Limit:</label>
+              <span>{{ accountDetail.account.creditLimit | currency }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Cash Credit Limit:</label>
+              <span>{{ accountDetail.account.cashCreditLimit | currency }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Open Date:</label>
+              <span>{{ accountDetail.account.openDate }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="section">
+          <h3>Customer Information</h3>
+          <div class="detail-grid">
+            <div class="detail-item">
+              <label>Customer ID:</label>
+              <span>{{ accountDetail.customer.customerId }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Name:</label>
+              <span>{{ accountDetail.customer.firstName }} {{ accountDetail.customer.lastName }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Address:</label>
+              <span>{{ accountDetail.customer.address }}</span>
+            </div>
+            <div class="detail-item">
+              <label>City, State ZIP:</label>
+              <span>{{ accountDetail.customer.city }}, {{ accountDetail.customer.state }} {{ accountDetail.customer.zipCode }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Phone:</label>
+              <span>{{ accountDetail.customer.phoneNumber }}</span>
+            </div>
+            <div class="detail-item">
+              <label>Credit Score:</label>
+              <span>{{ accountDetail.customer.creditScore }}</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="button-group">
+          <button (click)="onUpdate()" class="primary-button">Update Account</button>
+          <button (click)="onBack()" class="secondary-button">Back to Menu</button>
+        </div>
+      </div>
+    }
+
+    @if (!accountDetail && !errorMessage) {
+      <div class="empty-state">
+        <p>Enter an Account ID to view account details.</p>
+      </div>
+    }
+  </div>
+</div>

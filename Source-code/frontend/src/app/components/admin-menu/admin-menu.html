@@ -1,0 +1,28 @@
+<div class="menu-container">
+  <div class="menu-card">
+    <div class="menu-header">
+      <h1>CardDemo Application</h1>
+      <h2>Administrator Menu</h2>
+      @if (currentUser()) {
+        <p class="welcome">Welcome, Administrator {{ currentUser()?.firstName }} {{ currentUser()?.lastName }}</p>
+      }
+    </div>
+
+    <div class="menu-items">
+      @for (item of menuItems; track item.id) {
+        <button class="menu-item" (click)="selectOption(item.route)">
+          <span class="menu-key">{{ item.key }}</span>
+          <span class="menu-label">{{ item.label }}</span>
+        </button>
+      }
+    </div>
+
+    <div class="menu-actions">
+      <button class="exit-button" (click)="onExit()">Exit (F3)</button>
+    </div>
+
+    <div class="help-text">
+      <p>Select an option by clicking or pressing the corresponding number key.</p>
+    </div>
+  </div>
+</div>
