@@ -1,10 +1,10 @@
-# CardDemo Angular Frontend
+# cart-demo Angular Frontend
 
-Angular frontend application for the CardDemo Authorization Module, built based on user stories and validation rules extracted from COBOL mainframe programs.
+Angular frontend application for the cart-demo Authorization Module, built based on user stories and validation rules extracted from COBOL mainframe programs.
 
 ## Overview
 
-This application implements the CardDemo system's user interface using Angular 20.3.4, providing a modern web interface for mainframe COBOL business processes including user authentication, account management, credit card operations, and administrative functions.
+This application implements the cart-demo system's user interface using Angular 20.3.4, providing a modern web interface for mainframe COBOL business processes including user authentication, account management, credit card operations, and administrative functions.
 
 ## Features
 
@@ -285,7 +285,7 @@ npm install
 
 ## License
 
-This project is part of the CardDemo modernization initiative.
+This project is part of the cart-demo modernization initiative.
 
 ## Additional Resources
 
