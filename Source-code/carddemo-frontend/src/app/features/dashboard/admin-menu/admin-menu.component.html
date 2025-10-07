@@ -1,0 +1,39 @@
+<div class="menu-container">
+  <div class="menu-card">
+    <div class="menu-header">
+      <h2>CardDemo Application</h2>
+      <h3>Admin Menu</h3>
+      <p class="user-info">Welcome, {{ userName }} (Administrator)</p>
+    </div>
+
+    <div class="menu-options">
+      <div class="option-list">
+        <div *ngFor="let option of menuOptions" class="menu-option">
+          <span class="option-number">{{ option.value }}</span>
+          <span class="option-label">{{ option.label }}</span>
+        </div>
+      </div>
+
+      <div class="selection-form">
+        <div class="form-group">
+          <label for="option">Enter Option (1-4):</label>
+          <input 
+            type="text" 
+            id="option" 
+            [(ngModel)]="selectedOption"
+            maxlength="1"
+            class="option-input">
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div class="button-group">
+          <button (click)="onSubmit()" class="btn btn-primary">Enter</button>
+          <button (click)="onSignOff()" class="btn btn-secondary">Sign Off</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
