@@ -1,0 +1,84 @@
+name: Build and Deploy Node.js + Angular
+
+on:
+  push:
+    branches: [main]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      # Build backend (Node.js)
+      - name: Build backend Docker image
+        run: docker build -t my-backend:latest ./n8n-tryout/Source-code/backend
+
+      - name: Save backend image
+        run: docker save my-backend:latest -o backend.tar
+
+      # Build frontend (Angular)
+      - name: Build frontend Docker image
+        run: docker build -t my-frontend:latest ./n8n-tryout/Source-code/carddemo-frontend
+
+      - name: Save frontend image
+        run: docker save my-frontend:latest -o frontend.tar
+
+      - name: Fix permissions for tar files
+        run: chmod 644 *.tar
+
+      - name: Debug check files
+        run: ls -lh
+
+      # Copy both to VM
+      - name: Copy images to VM
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          source: "*.tar"
+          target: /home/hrudaym6/test/
+
+      - name: Clone or update project on VM
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /home/hrudaym6/repo
+            if [ -d "n8n-tryout/.git" ]; then
+              echo "Repo exists, pulling latest changes..."
+              cd n8n-tryout
+              git pull https://secrets.ACC_TKN@github.com/hrudaym6-hue/n8n-tryout.git
+            else
+              echo "Repo does not exist, cloning..."
+              git clone https://https://github.com/hrudaym6-hue/n8n-tryout.git 
+            fi
+
+      # Load and run on VM
+      - name: Deploy containers on VM
+        uses: appleboy/ssh-action@v1.0.0
+        with:
+          host: ${{ secrets.VM_HOST }}
+          username: ${{ secrets.VM_USER }}
+          key: ${{ secrets.VM_SSH_KEY }}
+          script: |
+            cd /home/hrudaym6/test/
+
+            # Ensure network exists
+            docker network create myapp-net || true
+
+            # Backend
+            docker load -i backend.tar
+            docker stop backend || true
+            docker rm backend || true
+            docker run -d --name backend --network myapp-net -p 8080:8080 my-backend:latest
+
+            # Frontend
+            docker load -i frontend.tar
+            docker stop frontend || true
+            docker rm frontend || true
+            docker run -d --name frontend --network myapp-net -p 3000:80 my-frontend:latest
