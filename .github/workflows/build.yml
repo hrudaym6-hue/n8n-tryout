@@ -13,14 +13,14 @@ jobs:
 
       # Build backend (Node.js)
       - name: Build backend Docker image
-        run: docker build -t my-backend:latest ./n8n-tryout/Source-code/backend
+        run: docker build -t my-backend:latest ./Source-code/backend
 
       - name: Save backend image
         run: docker save my-backend:latest -o backend.tar
 
       # Build frontend (Angular)
       - name: Build frontend Docker image
-        run: docker build -t my-frontend:latest ./n8n-tryout/Source-code/carddemo-frontend
+        run: docker build -t my-frontend:latest ./Source-code/carddemo-frontend
 
       - name: Save frontend image
         run: docker save my-frontend:latest -o frontend.tar
