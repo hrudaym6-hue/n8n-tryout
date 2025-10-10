@@ -75,10 +75,10 @@ jobs:
             docker load -i backend.tar
             docker stop backend || true
             docker rm backend || true
-            docker run -d --name backend --network myapp-net -p 8080:8080 my-backend:latest
+            docker run -d --name backend --network myapp-net -p 3000:3000 my-backend:latest
 
             # Frontend
             docker load -i frontend.tar
             docker stop frontend || true
             docker rm frontend || true
-            docker run -d --name frontend --network myapp-net -p 3000:80 my-frontend:latest
+            docker run -d --name frontend --network myapp-net -p 4200:80 my-frontend:latest
