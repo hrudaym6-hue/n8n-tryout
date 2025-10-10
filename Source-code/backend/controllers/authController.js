@@ -27,10 +27,6 @@ exports.register = async (req, res, next) => {
 
         users.set(userId, newUser);
 
-        console.log('[REGISTER] User registered:', userId);
-        console.log('[REGISTER] Total users:', users.size);
-        console.log('[REGISTER] All user IDs:', Array.from(users.keys()));
-
         req.session.user = {
             userId: newUser.user_id,
             userType: newUser.user_type,
@@ -51,28 +47,17 @@ exports.login = async (req, res, next) => {
     try {
         const { userId, password } = req.body;
 
-        console.log('[LOGIN] Attempt for userId:', userId);
-        console.log('[LOGIN] Total users in Map:', users.size);
-        console.log('[LOGIN] All user IDs:', Array.from(users.keys()));
-
         if (!userId || !password) {
             return res.status(400).json({ error: 'User ID and password are required' });
         }
 
         const user = users.get(userId);
 
-        console.log('[LOGIN] User found:', user ? 'YES' : 'NO');
-        if (user) {
-            console.log('[LOGIN] User object:', { ...user, password: '[REDACTED]' });
-        }
-
         if (!user) {
             return res.status(401).json({ error: 'Invalid user ID or password' });
         }
 
         const validPassword = await bcrypt.compare(password, user.password);
-
-        console.log('[LOGIN] Password valid:', validPassword);
 
         if (!validPassword) {
             return res.status(401).json({ error: 'Invalid user ID or password' });
