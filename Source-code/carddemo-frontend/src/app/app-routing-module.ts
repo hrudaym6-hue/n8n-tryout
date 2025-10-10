@@ -7,6 +7,14 @@ import { RegisterComponent } from './features/auth/register/register.component';
 import { MenuComponent } from './features/dashboard/menu/menu.component';
 import { AdminMenuComponent } from './features/dashboard/admin-menu/admin-menu.component';
 import { AccountListComponent } from './features/accounts/account-list/account-list.component';
+import { UserListComponent } from './features/users/user-list/user-list.component';
+import { UserAddComponent } from './features/users/user-add/user-add.component';
+import { UserUpdateComponent } from './features/users/user-update/user-update.component';
+import { UserDeleteComponent } from './features/users/user-delete/user-delete.component';
+import { CardListComponent } from './features/cards/card-list/card-list.component';
+import { TransactionListComponent } from './features/transactions/transaction-list/transaction-list.component';
+import { BillPaymentComponent } from './features/bill-payment/bill-payment.component';
+import { ReportsComponent } from './features/reports/reports.component';
 
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
@@ -28,29 +36,44 @@ const routes: Routes = [
     canActivate: [AuthGuard]
   },
   {
-    path: 'cards',
-    component: MenuComponent,
-    canActivate: [AuthGuard]
+    path: 'admin/users',
+    component: UserListComponent,
+    canActivate: [AuthGuard, AdminGuard]
   },
   {
-    path: 'transactions',
-    component: MenuComponent,
+    path: 'admin/users/add',
+    component: UserAddComponent,
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
+    path: 'admin/users/update',
+    component: UserUpdateComponent,
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
+    path: 'admin/users/delete',
+    component: UserDeleteComponent,
+    canActivate: [AuthGuard, AdminGuard]
+  },
+  {
+    path: 'cards',
+    component: CardListComponent,
     canActivate: [AuthGuard]
   },
   {
     path: 'bill-payment',
-    component: MenuComponent,
+    component: BillPaymentComponent,
+    canActivate: [AuthGuard]
+  },
+  {
+    path: 'transactions',
+    component: TransactionListComponent,
     canActivate: [AuthGuard]
   },
   {
     path: 'reports',
-    component: MenuComponent,
+    component: ReportsComponent,
     canActivate: [AuthGuard]
-  },
-  {
-    path: 'admin/users',
-    component: MenuComponent,
-    canActivate: [AuthGuard, AdminGuard]
   },
   { path: '**', redirectTo: '/login' }
 ];
