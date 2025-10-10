@@ -1,94 +1,82 @@
-const db = require('../config/database');
+const { accounts, customers, disclosureGroups } = require('../database/memoryStore');
 
 class AccountService {
     async getAccounts(filters = {}, page = 1, limit = 10) {
+        let allAccounts = Array.from(accounts.values());
+
+        if (filters.accountId) {
+            allAccounts = allAccounts.filter(a => a.account_id === filters.accountId);
+        }
+
+        if (filters.customerId) {
+            allAccounts = allAccounts.filter(a => a.customer_id === filters.customerId);
+        }
+
+        if (filters.accountStatus) {
+            allAccounts = allAccounts.filter(a => a.account_status === filters.accountStatus);
+        }
+
+        allAccounts.sort((a, b) => a.account_id - b.account_id);
+
         const offset = (page - 1) * limit;
-        let query = `
-            SELECT a.*, c.first_name, c.last_name, c.email, c.phone_number,
-                   dg.interest_rate, dg.group_description
-            FROM accounts a
-            JOIN customers c ON a.customer_id = c.customer_id
-            LEFT JOIN disclosure_groups dg ON a.group_id = dg.group_id
-            WHERE 1=1
-        `;
-        const params = [];
-        let paramIndex = 1;
+        const paginatedAccounts = allAccounts.slice(offset, offset + limit);
 
-        if (filters.accountId) {
-            query += ` AND a.account_id = $${paramIndex}`;
-            params.push(filters.accountId);
-            paramIndex++;
-        }
-
-        if (filters.customerId) {
-            query += ` AND a.customer_id = $${paramIndex}`;
-            params.push(filters.customerId);
-            paramIndex++;
-        }
-
-        if (filters.accountStatus) {
-            query += ` AND a.account_status = $${paramIndex}`;
-            params.push(filters.accountStatus);
-            paramIndex++;
-        }
-
-        query += ` ORDER BY a.account_id LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-        params.push(limit, offset);
-
-        const result = await db.query(query, params);
-
-        let countQuery = 'SELECT COUNT(*) FROM accounts a WHERE 1=1';
-        const countParams = [];
-        let countParamIndex = 1;
-
-        if (filters.accountId) {
-            countQuery += ` AND a.account_id = $${countParamIndex}`;
-            countParams.push(filters.accountId);
-            countParamIndex++;
-        }
-
-        if (filters.customerId) {
-            countQuery += ` AND a.customer_id = $${countParamIndex}`;
-            countParams.push(filters.customerId);
-            countParamIndex++;
-        }
-
-        if (filters.accountStatus) {
-            countQuery += ` AND a.account_status = $${countParamIndex}`;
-            countParams.push(filters.accountStatus);
-            countParamIndex++;
-        }
-
-        const countResult = await db.query(countQuery, countParams);
+        const enrichedAccounts = paginatedAccounts.map(account => {
+            const customer = customers.get(account.customer_id) || {};
+            const disclosureGroup = disclosureGroups.get(account.group_id) || {};
+            
+            return {
+                ...account,
+                first_name: customer.first_name,
+                last_name: customer.last_name,
+                email: customer.email,
+                phone_number: customer.phone_number,
+                interest_rate: disclosureGroup.interest_rate,
+                group_description: disclosureGroup.group_description
+            };
+        });
 
         return {
-            accounts: result.rows,
-            total: parseInt(countResult.rows[0].count),
+            accounts: enrichedAccounts,
+            total: allAccounts.length,
             page: parseInt(page),
             limit: parseInt(limit)
         };
     }
 
     async getAccountById(accountId) {
-        const result = await db.query(
-            `SELECT a.*, c.first_name, c.last_name, c.email, c.phone_number,
-                    c.date_of_birth, c.address_line1, c.address_line2, c.city,
-                    c.state, c.zip_code, c.fico_credit_score,
-                    dg.interest_rate, dg.group_description
-             FROM accounts a
-             JOIN customers c ON a.customer_id = c.customer_id
-             LEFT JOIN disclosure_groups dg ON a.group_id = dg.group_id
-             WHERE a.account_id = $1`,
-            [accountId]
-        );
+        const account = accounts.get(accountId);
+        if (!account) {
+            return null;
+        }
 
-        return result.rows[0] || null;
+        const customer = customers.get(account.customer_id) || {};
+        const disclosureGroup = disclosureGroups.get(account.group_id) || {};
+
+        return {
+            ...account,
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            email: customer.email,
+            phone_number: customer.phone_number,
+            date_of_birth: customer.date_of_birth,
+            address_line1: customer.address_line1,
+            address_line2: customer.address_line2,
+            city: customer.city,
+            state: customer.state,
+            zip_code: customer.zip_code,
+            fico_credit_score: customer.fico_credit_score,
+            interest_rate: disclosureGroup.interest_rate,
+            group_description: disclosureGroup.group_description
+        };
     }
 
     async updateAccount(accountId, updateData) {
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
+        const account = accounts.get(accountId);
+        
+        if (!account) {
+            throw new Error('Account not found');
+        }
 
         const allowedFields = [
             'account_status', 'credit_limit', 'cash_credit_limit',
@@ -98,33 +86,14 @@ class AccountService {
 
         for (const field of allowedFields) {
             if (updateData[field] !== undefined) {
-                fields.push(`${field} = $${paramIndex}`);
-                values.push(updateData[field]);
-                paramIndex++;
+                account[field] = updateData[field];
             }
         }
 
-        if (fields.length === 0) {
-            throw new Error('No valid fields to update');
-        }
+        account.updated_at = new Date();
+        accounts.set(accountId, account);
 
-        fields.push('updated_at = CURRENT_TIMESTAMP');
-        values.push(accountId);
-
-        const query = `
-            UPDATE accounts
-            SET ${fields.join(', ')}
-            WHERE account_id = $${paramIndex}
-            RETURNING *
-        `;
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
-            throw new Error('Account not found');
-        }
-
-        return result.rows[0];
+        return account;
     }
 
     async calculateAvailableCredit(accountId) {

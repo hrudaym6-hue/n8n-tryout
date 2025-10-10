@@ -3,6 +3,7 @@ import { RouterModule, Routes } from '@angular/router';
 import { AuthGuard } from './core/guards/auth.guard';
 import { AdminGuard } from './core/guards/admin.guard';
 import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
 import { MenuComponent } from './features/dashboard/menu/menu.component';
 import { AdminMenuComponent } from './features/dashboard/admin-menu/admin-menu.component';
 import { AccountListComponent } from './features/accounts/account-list/account-list.component';
@@ -10,6 +11,7 @@ import { AccountListComponent } from './features/accounts/account-list/account-l
 const routes: Routes = [
   { path: '', redirectTo: '/login', pathMatch: 'full' },
   { path: 'login', component: LoginComponent },
+  { path: 'register', component: RegisterComponent },
   { 
     path: 'dashboard', 
     component: MenuComponent, 

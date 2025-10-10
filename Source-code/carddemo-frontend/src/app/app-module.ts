@@ -7,6 +7,7 @@ import { AppRoutingModule } from './app-routing-module';
 import { App } from './app';
 import { AuthInterceptor } from './core/interceptors/auth.interceptor';
 import { LoginComponent } from './features/auth/login/login.component';
+import { RegisterComponent } from './features/auth/register/register.component';
 import { MenuComponent } from './features/dashboard/menu/menu.component';
 import { AdminMenuComponent } from './features/dashboard/admin-menu/admin-menu.component';
 import { AccountListComponent } from './features/accounts/account-list/account-list.component';
@@ -15,6 +16,7 @@ import { AccountListComponent } from './features/accounts/account-list/account-l
   declarations: [
     App,
     LoginComponent,
+    RegisterComponent,
     MenuComponent,
     AdminMenuComponent,
     AccountListComponent

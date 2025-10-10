@@ -1,12 +1,6 @@
-const db = require('../config/database');
+const { transactions, accounts, cards, transactionCategories, transactionTypes, getNextTransactionId } = require('../database/memoryStore');
 
 class TransactionService {
-    generateTransactionId() {
-        const timestamp = Date.now().toString();
-        const random = Math.floor(Math.random() * 1000).toString().padStart(3, '0');
-        return (timestamp + random).substring(0, 16);
-    }
-
     async createTransaction(transactionData) {
         const {
             accountId, cardNumber, transactionTypeCode, transactionCategoryCode,
@@ -14,168 +8,129 @@ class TransactionService {
             merchantId, merchantName, merchantCity, merchantZip
         } = transactionData;
 
-        const accountResult = await db.query(
-            'SELECT * FROM accounts WHERE account_id = $1',
-            [accountId]
-        );
-
-        if (accountResult.rows.length === 0) {
+        const account = accounts.get(accountId);
+        if (!account) {
             throw new Error('Account not found');
         }
 
-        const cardResult = await db.query(
-            'SELECT * FROM cards WHERE card_number = $1',
-            [cardNumber]
-        );
-
-        if (cardResult.rows.length === 0) {
+        const card = cards.get(cardNumber);
+        if (!card) {
             throw new Error('Card not found');
         }
 
-        const transactionId = this.generateTransactionId();
+        const transactionId = getNextTransactionId();
         const originDate = new Date();
         const processDate = new Date();
 
-        const result = await db.query(
-            `INSERT INTO transactions (
-                transaction_id, account_id, card_number, transaction_type_code,
-                transaction_category_code, transaction_source, transaction_description,
-                transaction_amount, merchant_id, merchant_name, merchant_city,
-                merchant_zip, origin_date, process_date
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13, $14)
-            RETURNING *`,
-            [
-                transactionId, accountId, cardNumber, transactionTypeCode,
-                transactionCategoryCode, transactionSource, transactionDescription,
-                transactionAmount, merchantId, merchantName, merchantCity,
-                merchantZip, originDate, processDate
-            ]
-        );
+        const newTransaction = {
+            transaction_id: transactionId,
+            account_id: accountId,
+            card_number: cardNumber,
+            transaction_type_code: transactionTypeCode,
+            transaction_category_code: transactionCategoryCode,
+            transaction_source: transactionSource,
+            transaction_description: transactionDescription,
+            transaction_amount: transactionAmount,
+            merchant_id: merchantId,
+            merchant_name: merchantName,
+            merchant_city: merchantCity,
+            merchant_zip: merchantZip,
+            origin_date: originDate,
+            process_date: processDate,
+            created_at: new Date(),
+            updated_at: new Date()
+        };
 
-        const account = accountResult.rows[0];
+        transactions.set(transactionId, newTransaction);
+
         const isDebit = ['03', '04', '05', '06'].includes(transactionTypeCode);
         const isCredit = ['02', '07', '08', '09'].includes(transactionTypeCode);
 
         if (isDebit) {
-            await db.query(
-                `UPDATE accounts 
-                 SET current_balance = current_balance + $1,
-                     current_cycle_debit = current_cycle_debit + $1,
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE account_id = $2`,
-                [transactionAmount, accountId]
-            );
+            account.current_balance = parseFloat(account.current_balance) + parseFloat(transactionAmount);
+            account.current_cycle_debit = parseFloat(account.current_cycle_debit || 0) + parseFloat(transactionAmount);
+            account.updated_at = new Date();
+            accounts.set(accountId, account);
         } else if (isCredit) {
-            await db.query(
-                `UPDATE accounts 
-                 SET current_balance = current_balance - $1,
-                     current_cycle_credit = current_cycle_credit + $1,
-                     updated_at = CURRENT_TIMESTAMP
-                 WHERE account_id = $2`,
-                [transactionAmount, accountId]
-            );
+            account.current_balance = parseFloat(account.current_balance) - parseFloat(transactionAmount);
+            account.current_cycle_credit = parseFloat(account.current_cycle_credit || 0) + parseFloat(transactionAmount);
+            account.updated_at = new Date();
+            accounts.set(accountId, account);
         }
 
-        return result.rows[0];
+        return newTransaction;
     }
 
     async getTransactions(filters = {}, page = 1, limit = 10) {
+        let allTransactions = Array.from(transactions.values());
+
+        if (filters.accountId) {
+            allTransactions = allTransactions.filter(t => t.account_id === filters.accountId);
+        }
+
+        if (filters.cardNumber) {
+            allTransactions = allTransactions.filter(t => t.card_number === filters.cardNumber);
+        }
+
+        if (filters.startDate) {
+            const startDate = new Date(filters.startDate);
+            allTransactions = allTransactions.filter(t => new Date(t.process_date) >= startDate);
+        }
+
+        if (filters.endDate) {
+            const endDate = new Date(filters.endDate);
+            allTransactions = allTransactions.filter(t => new Date(t.process_date) <= endDate);
+        }
+
+        allTransactions.sort((a, b) => new Date(b.process_date) - new Date(a.process_date));
+
         const offset = (page - 1) * limit;
-        let query = `
-            SELECT t.*, tt.type_description, tc.category_description,
-                   a.customer_id, c.card_type
-            FROM transactions t
-            JOIN transaction_types tt ON t.transaction_type_code = tt.type_code
-            JOIN transaction_categories tc ON t.transaction_category_code = tc.category_code
-            JOIN accounts a ON t.account_id = a.account_id
-            JOIN cards c ON t.card_number = c.card_number
-            WHERE 1=1
-        `;
-        const params = [];
-        let paramIndex = 1;
+        const paginatedTransactions = allTransactions.slice(offset, offset + limit);
 
-        if (filters.accountId) {
-            query += ` AND t.account_id = $${paramIndex}`;
-            params.push(filters.accountId);
-            paramIndex++;
-        }
-
-        if (filters.cardNumber) {
-            query += ` AND t.card_number = $${paramIndex}`;
-            params.push(filters.cardNumber);
-            paramIndex++;
-        }
-
-        if (filters.startDate) {
-            query += ` AND t.process_date >= $${paramIndex}`;
-            params.push(filters.startDate);
-            paramIndex++;
-        }
-
-        if (filters.endDate) {
-            query += ` AND t.process_date <= $${paramIndex}`;
-            params.push(filters.endDate);
-            paramIndex++;
-        }
-
-        query += ` ORDER BY t.process_date DESC LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-        params.push(limit, offset);
-
-        const result = await db.query(query, params);
-
-        let countQuery = 'SELECT COUNT(*) FROM transactions t WHERE 1=1';
-        const countParams = [];
-        let countParamIndex = 1;
-
-        if (filters.accountId) {
-            countQuery += ` AND t.account_id = $${countParamIndex}`;
-            countParams.push(filters.accountId);
-            countParamIndex++;
-        }
-
-        if (filters.cardNumber) {
-            countQuery += ` AND t.card_number = $${countParamIndex}`;
-            countParams.push(filters.cardNumber);
-            countParamIndex++;
-        }
-
-        if (filters.startDate) {
-            countQuery += ` AND t.process_date >= $${countParamIndex}`;
-            countParams.push(filters.startDate);
-            countParamIndex++;
-        }
-
-        if (filters.endDate) {
-            countQuery += ` AND t.process_date <= $${countParamIndex}`;
-            countParams.push(filters.endDate);
-            countParamIndex++;
-        }
-
-        const countResult = await db.query(countQuery, countParams);
+        const enrichedTransactions = paginatedTransactions.map(transaction => {
+            const type = transactionTypes.get(transaction.transaction_type_code) || {};
+            const category = transactionCategories.get(transaction.transaction_category_code) || {};
+            const account = accounts.get(transaction.account_id) || {};
+            const card = cards.get(transaction.card_number) || {};
+            
+            return {
+                ...transaction,
+                type_description: type.type_description,
+                category_description: category.category_description,
+                customer_id: account.customer_id,
+                card_type: card.card_type
+            };
+        });
 
         return {
-            transactions: result.rows,
-            total: parseInt(countResult.rows[0].count),
+            transactions: enrichedTransactions,
+            total: allTransactions.length,
             page: parseInt(page),
             limit: parseInt(limit)
         };
     }
 
     async getTransactionById(transactionId) {
-        const result = await db.query(
-            `SELECT t.*, tt.type_description, tc.category_description,
-                    a.customer_id, c.card_type, cust.first_name, cust.last_name
-             FROM transactions t
-             JOIN transaction_types tt ON t.transaction_type_code = tt.type_code
-             JOIN transaction_categories tc ON t.transaction_category_code = tc.category_code
-             JOIN accounts a ON t.account_id = a.account_id
-             JOIN cards c ON t.card_number = c.card_number
-             JOIN customers cust ON a.customer_id = cust.customer_id
-             WHERE t.transaction_id = $1`,
-            [transactionId]
-        );
+        const transaction = transactions.get(transactionId);
+        if (!transaction) {
+            return null;
+        }
 
-        return result.rows[0] || null;
+        const type = transactionTypes.get(transaction.transaction_type_code) || {};
+        const category = transactionCategories.get(transaction.transaction_category_code) || {};
+        const account = accounts.get(transaction.account_id) || {};
+        const card = cards.get(transaction.card_number) || {};
+        const customer = customers.get(account.customer_id) || {};
+
+        return {
+            ...transaction,
+            type_description: type.type_description,
+            category_description: category.category_description,
+            customer_id: account.customer_id,
+            card_type: card.card_type,
+            first_name: customer.first_name,
+            last_name: customer.last_name
+        };
     }
 }
 

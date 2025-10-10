@@ -1,123 +1,118 @@
-const db = require('../config/database');
+const { users } = require('../database/memoryStore');
 const bcrypt = require('bcrypt');
 
 class UserService {
     async getAllUsers(page = 1, limit = 10) {
+        const allUsers = Array.from(users.values());
         const offset = (page - 1) * limit;
-
-        const result = await db.query(
-            `SELECT user_id, first_name, last_name, user_type, created_at, updated_at
-             FROM users
-             ORDER BY user_id
-             LIMIT $1 OFFSET $2`,
-            [limit, offset]
-        );
-
-        const countResult = await db.query('SELECT COUNT(*) FROM users');
-
+        const paginatedUsers = allUsers.slice(offset, offset + limit);
+        
         return {
-            users: result.rows,
-            total: parseInt(countResult.rows[0].count),
-            page: parseInt(page),
-            limit: parseInt(limit)
+            users: paginatedUsers.map(u => ({
+                user_id: u.user_id,
+                first_name: u.first_name,
+                last_name: u.last_name,
+                user_type: u.user_type,
+                created_at: u.created_at,
+                updated_at: u.updated_at
+            })),
+            total: allUsers.length,
+            page,
+            limit
         };
     }
 
     async getUserById(userId) {
-        const result = await db.query(
-            `SELECT user_id, first_name, last_name, user_type, created_at, updated_at
-             FROM users
-             WHERE user_id = $1`,
-            [userId]
-        );
+        const user = users.get(userId);
 
-        return result.rows[0] || null;
+        if (!user) {
+            throw new Error('User not found');
+        }
+
+        return {
+            user_id: user.user_id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            user_type: user.user_type,
+            created_at: user.created_at,
+            updated_at: user.updated_at
+        };
     }
 
     async createUser(userData) {
-        const { userId, firstName, lastName, password, userType } = userData;
+        const { userId, firstName, lastName, password, userType = 'U' } = userData;
 
-        const existingUser = await this.getUserById(userId);
-        if (existingUser) {
+        if (users.has(userId)) {
             throw new Error('User ID already exists');
         }
 
         const hashedPassword = await bcrypt.hash(password, 10);
 
-        const result = await db.query(
-            `INSERT INTO users (user_id, first_name, last_name, password, user_type)
-             VALUES ($1, $2, $3, $4, $5)
-             RETURNING user_id, first_name, last_name, user_type, created_at, updated_at`,
-            [userId, firstName, lastName, hashedPassword, userType]
-        );
+        const newUser = {
+            user_id: userId,
+            first_name: firstName,
+            last_name: lastName,
+            password: hashedPassword,
+            user_type: userType,
+            created_at: new Date(),
+            updated_at: new Date()
+        };
 
-        return result.rows[0];
+        users.set(userId, newUser);
+
+        return {
+            user_id: newUser.user_id,
+            first_name: newUser.first_name,
+            last_name: newUser.last_name,
+            user_type: newUser.user_type,
+            created_at: newUser.created_at,
+            updated_at: newUser.updated_at
+        };
     }
 
     async updateUser(userId, updateData) {
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
+        const user = users.get(userId);
+        
+        if (!user) {
+            throw new Error('User not found');
+        }
 
         if (updateData.firstName) {
-            fields.push(`first_name = $${paramIndex}`);
-            values.push(updateData.firstName);
-            paramIndex++;
+            user.first_name = updateData.firstName;
         }
 
         if (updateData.lastName) {
-            fields.push(`last_name = $${paramIndex}`);
-            values.push(updateData.lastName);
-            paramIndex++;
+            user.last_name = updateData.lastName;
         }
 
         if (updateData.password) {
-            const hashedPassword = await bcrypt.hash(updateData.password, 10);
-            fields.push(`password = $${paramIndex}`);
-            values.push(hashedPassword);
-            paramIndex++;
+            user.password = await bcrypt.hash(updateData.password, 10);
         }
 
         if (updateData.userType) {
-            fields.push(`user_type = $${paramIndex}`);
-            values.push(updateData.userType);
-            paramIndex++;
+            user.user_type = updateData.userType;
         }
 
-        if (fields.length === 0) {
-            throw new Error('No valid fields to update');
-        }
+        user.updated_at = new Date();
+        users.set(userId, user);
 
-        fields.push('updated_at = CURRENT_TIMESTAMP');
-        values.push(userId);
-
-        const query = `
-            UPDATE users
-            SET ${fields.join(', ')}
-            WHERE user_id = $${paramIndex}
-            RETURNING user_id, first_name, last_name, user_type, created_at, updated_at
-        `;
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
-            throw new Error('User not found');
-        }
-
-        return result.rows[0];
+        return {
+            user_id: user.user_id,
+            first_name: user.first_name,
+            last_name: user.last_name,
+            user_type: user.user_type,
+            created_at: user.created_at,
+            updated_at: user.updated_at
+        };
     }
 
     async deleteUser(userId) {
-        const result = await db.query(
-            'DELETE FROM users WHERE user_id = $1 RETURNING user_id',
-            [userId]
-        );
-
-        if (result.rows.length === 0) {
+        if (!users.has(userId)) {
             throw new Error('User not found');
         }
 
-        return { success: true, userId: result.rows[0].user_id };
+        users.delete(userId);
+        return { success: true, userId };
     }
 }
 

@@ -1,33 +1,21 @@
-const db = require('../config/database');
+const { customers, getNextCustomerId } = require('../database/memoryStore');
 
 class CustomerService {
     async getAllCustomers(page = 1, limit = 10) {
+        const allCustomers = Array.from(customers.values());
         const offset = (page - 1) * limit;
-
-        const result = await db.query(
-            `SELECT * FROM customers
-             ORDER BY customer_id
-             LIMIT $1 OFFSET $2`,
-            [limit, offset]
-        );
-
-        const countResult = await db.query('SELECT COUNT(*) FROM customers');
+        const paginatedCustomers = allCustomers.slice(offset, offset + limit);
 
         return {
-            customers: result.rows,
-            total: parseInt(countResult.rows[0].count),
+            customers: paginatedCustomers,
+            total: allCustomers.length,
             page: parseInt(page),
             limit: parseInt(limit)
         };
     }
 
     async getCustomerById(customerId) {
-        const result = await db.query(
-            'SELECT * FROM customers WHERE customer_id = $1',
-            [customerId]
-        );
-
-        return result.rows[0] || null;
+        return customers.get(customerId) || null;
     }
 
     async createCustomer(customerData) {
@@ -37,27 +25,37 @@ class CustomerService {
             zipCode, ficoCreditScore
         } = customerData;
 
-        const result = await db.query(
-            `INSERT INTO customers (
-                customer_id, first_name, last_name, date_of_birth, phone_number,
-                ssn, email, address_line1, address_line2, city, state,
-                zip_code, fico_credit_score
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12, $13)
-            RETURNING *`,
-            [
-                customerId, firstName, lastName, dateOfBirth, phoneNumber,
-                ssn, email, addressLine1, addressLine2, city, state,
-                zipCode, ficoCreditScore
-            ]
-        );
+        const id = customerId || getNextCustomerId();
 
-        return result.rows[0];
+        const newCustomer = {
+            customer_id: id,
+            first_name: firstName,
+            last_name: lastName,
+            date_of_birth: dateOfBirth,
+            phone_number: phoneNumber,
+            ssn: ssn,
+            email: email,
+            address_line1: addressLine1,
+            address_line2: addressLine2,
+            city: city,
+            state: state,
+            zip_code: zipCode,
+            fico_credit_score: ficoCreditScore,
+            created_at: new Date(),
+            updated_at: new Date()
+        };
+
+        customers.set(id, newCustomer);
+
+        return newCustomer;
     }
 
     async updateCustomer(customerId, updateData) {
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
+        const customer = customers.get(customerId);
+        
+        if (!customer) {
+            throw new Error('Customer not found');
+        }
 
         const allowedFields = [
             'first_name', 'last_name', 'date_of_birth', 'phone_number',
@@ -68,33 +66,14 @@ class CustomerService {
         for (const field of allowedFields) {
             const camelCaseField = field.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
             if (updateData[camelCaseField] !== undefined) {
-                fields.push(`${field} = $${paramIndex}`);
-                values.push(updateData[camelCaseField]);
-                paramIndex++;
+                customer[field] = updateData[camelCaseField];
             }
         }
 
-        if (fields.length === 0) {
-            throw new Error('No valid fields to update');
-        }
+        customer.updated_at = new Date();
+        customers.set(customerId, customer);
 
-        fields.push('updated_at = CURRENT_TIMESTAMP');
-        values.push(customerId);
-
-        const query = `
-            UPDATE customers
-            SET ${fields.join(', ')}
-            WHERE customer_id = $${paramIndex}
-            RETURNING *
-        `;
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
-            throw new Error('Customer not found');
-        }
-
-        return result.rows[0];
+        return customer;
     }
 }
 

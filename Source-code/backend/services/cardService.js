@@ -1,103 +1,78 @@
-const db = require('../config/database');
+const { cards, accounts, customers } = require('../database/memoryStore');
 
 class CardService {
     async getCards(filters = {}, page = 1, limit = 10) {
+        let allCards = Array.from(cards.values());
+
+        if (filters.cardNumber) {
+            allCards = allCards.filter(c => c.card_number === filters.cardNumber);
+        }
+
+        if (filters.accountId) {
+            allCards = allCards.filter(c => c.account_id === filters.accountId);
+        }
+
+        if (filters.customerId) {
+            allCards = allCards.filter(c => c.customer_id === filters.customerId);
+        }
+
+        if (filters.cardStatus) {
+            allCards = allCards.filter(c => c.card_status === filters.cardStatus);
+        }
+
+        allCards.sort((a, b) => a.card_number.localeCompare(b.card_number));
+
         const offset = (page - 1) * limit;
-        let query = `
-            SELECT c.*, a.credit_limit, a.current_balance, cust.first_name, cust.last_name
-            FROM cards c
-            JOIN accounts a ON c.account_id = a.account_id
-            JOIN customers cust ON c.customer_id = cust.customer_id
-            WHERE 1=1
-        `;
-        const params = [];
-        let paramIndex = 1;
+        const paginatedCards = allCards.slice(offset, offset + limit);
 
-        if (filters.cardNumber) {
-            query += ` AND c.card_number = $${paramIndex}`;
-            params.push(filters.cardNumber);
-            paramIndex++;
-        }
-
-        if (filters.accountId) {
-            query += ` AND c.account_id = $${paramIndex}`;
-            params.push(filters.accountId);
-            paramIndex++;
-        }
-
-        if (filters.customerId) {
-            query += ` AND c.customer_id = $${paramIndex}`;
-            params.push(filters.customerId);
-            paramIndex++;
-        }
-
-        if (filters.cardStatus) {
-            query += ` AND c.card_status = $${paramIndex}`;
-            params.push(filters.cardStatus);
-            paramIndex++;
-        }
-
-        query += ` ORDER BY c.card_number LIMIT $${paramIndex} OFFSET $${paramIndex + 1}`;
-        params.push(limit, offset);
-
-        const result = await db.query(query, params);
-
-        let countQuery = 'SELECT COUNT(*) FROM cards c WHERE 1=1';
-        const countParams = [];
-        let countParamIndex = 1;
-
-        if (filters.cardNumber) {
-            countQuery += ` AND c.card_number = $${countParamIndex}`;
-            countParams.push(filters.cardNumber);
-            countParamIndex++;
-        }
-
-        if (filters.accountId) {
-            countQuery += ` AND c.account_id = $${countParamIndex}`;
-            countParams.push(filters.accountId);
-            countParamIndex++;
-        }
-
-        if (filters.customerId) {
-            countQuery += ` AND c.customer_id = $${countParamIndex}`;
-            countParams.push(filters.customerId);
-            countParamIndex++;
-        }
-
-        if (filters.cardStatus) {
-            countQuery += ` AND c.card_status = $${countParamIndex}`;
-            countParams.push(filters.cardStatus);
-            countParamIndex++;
-        }
-
-        const countResult = await db.query(countQuery, countParams);
+        const enrichedCards = paginatedCards.map(card => {
+            const account = accounts.get(card.account_id) || {};
+            const customer = customers.get(card.customer_id) || {};
+            
+            return {
+                ...card,
+                credit_limit: account.credit_limit,
+                current_balance: account.current_balance,
+                first_name: customer.first_name,
+                last_name: customer.last_name
+            };
+        });
 
         return {
-            cards: result.rows,
-            total: parseInt(countResult.rows[0].count),
+            cards: enrichedCards,
+            total: allCards.length,
             page: parseInt(page),
             limit: parseInt(limit)
         };
     }
 
     async getCardByNumber(cardNumber) {
-        const result = await db.query(
-            `SELECT c.*, a.credit_limit, a.current_balance, a.account_status,
-                    cust.first_name, cust.last_name, cust.email, cust.phone_number
-             FROM cards c
-             JOIN accounts a ON c.account_id = a.account_id
-             JOIN customers cust ON c.customer_id = cust.customer_id
-             WHERE c.card_number = $1`,
-            [cardNumber]
-        );
+        const card = cards.get(cardNumber);
+        if (!card) {
+            return null;
+        }
 
-        return result.rows[0] || null;
+        const account = accounts.get(card.account_id) || {};
+        const customer = customers.get(card.customer_id) || {};
+
+        return {
+            ...card,
+            credit_limit: account.credit_limit,
+            current_balance: account.current_balance,
+            account_status: account.account_status,
+            first_name: customer.first_name,
+            last_name: customer.last_name,
+            email: customer.email,
+            phone_number: customer.phone_number
+        };
     }
 
     async updateCard(cardNumber, updateData) {
-        const fields = [];
-        const values = [];
-        let paramIndex = 1;
+        const card = cards.get(cardNumber);
+        
+        if (!card) {
+            throw new Error('Card not found');
+        }
 
         const allowedFields = [
             'card_type', 'expiry_month', 'expiry_year', 'cvv_code',
@@ -107,33 +82,14 @@ class CardService {
         for (const field of allowedFields) {
             const camelCaseField = field.replace(/_([a-z])/g, (g) => g[1].toUpperCase());
             if (updateData[camelCaseField] !== undefined) {
-                fields.push(`${field} = $${paramIndex}`);
-                values.push(updateData[camelCaseField]);
-                paramIndex++;
+                card[field] = updateData[camelCaseField];
             }
         }
 
-        if (fields.length === 0) {
-            throw new Error('No valid fields to update');
-        }
+        card.updated_at = new Date();
+        cards.set(cardNumber, card);
 
-        fields.push('updated_at = CURRENT_TIMESTAMP');
-        values.push(cardNumber);
-
-        const query = `
-            UPDATE cards
-            SET ${fields.join(', ')}
-            WHERE card_number = $${paramIndex}
-            RETURNING *
-        `;
-
-        const result = await db.query(query, values);
-
-        if (result.rows.length === 0) {
-            throw new Error('Card not found');
-        }
-
-        return result.rows[0];
+        return card;
     }
 }
 
