@@ -13,8 +13,11 @@ FROM nginx:alpine
 # Remove default Nginx static assets
 RUN rm -rf /usr/share/nginx/html/*
 
+# Copy custom nginx configuration
+COPY nginx.conf /etc/nginx/conf.d/default.conf
+
 # Copy built Angular files to Nginx's html directory
-COPY --from=build /app/dist/ /usr/share/nginx/html/
+COPY --from=build /app/dist/carddemo-frontend/browser /usr/share/nginx/html/
 
 # Expose port Nginx serves on
 EXPOSE 80

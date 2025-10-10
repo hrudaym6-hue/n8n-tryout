@@ -3,6 +3,7 @@ const cors = require('cors');
 const dotenv = require('dotenv');
 const bodyParser = require('body-parser');
 const morgan = require('morgan');
+const session = require('express-session');
 const errorHandler = require('./middleware/errorHandler');
 
 dotenv.config();
@@ -10,7 +11,23 @@ dotenv.config();
 const app = express();
 const PORT = process.env.PORT || 3000;
 
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || 'http://localhost:4200',
+    credentials: true
+}));
+
+app.use(session({
+    secret: process.env.SESSION_SECRET || 'cardemo-secret-key-change-in-production',
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+        secure: process.env.NODE_ENV === 'production' ? false : false,
+        httpOnly: true,
+        maxAge: 24 * 60 * 60 * 1000,
+        sameSite: 'lax'
+    }
+}));
+
 app.use(morgan('combined'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));

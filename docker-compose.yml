@@ -1,0 +1,29 @@
+version: '3.8'
+
+services:
+  backend:
+    build: ./Source-code/backend
+    container_name: carddemo-backend
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - SESSION_SECRET=change-this-secret-in-production
+      - FRONTEND_URL=http://localhost
+    networks:
+      - carddemo-network
+
+  frontend:
+    build: ./Source-code/carddemo-frontend
+    container_name: carddemo-frontend
+    ports:
+      - "80:80"
+    depends_on:
+      - backend
+    networks:
+      - carddemo-network
+
+networks:
+  carddemo-network:
+    driver: bridge

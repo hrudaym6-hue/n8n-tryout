@@ -1,0 +1,37 @@
+<div class="register-container">
+  <div class="register-card">
+    <h2>CardDemo Registration</h2>
+    <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userId">User ID</label>
+        <input type="text" id="userId" formControlName="userId" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="firstName">First Name</label>
+        <input type="text" id="firstName" formControlName="firstName" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="lastName">Last Name</label>
+        <input type="text" id="lastName" formControlName="lastName" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="password">Password</label>
+        <input type="password" id="password" formControlName="password" class="form-control" />
+      </div>
+      <div class="form-group">
+        <label for="confirmPassword">Confirm Password</label>
+        <input type="password" id="confirmPassword" formControlName="confirmPassword" class="form-control" />
+      </div>
+      <div class="error-message" *ngIf="errorMessage">{{ errorMessage }}</div>
+      <div class="button-group">
+        <button type="submit" [disabled]="loading" class="btn btn-primary">
+          {{ loading ? 'Registering...' : 'Register' }}
+        </button>
+        <button type="button" (click)="onClear()" class="btn btn-secondary">Clear</button>
+      </div>
+      <div class="login-link">
+        Already have an account? <a routerLink="/login">Login here</a>
+      </div>
+    </form>
+  </div>
+</div>

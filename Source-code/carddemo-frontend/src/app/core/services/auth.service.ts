@@ -41,23 +41,39 @@ export class AuthService {
     return this.currentUserValue?.userType === 'A';
   }
 
-  login(userId: string, password: string): Observable<LoginResponse> {
-    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
+  register(userId: string, firstName: string, lastName: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/register`, {
       userId,
+      firstName,
+      lastName,
       password
-    }).pipe(
+    }, { withCredentials: true }).pipe(
       tap(response => {
-        localStorage.setItem(this.tokenKey, response.token);
         localStorage.setItem(this.userKey, JSON.stringify(response.user));
         this.currentUserSubject.next(response.user);
       })
     );
   }
 
-  logout(): void {
-    localStorage.removeItem(this.tokenKey);
-    localStorage.removeItem(this.userKey);
-    this.currentUserSubject.next(null);
+  login(userId: string, password: string): Observable<LoginResponse> {
+    return this.http.post<LoginResponse>(`${environment.apiUrl}/auth/login`, {
+      userId,
+      password
+    }, { withCredentials: true }).pipe(
+      tap(response => {
+        localStorage.setItem(this.userKey, JSON.stringify(response.user));
+        this.currentUserSubject.next(response.user);
+      })
+    );
+  }
+
+  logout(): Observable<any> {
+    return this.http.post(`${environment.apiUrl}/auth/logout`, {}, { withCredentials: true }).pipe(
+      tap(() => {
+        localStorage.removeItem(this.userKey);
+        this.currentUserSubject.next(null);
+      })
+    );
   }
 
   getToken(): string | null {

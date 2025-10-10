@@ -1,15 +1,12 @@
-const db = require('../config/database');
+const { authorizations, accounts, cards, customers, getNextAuthId } = require('../database/memoryStore');
 
 class AuthorizationService {
     async processAuthorization(authData) {
         const { accountId, cardNumber, transactionAmount, merchantId, merchantName, merchantCity, merchantZip } = authData;
 
-        const accountResult = await db.query(
-            'SELECT * FROM accounts WHERE account_id = $1',
-            [accountId]
-        );
+        const account = accounts.get(accountId);
 
-        if (accountResult.rows.length === 0) {
+        if (!account) {
             return {
                 responseCode: '14',
                 reasonCode: 'ACNT',
@@ -17,8 +14,6 @@ class AuthorizationService {
                 message: 'Account not found'
             };
         }
-
-        const account = accountResult.rows[0];
 
         if (account.account_status !== 'Y') {
             return {
@@ -29,12 +24,9 @@ class AuthorizationService {
             };
         }
 
-        const cardResult = await db.query(
-            'SELECT * FROM cards WHERE card_number = $1 AND account_id = $2',
-            [cardNumber, accountId]
-        );
+        const card = cards.get(cardNumber);
 
-        if (cardResult.rows.length === 0) {
+        if (!card || card.account_id !== accountId) {
             return {
                 responseCode: '14',
                 reasonCode: 'CARD',
@@ -42,8 +34,6 @@ class AuthorizationService {
                 message: 'Card not found or does not belong to account'
             };
         }
-
-        const card = cardResult.rows[0];
 
         if (card.card_status !== 'Y') {
             return {
@@ -75,73 +65,85 @@ class AuthorizationService {
         }
 
         const authTime = new Date();
-        const authResult = await db.query(
-            `INSERT INTO authorizations (
-                account_id, card_number, transaction_amount, 
-                merchant_id, merchant_name, merchant_city, merchant_zip,
-                auth_date, auth_time, response_code, approved_amount, reason_code
-            ) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9, $10, $11, $12)
-            RETURNING *`,
-            [
-                accountId, cardNumber, transactionAmount,
-                merchantId, merchantName, merchantCity, merchantZip,
-                authTime, authTime, '00', transactionAmount, 'APPR'
-            ]
-        );
+        const authId = getNextAuthId();
 
-        await db.query(
-            'UPDATE accounts SET current_balance = current_balance + $1, updated_at = CURRENT_TIMESTAMP WHERE account_id = $2',
-            [transactionAmount, accountId]
-        );
+        const newAuth = {
+            auth_id: authId,
+            account_id: accountId,
+            card_number: cardNumber,
+            transaction_amount: transactionAmount,
+            merchant_id: merchantId,
+            merchant_name: merchantName,
+            merchant_city: merchantCity,
+            merchant_zip: merchantZip,
+            auth_date: authTime,
+            auth_time: authTime,
+            response_code: '00',
+            approved_amount: transactionAmount,
+            reason_code: 'APPR',
+            created_at: new Date(),
+            updated_at: new Date()
+        };
+
+        authorizations.set(authId, newAuth);
+
+        account.current_balance = parseFloat(account.current_balance) + parseFloat(transactionAmount);
+        account.updated_at = new Date();
+        accounts.set(accountId, account);
 
         return {
             responseCode: '00',
             reasonCode: 'APPR',
             approvedAmount: transactionAmount,
             message: 'Authorization approved',
-            authId: authResult.rows[0].auth_id
+            authId: authId
         };
     }
 
     async getAuthorizationsByAccount(accountId, page = 1, limit = 10) {
+        let allAuths = Array.from(authorizations.values())
+            .filter(a => a.account_id === accountId)
+            .sort((a, b) => new Date(b.auth_date) - new Date(a.auth_date));
+
         const offset = (page - 1) * limit;
+        const paginatedAuths = allAuths.slice(offset, offset + limit);
 
-        const result = await db.query(
-            `SELECT a.*, acc.customer_id, c.card_type
-             FROM authorizations a
-             JOIN accounts acc ON a.account_id = acc.account_id
-             JOIN cards c ON a.card_number = c.card_number
-             WHERE a.account_id = $1
-             ORDER BY a.auth_date DESC, a.auth_time DESC
-             LIMIT $2 OFFSET $3`,
-            [accountId, limit, offset]
-        );
-
-        const countResult = await db.query(
-            'SELECT COUNT(*) FROM authorizations WHERE account_id = $1',
-            [accountId]
-        );
+        const enrichedAuths = paginatedAuths.map(auth => {
+            const account = accounts.get(auth.account_id) || {};
+            const card = cards.get(auth.card_number) || {};
+            
+            return {
+                ...auth,
+                customer_id: account.customer_id,
+                card_type: card.card_type
+            };
+        });
 
         return {
-            authorizations: result.rows,
-            total: parseInt(countResult.rows[0].count),
+            authorizations: enrichedAuths,
+            total: allAuths.length,
             page: parseInt(page),
             limit: parseInt(limit)
         };
     }
 
     async getAuthorizationById(authId) {
-        const result = await db.query(
-            `SELECT a.*, acc.customer_id, c.card_type, cust.first_name, cust.last_name
-             FROM authorizations a
-             JOIN accounts acc ON a.account_id = acc.account_id
-             JOIN cards c ON a.card_number = c.card_number
-             JOIN customers cust ON acc.customer_id = cust.customer_id
-             WHERE a.auth_id = $1`,
-            [authId]
-        );
+        const auth = authorizations.get(authId);
+        if (!auth) {
+            return null;
+        }
 
-        return result.rows[0] || null;
+        const account = accounts.get(auth.account_id) || {};
+        const card = cards.get(auth.card_number) || {};
+        const customer = customers.get(account.customer_id) || {};
+
+        return {
+            ...auth,
+            customer_id: account.customer_id,
+            card_type: card.card_type,
+            first_name: customer.first_name,
+            last_name: customer.last_name
+        };
     }
 }
 
