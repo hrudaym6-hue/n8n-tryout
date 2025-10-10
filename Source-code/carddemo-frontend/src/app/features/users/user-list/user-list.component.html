@@ -1,0 +1,87 @@
+<div class="user-list-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>User List</h2>
+      <p class="subtitle">Manage system users</p>
+    </div>
+
+    <div class="card-body">
+      <div class="search-section">
+        <div class="search-form">
+          <input
+            type="text"
+            [(ngModel)]="searchUserId"
+            placeholder="Search by User ID"
+            class="form-control"
+            (keyup.enter)="onSearch()"
+          />
+          <button (click)="onSearch()" class="btn btn-primary">Search</button>
+          <button (click)="onClearSearch()" class="btn btn-secondary">Clear</button>
+        </div>
+        <button (click)="onAddUser()" class="btn btn-success">Add New User</button>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="loading" class="loading-message">
+        Loading users...
+      </div>
+
+      <div *ngIf="!loading && users.length === 0" class="no-data-message">
+        No users found.
+      </div>
+
+      <div *ngIf="!loading && users.length > 0" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>User ID</th>
+              <th>First Name</th>
+              <th>Last Name</th>
+              <th>User Type</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let user of users">
+              <td>{{ user.user_id }}</td>
+              <td>{{ user.first_name }}</td>
+              <td>{{ user.last_name }}</td>
+              <td>{{ user.user_type === 'A' ? 'Admin' : 'User' }}</td>
+              <td class="actions">
+                <button (click)="onUpdateUser(user.user_id)" class="btn btn-sm btn-primary">Update</button>
+                <button (click)="onDeleteUser(user.user_id)" class="btn btn-sm btn-danger">Delete</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading && users.length > 0" class="pagination">
+        <button 
+          (click)="onPreviousPage()" 
+          [disabled]="currentPage === 1"
+          class="btn btn-secondary"
+        >
+          Previous
+        </button>
+        <span class="page-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} total users)
+        </span>
+        <button 
+          (click)="onNextPage()" 
+          [disabled]="currentPage >= totalPages"
+          class="btn btn-secondary"
+        >
+          Next
+        </button>
+      </div>
+
+      <div class="actions-footer">
+        <button (click)="onBackToMenu()" class="btn btn-secondary">Back to Admin Menu</button>
+      </div>
+    </div>
+  </div>
+</div>

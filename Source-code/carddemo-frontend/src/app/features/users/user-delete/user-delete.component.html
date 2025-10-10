@@ -1,0 +1,74 @@
+<div class="user-delete-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Delete User</h2>
+      <p class="subtitle">Confirm user deletion</p>
+    </div>
+
+    <div class="card-body">
+      <div *ngIf="loadingUser" class="loading-message">
+        Loading user data...
+      </div>
+
+      <div *ngIf="!loadingUser && user">
+        <div *ngIf="errorMessage" class="error-message">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="successMessage" class="success-message">
+          {{ successMessage }}
+        </div>
+
+        <div class="warning-box">
+          <h3>⚠️ Warning</h3>
+          <p>Are you sure you want to delete the following user? This action cannot be undone.</p>
+        </div>
+
+        <div class="user-details">
+          <div class="detail-row">
+            <label>User ID:</label>
+            <span>{{ user.user_id }}</span>
+          </div>
+          <div class="detail-row">
+            <label>First Name:</label>
+            <span>{{ user.first_name }}</span>
+          </div>
+          <div class="detail-row">
+            <label>Last Name:</label>
+            <span>{{ user.last_name }}</span>
+          </div>
+          <div class="detail-row">
+            <label>User Type:</label>
+            <span>{{ user.user_type === 'A' ? 'Admin' : 'User' }}</span>
+          </div>
+        </div>
+
+        <div class="form-actions">
+          <button 
+            type="button" 
+            (click)="onConfirmDelete()" 
+            [disabled]="loading"
+            class="btn btn-danger"
+          >
+            {{ loading ? 'Deleting...' : 'Confirm Delete' }}
+          </button>
+          <button 
+            type="button" 
+            (click)="onCancel()" 
+            class="btn btn-secondary"
+            [disabled]="loading"
+          >
+            Cancel
+          </button>
+        </div>
+      </div>
+
+      <div *ngIf="!loadingUser && !user && errorMessage" class="error-state">
+        <p>{{ errorMessage }}</p>
+        <button type="button" (click)="onCancel()" class="btn btn-secondary">
+          Back to User List
+        </button>
+      </div>
+    </div>
+  </div>
+</div>

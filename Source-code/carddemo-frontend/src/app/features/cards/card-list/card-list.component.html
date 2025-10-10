@@ -1,0 +1,101 @@
+<div class="card-list-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Credit Card List</h2>
+      <p class="subtitle">View and manage credit cards</p>
+    </div>
+
+    <div class="card-body">
+      <div class="search-section">
+        <div class="search-form">
+          <input
+            type="text"
+            [(ngModel)]="searchCardNumber"
+            placeholder="Search by Card Number"
+            class="form-control"
+            (keyup.enter)="onSearch()"
+          />
+          <input
+            type="text"
+            [(ngModel)]="searchAccountId"
+            placeholder="Search by Account ID"
+            class="form-control"
+            (keyup.enter)="onSearch()"
+          />
+          <button (click)="onSearch()" class="btn btn-primary">Search</button>
+          <button (click)="onClearSearch()" class="btn btn-secondary">Clear</button>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="loading" class="loading-message">
+        Loading cards...
+      </div>
+
+      <div *ngIf="!loading && cards.length === 0" class="no-data-message">
+        No cards found.
+      </div>
+
+      <div *ngIf="!loading && cards.length > 0" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Card Number</th>
+              <th>Account ID</th>
+              <th>Customer ID</th>
+              <th>Card Holder</th>
+              <th>Expiry Date</th>
+              <th>Status</th>
+              <th>Credit Limit</th>
+              <th>Balance</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let card of cards">
+              <td>{{ card.card_number }}</td>
+              <td>{{ card.account_id }}</td>
+              <td>{{ card.customer_id }}</td>
+              <td>{{ card.first_name }} {{ card.last_name }}</td>
+              <td>{{ card.expiry_month }}/{{ card.expiry_year }}</td>
+              <td>
+                <span [class.status-active]="card.card_status === 'Y'" 
+                      [class.status-inactive]="card.card_status !== 'Y'">
+                  {{ card.card_status === 'Y' ? 'Active' : 'Inactive' }}
+                </span>
+              </td>
+              <td>{{ formatCurrency(card.credit_limit) }}</td>
+              <td>{{ formatCurrency(card.current_balance) }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading && cards.length > 0" class="pagination">
+        <button 
+          (click)="onPreviousPage()" 
+          [disabled]="currentPage === 1"
+          class="btn btn-secondary"
+        >
+          Previous
+        </button>
+        <span class="page-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} total cards)
+        </span>
+        <button 
+          (click)="onNextPage()" 
+          [disabled]="currentPage >= totalPages"
+          class="btn btn-secondary"
+        >
+          Next
+        </button>
+      </div>
+
+      <div class="actions-footer">
+        <button (click)="onBackToMenu()" class="btn btn-secondary">Back to Main Menu</button>
+      </div>
+    </div>
+  </div>
+</div>

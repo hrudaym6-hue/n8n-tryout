@@ -1,0 +1,105 @@
+<div class="transaction-list-container">
+  <div class="card">
+    <div class="card-header">
+      <h2>Transaction List</h2>
+      <p class="subtitle">View transaction history</p>
+    </div>
+
+    <div class="card-body">
+      <div class="search-section">
+        <div class="search-form">
+          <input
+            type="text"
+            [(ngModel)]="searchCardNumber"
+            placeholder="Search by Card Number"
+            class="form-control"
+            (keyup.enter)="onSearch()"
+          />
+          <input
+            type="text"
+            [(ngModel)]="searchAccountId"
+            placeholder="Search by Account ID"
+            class="form-control"
+            (keyup.enter)="onSearch()"
+          />
+          <button (click)="onSearch()" class="btn btn-primary">Search</button>
+          <button (click)="onClearSearch()" class="btn btn-secondary">Clear</button>
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="error-message">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="loading" class="loading-message">
+        Loading transactions...
+      </div>
+
+      <div *ngIf="!loading && transactions.length === 0" class="no-data-message">
+        No transactions found.
+      </div>
+
+      <div *ngIf="!loading && transactions.length > 0" class="table-container">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Account ID</th>
+              <th>Card Number</th>
+              <th>Description</th>
+              <th>Merchant</th>
+              <th>Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of transactions">
+              <td>{{ transaction.transaction_id }}</td>
+              <td>{{ formatDate(transaction.transaction_date) }}</td>
+              <td>{{ transaction.account_id }}</td>
+              <td>{{ transaction.card_number }}</td>
+              <td>{{ transaction.transaction_desc }}</td>
+              <td>
+                <div *ngIf="transaction.merchant_name">
+                  {{ transaction.merchant_name }}
+                  <div class="merchant-details" *ngIf="transaction.merchant_city">
+                    {{ transaction.merchant_city }}
+                  </div>
+                </div>
+                <div *ngIf="!transaction.merchant_name">N/A</div>
+              </td>
+              <td [class.amount-positive]="transaction.transaction_amount > 0"
+                  [class.amount-negative]="transaction.transaction_amount < 0">
+                {{ formatCurrency(transaction.transaction_amount) }}
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!loading && transactions.length > 0" class="pagination">
+        <button 
+          (click)="onPreviousPage()" 
+          [disabled]="currentPage === 1"
+          class="btn btn-secondary"
+        >
+          Previous
+        </button>
+        <span class="page-info">
+          Page {{ currentPage }} of {{ totalPages }} ({{ totalRecords }} total transactions)
+        </span>
+        <button 
+          (click)="onNextPage()" 
+          [disabled]="currentPage >= totalPages"
+          class="btn btn-secondary"
+        >
+          Next
+        </button>
+      </div>
+
+      <div class="actions-footer">
+        <button (click)="onBackToMenu()" class="btn btn-secondary">Back to Main Menu</button>
+      </div>
+    </div>
+  </div>
+</div>
