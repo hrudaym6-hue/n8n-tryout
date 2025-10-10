@@ -27,6 +27,4 @@ app.get('/api/health', (req, res) => {
 
 app.listen(PORT, () => {
     console.log(`CardDemo Backend Server running on port ${PORT}`);
-});
-
 module.exports = app;
