@@ -12,7 +12,6 @@ export interface User {
 }
 
 export interface LoginResponse {
-  token: string;
   user: User;
 }
 
@@ -22,7 +21,6 @@ export interface LoginResponse {
 export class AuthService {
   private currentUserSubject: BehaviorSubject<User | null>;
   public currentUser: Observable<User | null>;
-  private tokenKey = 'cardemo_token';
   private userKey = 'cardemo_user';
 
   constructor(private http: HttpClient) {
@@ -76,11 +74,7 @@ export class AuthService {
     );
   }
 
-  getToken(): string | null {
-    return localStorage.getItem(this.tokenKey);
-  }
-
   isLoggedIn(): boolean {
-    return !!this.getToken();
+    return !!this.currentUserValue;
   }
 }
