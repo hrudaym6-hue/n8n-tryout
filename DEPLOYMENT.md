@@ -14,27 +14,9 @@ External PC -> VM:80 (nginx) -> backend:3000 (internal Docker network only)
 ```
 
 ### CORS Configuration for External Access
-When deploying to a VM that will be accessed from external PCs, you need to configure the allowed origins.
+The backend is configured to accept requests from any origin, making it easy to deploy on a VM and access from different PCs without additional configuration.
 
-**Steps:**
-1. Open `docker-compose.yml`
-2. Find the `ALLOWED_ORIGINS` environment variable under the `backend` service
-3. Update it to include your VM's IP address or hostname:
-   ```yaml
-   - ALLOWED_ORIGINS=http://192.168.1.100,http://192.168.1.100:80,http://your-vm-hostname
-   ```
-4. Replace `192.168.1.100` with your actual VM IP address
-5. You can add multiple origins separated by commas
-
-**Example for VM at IP 192.168.1.100:**
-```yaml
-environment:
-  - NODE_ENV=production
-  - PORT=3000
-  - SESSION_SECRET=your-secure-secret-here
-  - FRONTEND_URL=http://192.168.1.100
-  - ALLOWED_ORIGINS=http://192.168.1.100,http://192.168.1.100:80,http://localhost,http://localhost:80
-```
+**No CORS configuration is required** - the application will work out of the box when deployed on a VM and accessed from external PCs.
 
 ## Deployment Steps
 
@@ -45,9 +27,7 @@ environment:
    ```
 
 2. Update `docker-compose.yml`:
-   - Update `ALLOWED_ORIGINS` to include your VM's IP address (as shown above)
-   - Update `SESSION_SECRET` to a secure random string
-   - Update `FRONTEND_URL` to your VM's IP address (optional)
+   - Update `SESSION_SECRET` to a secure random string (required for production)
 
 3. Build and start the containers:
    ```bash
@@ -92,36 +72,32 @@ You can create additional users by registering through the application's registr
 
 2. **Session Secret**: Always change the `SESSION_SECRET` to a secure random string in production.
 
-3. **CORS Configuration**: Only add trusted origins to `ALLOWED_ORIGINS`. Don't use `*` (allow all) in production.
+3. **CORS Configuration**: The backend accepts requests from any origin for deployment flexibility. If stricter CORS control is needed for your production environment, you can modify the CORS configuration in `Source-code/backend/server.js`.
 
 4. **Firewall**: Ensure your VM's firewall allows incoming connections on port 80.
 
 ## Troubleshooting
 
 ### CORS Errors
-If you see CORS errors in the browser console when accessing from external PCs:
+The application is configured to accept requests from any origin, so CORS errors should not occur. If you do see CORS errors:
 
-1. **Verify ALLOWED_ORIGINS** includes the exact URL you're using:
+1. **Check browser console** for the exact error message:
+   - Press F12 to open developer tools
+   - Go to Console tab
+   - Look for CORS error messages
+
+2. **Verify the backend is accessible** through the nginx proxy:
    ```bash
-   docker-compose logs backend | grep ALLOWED_ORIGINS
+   curl -I http://YOUR_VM_IP/api/health
    ```
 
-2. **Include both with and without port**:
-   ```yaml
-   - ALLOWED_ORIGINS=http://192.168.1.100,http://192.168.1.100:80
-   ```
+3. **Check browser cookies** are enabled (required for session authentication)
 
-3. **Restart containers after changes**:
+4. **Restart containers** if the issue persists:
    ```bash
    docker-compose down
    docker-compose up -d --build
    ```
-
-4. **Check browser console** for the exact origin being blocked:
-   - Press F12 to open developer tools
-   - Go to Console tab
-   - Look for CORS error messages
-   - Add that exact origin to ALLOWED_ORIGINS
 
 ### Cannot Access Application
 
