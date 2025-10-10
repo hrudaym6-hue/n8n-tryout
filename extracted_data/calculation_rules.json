@@ -1,0 +1,460 @@
+[
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "rules": [
+      {
+        "description": "Available credit is calculated by subtracting credit balance from credit limit when authorization summary exists",
+        "type": "calculation",
+        "condition": "FOUND-PAUT-SMRY-SEG is true",
+        "outcome": "WS-AVAILABLE-AMT is set to the difference between credit limit and current balance",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 666
+        },
+        "variablesInvolved": [
+          "WS-AVAILABLE-AMT",
+          "PA-CREDIT-LIMIT",
+          "PA-CREDIT-BALANCE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Credit Management",
+          "Authorization",
+          "Available Credit"
+        ]
+      },
+      {
+        "description": "Available credit is calculated from account master when authorization summary is not found",
+        "type": "calculation",
+        "condition": "FOUND-ACCT-IN-MSTR is true and authorization summary not found",
+        "outcome": "WS-AVAILABLE-AMT is set using account credit limit minus current balance",
+        "location": {
+          "function": "6000-MAKE-DECISION",
+          "line": 674
+        },
+        "variablesInvolved": [
+          "WS-AVAILABLE-AMT",
+          "ACCT-CREDIT-LIMIT",
+          "ACCT-CURR-BAL"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Credit Management",
+          "Account Master",
+          "Available Credit"
+        ]
+      },
+      {
+        "description": "Approved authorization count is incremented by 1",
+        "type": "calculation",
+        "condition": "AUTH-RESP-APPROVED is true",
+        "outcome": "PA-APPROVED-AUTH-CNT increased by 1",
+        "location": {
+          "function": "8400-UPDATE-SUMMARY",
+          "line": 814
+        },
+        "variablesInvolved": [
+          "PA-APPROVED-AUTH-CNT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Approved Count"
+        ]
+      },
+      {
+        "description": "Approved authorization amount is accumulated",
+        "type": "calculation",
+        "condition": "AUTH-RESP-APPROVED is true",
+        "outcome": "WS-APPROVED-AMT is added to PA-APPROVED-AUTH-AMT",
+        "location": {
+          "function": "8400-UPDATE-SUMMARY",
+          "line": 815
+        },
+        "variablesInvolved": [
+          "PA-APPROVED-AUTH-AMT",
+          "WS-APPROVED-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Approved Amount"
+        ]
+      },
+      {
+        "description": "Credit balance is updated with approved amount",
+        "type": "calculation",
+        "condition": "AUTH-RESP-APPROVED is true",
+        "outcome": "WS-APPROVED-AMT is added to PA-CREDIT-BALANCE",
+        "location": {
+          "function": "8400-UPDATE-SUMMARY",
+          "line": 817
+        },
+        "variablesInvolved": [
+          "PA-CREDIT-BALANCE",
+          "WS-APPROVED-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Credit Balance",
+          "Authorization Statistics"
+        ]
+      },
+      {
+        "description": "Declined authorization count is incremented by 1",
+        "type": "calculation",
+        "condition": "AUTH-RESP-APPROVED is false",
+        "outcome": "PA-DECLINED-AUTH-CNT increased by 1",
+        "location": {
+          "function": "8400-UPDATE-SUMMARY",
+          "line": 820
+        },
+        "variablesInvolved": [
+          "PA-DECLINED-AUTH-CNT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Declined Count"
+        ]
+      },
+      {
+        "description": "Declined authorization amount is accumulated",
+        "type": "calculation",
+        "condition": "AUTH-RESP-APPROVED is false",
+        "outcome": "PA-TRANSACTION-AMT is added to PA-DECLINED-AUTH-AMT",
+        "location": {
+          "function": "8400-UPDATE-SUMMARY",
+          "line": 821
+        },
+        "variablesInvolved": [
+          "PA-DECLINED-AUTH-AMT",
+          "PA-TRANSACTION-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Declined Amount"
+        ]
+      },
+      {
+        "description": "Authorization date is computed using complement of current date",
+        "type": "calculation",
+        "condition": "Always applies when creating authorization record",
+        "outcome": "PA-AUTH-DATE-9C is set to 99999 minus WS-YYDDD",
+        "location": {
+          "function": "8500-INSERT-AUTH",
+          "line": 874
+        },
+        "variablesInvolved": [
+          "PA-AUTH-DATE-9C",
+          "WS-YYDDD"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Authorization Timestamp"
+        ]
+      },
+      {
+        "description": "Authorization time is computed using complement of current time with milliseconds",
+        "type": "calculation",
+        "condition": "Always applies when creating authorization record",
+        "outcome": "PA-AUTH-TIME-9C is set to 999999999 minus WS-TIME-WITH-MS",
+        "location": {
+          "function": "8500-INSERT-AUTH",
+          "line": 875
+        },
+        "variablesInvolved": [
+          "PA-AUTH-TIME-9C",
+          "WS-TIME-WITH-MS"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Time Calculation",
+          "Authorization Timestamp"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+    "rules": [
+      {
+        "description": "Authorization date is extracted from complement representation",
+        "type": "calculation",
+        "condition": "Always applies when checking expiration",
+        "outcome": "WS-AUTH-DATE is computed as 99999 minus PA-AUTH-DATE-9C",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 280
+        },
+        "variablesInvolved": [
+          "WS-AUTH-DATE",
+          "PA-AUTH-DATE-9C"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Expiration Check"
+        ]
+      },
+      {
+        "description": "Day difference is calculated between current date and authorization date",
+        "type": "calculation",
+        "condition": "Always applies when checking expiration",
+        "outcome": "WS-DAY-DIFF is set to CURRENT-YYDDD minus WS-AUTH-DATE",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 282
+        },
+        "variablesInvolved": [
+          "WS-DAY-DIFF",
+          "CURRENT-YYDDD",
+          "WS-AUTH-DATE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Expiration Check"
+        ]
+      },
+      {
+        "description": "Approved authorization count is decremented when expired approved authorization is deleted",
+        "type": "calculation",
+        "condition": "PA-AUTH-RESP-CODE equals 00 and authorization is expired",
+        "outcome": "PA-APPROVED-AUTH-CNT is decreased by 1",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 288
+        },
+        "variablesInvolved": [
+          "PA-APPROVED-AUTH-CNT",
+          "PA-AUTH-RESP-CODE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Purge Process"
+        ]
+      },
+      {
+        "description": "Approved authorization amount is reduced when expired approved authorization is deleted",
+        "type": "calculation",
+        "condition": "PA-AUTH-RESP-CODE equals 00 and authorization is expired",
+        "outcome": "PA-APPROVED-AMT is subtracted from PA-APPROVED-AUTH-AMT",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 289
+        },
+        "variablesInvolved": [
+          "PA-APPROVED-AUTH-AMT",
+          "PA-APPROVED-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Purge Process"
+        ]
+      },
+      {
+        "description": "Declined authorization count is decremented when expired declined authorization is deleted",
+        "type": "calculation",
+        "condition": "PA-AUTH-RESP-CODE is not 00 and authorization is expired",
+        "outcome": "PA-DECLINED-AUTH-CNT is decreased by 1",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 291
+        },
+        "variablesInvolved": [
+          "PA-DECLINED-AUTH-CNT",
+          "PA-AUTH-RESP-CODE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Purge Process"
+        ]
+      },
+      {
+        "description": "Declined authorization amount is reduced when expired declined authorization is deleted",
+        "type": "calculation",
+        "condition": "PA-AUTH-RESP-CODE is not 00 and authorization is expired",
+        "outcome": "PA-TRANSACTION-AMT is subtracted from PA-DECLINED-AUTH-AMT",
+        "location": {
+          "function": "4000-CHECK-IF-EXPIRED",
+          "line": 292
+        },
+        "variablesInvolved": [
+          "PA-DECLINED-AUTH-AMT",
+          "PA-TRANSACTION-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Statistics",
+          "Purge Process"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN02C.cbl",
+    "rules": [
+      {
+        "description": "New transaction ID is generated by incrementing the highest existing transaction ID",
+        "type": "calculation",
+        "condition": "Adding a new transaction",
+        "outcome": "Highest transaction ID is read and incremented by 1",
+        "location": {
+          "function": "ADD-TRANSACTION",
+          "line": 449
+        },
+        "variablesInvolved": [
+          "TRAN-ID",
+          "WS-TRAN-ID-N"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Transaction ID Generation",
+          "Sequence Management"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN02C.cbl",
+    "rules": [
+      {
+        "description": "Transaction counter is incremented by 1 for each transaction read",
+        "type": "calculation",
+        "condition": "Transaction record successfully read",
+        "outcome": "WS-TRANSACTION-COUNT is increased by 1",
+        "location": {
+          "function": "MAIN-PARA",
+          "line": 206
+        },
+        "variablesInvolved": [
+          "WS-TRANSACTION-COUNT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Transaction Processing",
+          "Statistics"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT04C.cbl",
+    "rules": [
+      {
+        "description": "Monthly interest is calculated by multiplying transaction category balance by interest rate and dividing by 1200",
+        "type": "calculation",
+        "condition": "Interest computation is performed for each transaction category balance",
+        "outcome": "Monthly interest amount computed and added to total interest",
+        "location": {
+          "function": "1300-COMPUTE-INTEREST",
+          "line": 464
+        },
+        "variablesInvolved": [
+          "WS-MONTHLY-INT",
+          "TRAN-CAT-BAL",
+          "DIS-INT-RATE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Interest Calculation",
+          "Financial Computation"
+        ]
+      },
+      {
+        "description": "Total interest is accumulated by adding monthly interest to running total",
+        "type": "calculation",
+        "condition": "After monthly interest calculation",
+        "outcome": "Running total of interest is updated",
+        "location": {
+          "function": "1300-COMPUTE-INTEREST",
+          "line": 467
+        },
+        "variablesInvolved": [
+          "WS-MONTHLY-INT",
+          "WS-TOTAL-INT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Interest Calculation",
+          "Accumulation"
+        ]
+      },
+      {
+        "description": "Account current balance is increased by total interest amount",
+        "type": "calculation",
+        "condition": "During account update after interest calculation",
+        "outcome": "Account balance reflects added interest charges",
+        "location": {
+          "function": "1050-UPDATE-ACCOUNT",
+          "line": 352
+        },
+        "variablesInvolved": [
+          "WS-TOTAL-INT",
+          "ACCT-CURR-BAL"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Management",
+          "Balance Update"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBIL00C.cbl",
+    "rules": [
+      {
+        "description": "Account balance is reduced by the payment amount",
+        "type": "calculation",
+        "condition": "After successful bill payment transaction",
+        "outcome": "New account balance computed by subtracting payment amount",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 234
+        },
+        "variablesInvolved": [
+          "ACCT-CURR-BAL",
+          "TRAN-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Bill Payment",
+          "Balance Update",
+          "Deduction"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03A.CBL",
+    "rules": [
+      {
+        "description": "Transaction amount accumulation for statement total calculation",
+        "type": "calculation",
+        "condition": "Processing transaction records for a card",
+        "outcome": "Total transaction amount accumulated for statement display",
+        "location": {
+          "function": "PROCEDURE DIVISION",
+          "line": 65
+        },
+        "variablesInvolved": [
+          "WS-TOTAL-AMT",
+          "WS-TRN-AMT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Statement Generation",
+          "Transaction Summary",
+          "Amount Calculation"
+        ]
+      }
+    ]
+  }
+]
