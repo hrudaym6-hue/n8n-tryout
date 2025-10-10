@@ -55,7 +55,7 @@ jobs:
               git pull https://secrets.ACC_TKN@github.com/hrudaym6-hue/n8n-tryout.git
             else
               echo "Repo does not exist, cloning..."
-              git clone https://https://github.com/hrudaym6-hue/n8n-tryout.git 
+              git clone https://github.com/hrudaym6-hue/n8n-tryout.git 
             fi
 
       # Load and run on VM
