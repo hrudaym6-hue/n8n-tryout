@@ -1,4 +1,4 @@
-baconst bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt');
 
 const users = new Map();
 const accounts = new Map();
