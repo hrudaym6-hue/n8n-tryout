@@ -2,8 +2,7 @@ version: '3.8'
 
 services:
   # Backend service - only accessible internally via Docker network
-  # For VM deployment: Update ALLOWED_ORIGINS to include your VM's IP or hostname
-  # Example: ALLOWED_ORIGINS=http://192.168.1.100,http://192.168.1.100:80,http://vm-hostname
+  # CORS is configured to accept requests from any origin for VM deployment flexibility
   backend:
     build: ./Source-code/backend
     container_name: carddemo-backend
@@ -11,8 +10,6 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - SESSION_SECRET=change-this-secret-in-production
-      - FRONTEND_URL=http://localhost
-      - ALLOWED_ORIGINS=http://localhost,http://localhost:80
     networks:
       - carddemo-network
 

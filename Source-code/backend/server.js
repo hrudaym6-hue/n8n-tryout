@@ -12,17 +12,7 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 
 app.use(cors({
-    origin: function (origin, callback) {
-        const allowedOrigins = process.env.ALLOWED_ORIGINS 
-            ? process.env.ALLOWED_ORIGINS.split(',') 
-            : ['http://localhost', 'http://localhost:80', 'http://localhost:4200'];
-        
-        if (!origin || allowedOrigins.includes(origin) || allowedOrigins.includes('*')) {
-            callback(null, true);
-        } else {
-            callback(null, true);
-        }
-    },
+    origin: true,
     credentials: true
 }));
 
