@@ -1,0 +1,2200 @@
+[
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "validations": [
+      {
+        "description": "User ID is required for authentication",
+        "type": "required field",
+        "condition": "USERIDI OF COSGN0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Please enter User ID ...' displayed, cursor positioned at User ID field",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 118
+        },
+        "field": "USERIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "sign-on"]
+      },
+      {
+        "description": "Password is required for authentication",
+        "type": "required field",
+        "condition": "PASSWDI OF COSGN0AI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Please enter Password ...' displayed, cursor positioned at Password field",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 127
+        },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "sign-on", "password"]
+      },
+      {
+        "description": "User credentials must exist in security file",
+        "type": "cross-reference validation",
+        "condition": "READ-USER-SEC-FILE, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'User not found. Try again ...' displayed",
+        "location": {
+          "function": "VALIDATE-USER",
+          "line": 173
+        },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "user security", "VSAM file"]
+      },
+      {
+        "description": "Password must match stored password",
+        "type": "business rule",
+        "condition": "PASSWDI NOT = SEC-USR-PWD",
+        "failureOutcome": "Error message 'Wrong password. Try again ...' displayed",
+        "location": {
+          "function": "VALIDATE-USER",
+          "line": 179
+        },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "password verification"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "validations": [
+      {
+        "description": "Account ID is required",
+        "type": "required field",
+        "condition": "ACCTIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Acct ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 318
+        },
+        "field": "ACCTIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account update"]
+      },
+      {
+        "description": "Account ID must be numeric",
+        "type": "format check",
+        "condition": "ACCTIDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Acct ID must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 326
+        },
+        "field": "ACCTIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "data format"]
+      },
+      {
+        "description": "Account status is required",
+        "type": "required field",
+        "condition": "ASTATUSI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Account Status can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 334
+        },
+        "field": "ASTATUSI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account status"]
+      },
+      {
+        "description": "Account status must be 'Y' or 'N'",
+        "type": "format check",
+        "condition": "ASTATUSI NOT = 'Y' AND NOT = 'N'",
+        "failureOutcome": "Error message 'Invalid value. Valid values are (Y/N)...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 342
+        },
+        "field": "ASTATUSI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account status"]
+      },
+      {
+        "description": "Current balance is required",
+        "type": "required field",
+        "condition": "ACURBALI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Curr Bal can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 351
+        },
+        "field": "ACURBALI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account balance"]
+      },
+      {
+        "description": "Current balance must be numeric",
+        "type": "format check",
+        "condition": "ACURBALI NOT NUMERIC",
+        "failureOutcome": "Error message 'Curr Bal must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 359
+        },
+        "field": "ACURBALI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "data format"]
+      },
+      {
+        "description": "Credit limit is required",
+        "type": "required field",
+        "condition": "ACRLIMTI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Cred Lim can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 367
+        },
+        "field": "ACRLIMTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "credit limit"]
+      },
+      {
+        "description": "Credit limit must be numeric",
+        "type": "format check",
+        "condition": "ACRLIMTI NOT NUMERIC",
+        "failureOutcome": "Error message 'Cred Lim must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 375
+        },
+        "field": "ACRLIMTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "data format"]
+      },
+      {
+        "description": "Cash credit limit is required",
+        "type": "required field",
+        "condition": "ACSHLIMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Cash Cred Lim can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 383
+        },
+        "field": "ACSHLIMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "cash credit limit"]
+      },
+      {
+        "description": "Cash credit limit must be numeric",
+        "type": "format check",
+        "condition": "ACSHLIMI NOT NUMERIC",
+        "failureOutcome": "Error message 'Cash Cred Lim must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 391
+        },
+        "field": "ACSHLIMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "data format"]
+      },
+      {
+        "description": "Account open date is required",
+        "type": "required field",
+        "condition": "AOPNDTI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Open Date can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 399
+        },
+        "field": "AOPNDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account dates"]
+      },
+      {
+        "description": "Account expiry date is required",
+        "type": "required field",
+        "condition": "AEXPDTI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Exp Date can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 407
+        },
+        "field": "AEXPDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account dates"]
+      },
+      {
+        "description": "Account reissue date is required",
+        "type": "required field",
+        "condition": "AREISDTI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Reissue Date can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 415
+        },
+        "field": "AREISDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account dates"]
+      },
+      {
+        "description": "Account must exist in VSAM file for update",
+        "type": "cross-reference validation",
+        "condition": "READ-ACCOUNT-VSAM, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'Account not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-ACCOUNT-VSAM",
+          "line": 231
+        },
+        "field": "ACCOUNT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "VSAM file", "account lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "validations": [
+      {
+        "description": "Account ID is required for account view",
+        "type": "required field",
+        "condition": "ACCTSIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Acct ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 239
+        },
+        "field": "ACCTSIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "account view"]
+      },
+      {
+        "description": "Account ID must be numeric",
+        "type": "format check",
+        "condition": "ACCTSIDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Acct ID must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 247
+        },
+        "field": "ACCTSIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "data format"]
+      },
+      {
+        "description": "Account must exist in VSAM file",
+        "type": "cross-reference validation",
+        "condition": "READ-ACCOUNT-VSAM, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'Account not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-ACCOUNT-VSAM",
+          "line": 182
+        },
+        "field": "ACCOUNT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account management", "VSAM file", "account lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "validations": [
+      {
+        "description": "Card number is required",
+        "type": "required field",
+        "condition": "CRDNUMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Card Num can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 293
+        },
+        "field": "CRDNUMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card update"]
+      },
+      {
+        "description": "Card number must be numeric",
+        "type": "format check",
+        "condition": "CRDNUMI NOT NUMERIC",
+        "failureOutcome": "Error message 'Card Num must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 301
+        },
+        "field": "CRDNUMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "data format"]
+      },
+      {
+        "description": "Cardholder name is required",
+        "type": "required field",
+        "condition": "CRDNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 309
+        },
+        "field": "CRDNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "cardholder information"]
+      },
+      {
+        "description": "Card status is required",
+        "type": "required field",
+        "condition": "CRDSTCDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Status can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 317
+        },
+        "field": "CRDSTCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card status"]
+      },
+      {
+        "description": "Card expiry month is required",
+        "type": "required field",
+        "condition": "CRDMMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Expiry Mon can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 325
+        },
+        "field": "CRDMMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card expiration"]
+      },
+      {
+        "description": "Card expiry month must be numeric",
+        "type": "format check",
+        "condition": "CRDMMI NOT NUMERIC",
+        "failureOutcome": "Error message 'Expiry Mon must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 333
+        },
+        "field": "CRDMMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "data format"]
+      },
+      {
+        "description": "Card expiry month must be between 1 and 12",
+        "type": "range check",
+        "condition": "CRDMMI < 1 OR CRDMMI > 12",
+        "failureOutcome": "Error message 'Expiry Mon must be between 1 and 12...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 341
+        },
+        "field": "CRDMMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "date validation"]
+      },
+      {
+        "description": "Card expiry year is required",
+        "type": "required field",
+        "condition": "CRDYYI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Expiry Year can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 350
+        },
+        "field": "CRDYYI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card expiration"]
+      },
+      {
+        "description": "Card expiry year must be numeric",
+        "type": "format check",
+        "condition": "CRDYYI NOT NUMERIC",
+        "failureOutcome": "Error message 'Expiry Year must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 358
+        },
+        "field": "CRDYYI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "data format"]
+      },
+      {
+        "description": "Card expiry year must be between 1950 and 2099",
+        "type": "range check",
+        "condition": "CRDYYI < 1950 OR CRDYYI > 2099",
+        "failureOutcome": "Error message 'Expiry Year must be between 1950 and 2099...' displayed",
+        "location": {
+          "function": "EDIT-CARD-FIELDS",
+          "line": 366
+        },
+        "field": "CRDYYI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "date validation"]
+      },
+      {
+        "description": "Card must exist in XREF file for update",
+        "type": "cross-reference validation",
+        "condition": "READ-XREF-VSAM, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'Card not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-XREF-VSAM",
+          "line": 215
+        },
+        "field": "CARD-NUM",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "VSAM file", "card lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "validations": [
+      {
+        "description": "Card number filter must be numeric if provided",
+        "type": "format check",
+        "condition": "CRDNUMI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'Card Num must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-CARD-SEARCH-FIELDS",
+          "line": 267
+        },
+        "field": "CRDNUMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card search", "data format"]
+      },
+      {
+        "description": "Account number filter must be numeric if provided",
+        "type": "format check",
+        "condition": "ACCTIDI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'Acct ID must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-CARD-SEARCH-FIELDS",
+          "line": 275
+        },
+        "field": "ACCTIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "card search", "data format"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "validations": [
+      {
+        "description": "Menu selection must be numeric",
+        "type": "format check",
+        "condition": "CDSEL1I NOT NUMERIC",
+        "failureOutcome": "Error message 'Selection must be Numeric...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 189
+        },
+        "field": "CDSEL1I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "menu selection"]
+      },
+      {
+        "description": "Menu selection must be between 1 and 7",
+        "type": "range check",
+        "condition": "CDSEL1I < 1 OR CDSEL1I > 7",
+        "failureOutcome": "Error message 'Selection must be between 1 and 7...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 197
+        },
+        "field": "CDSEL1I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["card management", "menu selection"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "validations": [
+      {
+        "description": "Start date filter must be numeric if provided",
+        "type": "format check",
+        "condition": "TRNSTDTI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'Start Date must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 257
+        },
+        "field": "TRNSTDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "date validation"]
+      },
+      {
+        "description": "End date filter must be numeric if provided",
+        "type": "format check",
+        "condition": "TRNENDTI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'End Date must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 265
+        },
+        "field": "TRNENDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "date validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "validations": [
+      {
+        "description": "Transaction ID is required for detail view",
+        "type": "required field",
+        "condition": "TRNIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 245
+        },
+        "field": "TRNIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction detail"]
+      },
+      {
+        "description": "Transaction must exist in file",
+        "type": "cross-reference validation",
+        "condition": "READ-TRANSACTION-FILE, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'Transaction not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-TRANSACTION-FILE",
+          "line": 188
+        },
+        "field": "TRANID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "VSAM file", "transaction lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN02C.cbl",
+    "validations": [
+      {
+        "description": "Card number is required for transaction",
+        "type": "required field",
+        "condition": "CARDNUMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Card Num can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 341
+        },
+        "field": "CARDNUMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "card number"]
+      },
+      {
+        "description": "Card number must be numeric",
+        "type": "format check",
+        "condition": "CARDNUMI NOT NUMERIC",
+        "failureOutcome": "Error message 'Card Num must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 349
+        },
+        "field": "CARDNUMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "data format"]
+      },
+      {
+        "description": "Transaction type code is required",
+        "type": "required field",
+        "condition": "TTYPCDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Type Cd can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 357
+        },
+        "field": "TTYPCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction type"]
+      },
+      {
+        "description": "Transaction category code is required",
+        "type": "required field",
+        "condition": "TCATCDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Cat Cd can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 365
+        },
+        "field": "TCATCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction category"]
+      },
+      {
+        "description": "Transaction category code must be numeric",
+        "type": "format check",
+        "condition": "TCATCDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Tran Cat Cd must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 373
+        },
+        "field": "TCATCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "data format"]
+      },
+      {
+        "description": "Transaction source is required",
+        "type": "required field",
+        "condition": "TRNSRCI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Source can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 381
+        },
+        "field": "TRNSRCI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction source"]
+      },
+      {
+        "description": "Transaction description is required",
+        "type": "required field",
+        "condition": "TDESCI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Desc can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 389
+        },
+        "field": "TDESCI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction description"]
+      },
+      {
+        "description": "Transaction amount is required",
+        "type": "required field",
+        "condition": "TRNAMTI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Amt can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 397
+        },
+        "field": "TRNAMTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "transaction amount"]
+      },
+      {
+        "description": "Transaction amount must be numeric",
+        "type": "format check",
+        "condition": "TRNAMTI NOT NUMERIC",
+        "failureOutcome": "Error message 'Tran Amt must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 405
+        },
+        "field": "TRNAMTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "data format"]
+      },
+      {
+        "description": "Merchant ID is required",
+        "type": "required field",
+        "condition": "MIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Merchant Id can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 413
+        },
+        "field": "MIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "merchant information"]
+      },
+      {
+        "description": "Merchant name is required",
+        "type": "required field",
+        "condition": "MNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Merchant Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 421
+        },
+        "field": "MNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "merchant information"]
+      },
+      {
+        "description": "Merchant city is required",
+        "type": "required field",
+        "condition": "MCITYI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Merchant City can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 429
+        },
+        "field": "MCITYI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "merchant information"]
+      },
+      {
+        "description": "Merchant ZIP code is required",
+        "type": "required field",
+        "condition": "MZIPI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Merchant Zip can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRANSACTION-FIELDS",
+          "line": 437
+        },
+        "field": "MZIPI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "merchant information"]
+      },
+      {
+        "description": "Card must be active for transactions",
+        "type": "business rule",
+        "condition": "XREF-CARD-STATUS NOT = 'Y'",
+        "failureOutcome": "Error message 'Card is not active. Please check card status.' displayed",
+        "location": {
+          "function": "VALIDATE-CARD-STATUS",
+          "line": 268
+        },
+        "field": "XREF-CARD-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction processing", "card status", "business rule"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "validations": [
+      {
+        "description": "User ID filter must be alphanumeric if provided",
+        "type": "format check",
+        "condition": "USRIDI NOT = SPACES AND contains non-alphanumeric characters",
+        "failureOutcome": "Error flag set, error message displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 252
+        },
+        "field": "USRIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user search"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "validations": [
+      {
+        "description": "First name is required",
+        "type": "required field",
+        "condition": "FNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'First Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 301
+        },
+        "field": "FNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration"]
+      },
+      {
+        "description": "Last name is required",
+        "type": "required field",
+        "condition": "LNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Last Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 309
+        },
+        "field": "LNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration"]
+      },
+      {
+        "description": "User ID is required",
+        "type": "required field",
+        "condition": "USRIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'User Id can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 317
+        },
+        "field": "USRIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration"]
+      },
+      {
+        "description": "Password is required",
+        "type": "required field",
+        "condition": "PASSWDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Password can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 325
+        },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration", "password"]
+      },
+      {
+        "description": "User type is required",
+        "type": "required field",
+        "condition": "UTYPEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'User Type can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 333
+        },
+        "field": "UTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration", "user type"]
+      },
+      {
+        "description": "User type must be 'A' (admin) or 'U' (regular user)",
+        "type": "format check",
+        "condition": "UTYPEI NOT = 'A' AND NOT = 'U'",
+        "failureOutcome": "Error message 'User Type must be (A)dmin or (U)ser...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 341
+        },
+        "field": "UTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user type", "access control"]
+      },
+      {
+        "description": "User ID must not already exist",
+        "type": "duplicate key check",
+        "condition": "WRITE-USER-SEC-FILE, IF DFHRESP = DUPKEY",
+        "failureOutcome": "Error message 'User already exists. Try again with a different User ID.' displayed",
+        "location": {
+          "function": "WRITE-USER-SEC-FILE",
+          "line": 213
+        },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user registration", "duplicate prevention"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "validations": [
+      {
+        "description": "User ID is required for update",
+        "type": "required field",
+        "condition": "USRIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'User Id can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 317
+        },
+        "field": "USRIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update"]
+      },
+      {
+        "description": "First name is required",
+        "type": "required field",
+        "condition": "FNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'First Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 325
+        },
+        "field": "FNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update"]
+      },
+      {
+        "description": "Last name is required",
+        "type": "required field",
+        "condition": "LNAMEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Last Name can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 333
+        },
+        "field": "LNAMEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update"]
+      },
+      {
+        "description": "Password is required",
+        "type": "required field",
+        "condition": "PASSWDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Password can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 341
+        },
+        "field": "PASSWDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update", "password"]
+      },
+      {
+        "description": "User type is required",
+        "type": "required field",
+        "condition": "UTYPEI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'User Type can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 349
+        },
+        "field": "UTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user update", "user type"]
+      },
+      {
+        "description": "User type must be 'A' (admin) or 'U' (regular user)",
+        "type": "format check",
+        "condition": "UTYPEI NOT = 'A' AND NOT = 'U'",
+        "failureOutcome": "Error message 'User Type must be (A)dmin or (U)ser...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 357
+        },
+        "field": "UTYPEI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user type", "access control"]
+      },
+      {
+        "description": "User must exist for update",
+        "type": "cross-reference validation",
+        "condition": "READ-USER-SEC-FILE, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'User not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-USER-SEC-FILE",
+          "line": 229
+        },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "VSAM file", "user lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "validations": [
+      {
+        "description": "User ID is required for delete",
+        "type": "required field",
+        "condition": "USRIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'User Id can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 256
+        },
+        "field": "USRIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user delete"]
+      },
+      {
+        "description": "Confirmation is required for delete operation",
+        "type": "required field",
+        "condition": "CONFIRMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Confirmation can NOT be empty. Enter (Y)es or (N)o ...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 264
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "user delete", "confirmation"]
+      },
+      {
+        "description": "Confirmation must be 'Y' or 'N'",
+        "type": "format check",
+        "condition": "CONFIRMI NOT = 'Y' AND NOT = 'N'",
+        "failureOutcome": "Error message 'Invalid value. Valid values are (Y/N)...' displayed",
+        "location": {
+          "function": "EDIT-USER-FIELDS",
+          "line": 273
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "confirmation validation"]
+      },
+      {
+        "description": "User must exist for delete",
+        "type": "cross-reference validation",
+        "condition": "READ-USER-SEC-FILE, IF DFHRESP = NOTFND",
+        "failureOutcome": "Error message 'User not found. Try again ...' displayed",
+        "location": {
+          "function": "READ-USER-SEC-FILE",
+          "line": 198
+        },
+        "field": "SEC-USR-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "VSAM file", "user lookup"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "validations": [
+      {
+        "description": "Menu selection is required",
+        "type": "required field",
+        "condition": "OPTN01I = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Please enter an option...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 153
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "admin menu"]
+      },
+      {
+        "description": "Menu selection must be numeric",
+        "type": "format check",
+        "condition": "OPTN01I NOT NUMERIC",
+        "failureOutcome": "Error message 'Please enter a valid numeric option...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 161
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "data format"]
+      },
+      {
+        "description": "Menu selection must be between 1 and 4",
+        "type": "range check",
+        "condition": "OPTN01I < 1 OR OPTN01I > 4",
+        "failureOutcome": "Error message 'Please enter a valid option (1-4)...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 169
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "admin menu"]
+      },
+      {
+        "description": "User must have admin privileges to access admin menu",
+        "type": "business rule",
+        "condition": "CDEMO-USER-TYPE NOT = 'A'",
+        "failureOutcome": "Error message 'You are not authorized to access this function' displayed, transaction terminated",
+        "location": {
+          "function": "MAIN-PARA",
+          "line": 117
+        },
+        "field": "CDEMO-USER-TYPE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user management", "access control", "admin privileges"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "validations": [
+      {
+        "description": "Menu selection is required",
+        "type": "required field",
+        "condition": "OPTN01I = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Please enter an option...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 159
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "main menu"]
+      },
+      {
+        "description": "Menu selection must be numeric",
+        "type": "format check",
+        "condition": "OPTN01I NOT NUMERIC",
+        "failureOutcome": "Error message 'Please enter a valid numeric option...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 167
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "data format"]
+      },
+      {
+        "description": "Menu selection must be between 1 and 6",
+        "type": "range check",
+        "condition": "OPTN01I < 1 OR OPTN01I > 6",
+        "failureOutcome": "Error message 'Please enter a valid option (1-6)...' displayed",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 175
+        },
+        "field": "OPTN01I",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["menu navigation", "main menu"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBIL00C.cbl",
+    "validations": [
+      {
+        "description": "Account ID is required for billing",
+        "type": "required field",
+        "condition": "ACCTSIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Acct ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 159
+        },
+        "field": "ACCTSIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["billing", "account management"]
+      },
+      {
+        "description": "Confirmation is required for payment processing",
+        "type": "required field",
+        "condition": "CONFIRMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Confirmation can NOT be empty. Enter (Y)es or (N)o ...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 173
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["billing", "payment processing", "confirmation"]
+      },
+      {
+        "description": "Confirmation must be 'Y' or 'N'",
+        "type": "format check",
+        "condition": "CONFIRMI NOT = 'Y' AND NOT = 'N'",
+        "failureOutcome": "Error message 'Invalid value. Valid values are (Y/N)...' displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 182
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["billing", "confirmation validation"]
+      },
+      {
+        "description": "Account balance must be greater than zero for payment",
+        "type": "business rule",
+        "condition": "ACCOUNT-CURR-BAL <= 0",
+        "failureOutcome": "Error message indicating no balance to pay",
+        "location": {
+          "function": "VALIDATE-ACCOUNT-BALANCE",
+          "line": 198
+        },
+        "field": "ACCOUNT-CURR-BAL",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["billing", "account balance", "business rule"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CORPT00C.cbl",
+    "validations": [
+      {
+        "description": "Date validation through CSUTLDTC utility",
+        "type": "format check",
+        "condition": "Date validation performed by CSUTLDTC",
+        "failureOutcome": "Error message based on date validation result",
+        "location": {
+          "function": "VALIDATE-DATE",
+          "line": 150
+        },
+        "field": "DATE-FIELD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["reporting", "date validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CSUTLDTC.cbl",
+    "validations": [
+      {
+        "description": "Date must have sufficient data",
+        "type": "format check",
+        "condition": "FC-INSUFFICIENT-DATA from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: INSUFFICIENT DATA for this FMT'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 128
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date must be valid",
+        "type": "format check",
+        "condition": "FC-BAD-DATE-VALUE from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Date value is not a valid date'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 133
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date era must be valid",
+        "type": "format check",
+        "condition": "FC-INVALID-ERA from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Invalid ERA in FMT'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 136
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date must be in supported range",
+        "type": "range check",
+        "condition": "FC-UNSUPP-RANGE from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Date is out of range for FMT'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 139
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date month must be valid",
+        "type": "format check",
+        "condition": "FC-INVALID-MONTH from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Invalid MONTH value'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 142
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date picture string must be valid",
+        "type": "format check",
+        "condition": "FC-BAD-PIC-STRING from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Character in picture string not recognized'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 145
+        },
+        "field": "INPUT-DATE-FORMAT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      },
+      {
+        "description": "Date must contain numeric data",
+        "type": "format check",
+        "condition": "FC-NON-NUMERIC-DATA from CEEDAYS API",
+        "failureOutcome": "Error message 'CEEDAYS: Non-Numeric data in a date field'",
+        "location": {
+          "function": "CALL-CEEDAYS",
+          "line": 148
+        },
+        "field": "INPUT-DATE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "date utility"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "validations": [
+      {
+        "description": "Input file must open successfully",
+        "type": "file status validation",
+        "condition": "ACCTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-ACCTFILE-OPEN",
+          "line": 178
+        },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "account file load"]
+      },
+      {
+        "description": "Output file must open successfully",
+        "type": "file status validation",
+        "condition": "VSAM-FS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1100-CARDXREF-OPEN",
+          "line": 194
+        },
+        "field": "VSAM-FS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "VSAM file"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT02C.cbl",
+    "validations": [
+      {
+        "description": "Account file must open successfully",
+        "type": "file status validation",
+        "condition": "ACCTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-ACCTFILE-OPEN",
+          "line": 134
+        },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "account processing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT03C.cbl",
+    "validations": [
+      {
+        "description": "Account file must open successfully",
+        "type": "file status validation",
+        "condition": "ACCTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-ACCTFILE-OPEN",
+          "line": 142
+        },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "account processing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT04C.cbl",
+    "validations": [
+      {
+        "description": "Account file must open successfully",
+        "type": "file status validation",
+        "condition": "ACCTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-ACCTFILE-OPEN",
+          "line": 233
+        },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "interest calculation"]
+      },
+      {
+        "description": "Interest rate must be valid for calculation",
+        "type": "business rule",
+        "condition": "FD-ACCT-GROUP-ID determines interest rate",
+        "failureOutcome": "Default interest rate used if group ID not found",
+        "location": {
+          "function": "2000-CALCULATE-INTEREST",
+          "line": 289
+        },
+        "field": "FD-ACCT-GROUP-ID",
+        "isConfigurable": true,
+        "relatedDomainConcepts": ["batch processing", "interest calculation", "business rule"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN01C.cbl",
+    "validations": [
+      {
+        "description": "Transaction file must open successfully",
+        "type": "file status validation",
+        "condition": "TRNXFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-TRNXFILE-OPEN",
+          "line": 199
+        },
+        "field": "TRNXFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction load"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN02C.cbl",
+    "validations": [
+      {
+        "description": "Daily transaction file must open successfully",
+        "type": "file status validation",
+        "condition": "DALYTRAN-FILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-DALYTRAN-OPEN",
+          "line": 123
+        },
+        "field": "DALYTRAN-FILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction validation"]
+      },
+      {
+        "description": "Transaction validation file must open successfully",
+        "type": "file status validation",
+        "condition": "TRNXFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1100-TRNXFILE-OPEN",
+          "line": 139
+        },
+        "field": "TRNXFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction validation"]
+      },
+      {
+        "description": "Reject file must open successfully",
+        "type": "file status validation",
+        "condition": "REJECT-FILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1200-REJECT-OPEN",
+          "line": 155
+        },
+        "field": "REJECT-FILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction validation"]
+      },
+      {
+        "description": "Transaction must pass validation rules",
+        "type": "business rule",
+        "condition": "Various validation checks on transaction fields",
+        "failureOutcome": "Transaction written to reject file with WS-VALIDATION-FAIL-REASON",
+        "location": {
+          "function": "3000-VALIDATE-TRANSACTION",
+          "line": 180
+        },
+        "field": "TRANSACTION-RECORD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "transaction validation", "business rule"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN03C.cbl",
+    "validations": [
+      {
+        "description": "Transaction file must open successfully",
+        "type": "file status validation",
+        "condition": "TRNXFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-TRNXFILE-OPEN",
+          "line": 159
+        },
+        "field": "TRNXFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction processing"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBCUS01C.cbl",
+    "validations": [
+      {
+        "description": "Customer file must open successfully",
+        "type": "file status validation",
+        "condition": "CUSTFILE-STATUS NOT = '00'",
+        "failureOutcome": "Error message displayed, program terminates",
+        "location": {
+          "function": "1000-CUSTFILE-OPEN",
+          "line": 218
+        },
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "customer file load"]
+      },
+      {
+        "description": "SSN format must be valid",
+        "type": "format check",
+        "condition": "SSN field validation check",
+        "failureOutcome": "Error flag set, record rejected",
+        "location": {
+          "function": "VALIDATE-SSN",
+          "line": 280
+        },
+        "field": "CUST-SSN",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "customer data", "SSN validation"]
+      },
+      {
+        "description": "Phone number format must be valid",
+        "type": "format check",
+        "condition": "Phone field validation check",
+        "failureOutcome": "Error flag set, record rejected",
+        "location": {
+          "function": "VALIDATE-PHONE",
+          "line": 294
+        },
+        "field": "CUST-PHONE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "customer data", "phone validation"]
+      },
+      {
+        "description": "FICO score must be between 300 and 850",
+        "type": "range check",
+        "condition": "FICO-RANGE-IS-VALID (300-850)",
+        "failureOutcome": "Error message 'should be between 300 and 850' set",
+        "location": {
+          "function": "VALIDATE-FICO-SCORE",
+          "line": 307
+        },
+        "field": "CUST-FICO-CREDIT-SCORE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "customer data", "FICO score validation"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03A.CBL",
+    "validations": [
+      {
+        "description": "Statement output files must open successfully",
+        "type": "file status validation",
+        "condition": "File status checks for statement files",
+        "failureOutcome": "Error handling for file operations",
+        "location": {
+          "function": "FILE-OPEN",
+          "line": 150
+        },
+        "field": "FILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "statement generation", "file operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03B.CBL",
+    "validations": [
+      {
+        "description": "Transaction file status must be valid",
+        "type": "file status validation",
+        "condition": "TRNXFILE-STATUS checked after file operations",
+        "failureOutcome": "File status returned to calling program",
+        "location": {
+          "function": "1900-EXIT",
+          "line": 152
+        },
+        "field": "TRNXFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction file"]
+      },
+      {
+        "description": "Cross-reference file status must be valid",
+        "type": "file status validation",
+        "condition": "XREFFILE-STATUS checked after file operations",
+        "failureOutcome": "File status returned to calling program",
+        "location": {
+          "function": "2900-EXIT",
+          "line": 176
+        },
+        "field": "XREFFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "cross-reference file"]
+      },
+      {
+        "description": "Customer file status must be valid",
+        "type": "file status validation",
+        "condition": "CUSTFILE-STATUS checked after file operations",
+        "failureOutcome": "File status returned to calling program",
+        "location": {
+          "function": "3900-EXIT",
+          "line": 201
+        },
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "customer file"]
+      },
+      {
+        "description": "Account file status must be valid",
+        "type": "file status validation",
+        "condition": "ACCTFILE-STATUS checked after file operations",
+        "failureOutcome": "File status returned to calling program",
+        "location": {
+          "function": "4900-EXIT",
+          "line": 226
+        },
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "account file"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "validations": [
+      {
+        "description": "Authorization request queue must be readable",
+        "type": "cross-reference validation",
+        "condition": "MQ GET operation status check",
+        "failureOutcome": "Error handling for queue read failure",
+        "location": {
+          "function": "READ-AUTH-REQUEST",
+          "line": 245
+        },
+        "field": "MQ-REASON-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "MQ operations", "message queue"]
+      },
+      {
+        "description": "Transaction amount must not exceed available credit",
+        "type": "business rule",
+        "condition": "WS-TRANSACTION-AMT > WS-AVAILABLE-AMT",
+        "failureOutcome": "Authorization declined with response code '05' and reason code 4100",
+        "location": {
+          "function": "CHECK-CREDIT-LIMIT",
+          "line": 358
+        },
+        "field": "WS-TRANSACTION-AMT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "credit limit", "business rule"]
+      },
+      {
+        "description": "Card must be active for authorization",
+        "type": "business rule",
+        "condition": "CARD-ACCT-STATUS NOT = 'Y'",
+        "failureOutcome": "Authorization declined with response code '14'",
+        "location": {
+          "function": "CHECK-CARD-STATUS",
+          "line": 293
+        },
+        "field": "CARD-ACCT-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "card status", "business rule"]
+      },
+      {
+        "description": "Card must not be expired for authorization",
+        "type": "business rule",
+        "condition": "WS-CARD-EXPIRY-DT < WS-CURRENT-DATE",
+        "failureOutcome": "Authorization declined with response code '54'",
+        "location": {
+          "function": "CHECK-CARD-EXPIRY",
+          "line": 319
+        },
+        "field": "WS-CARD-EXPIRY-DT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "card expiration", "business rule"]
+      },
+      {
+        "description": "Authorization summary must be successfully inserted",
+        "type": "database validation",
+        "condition": "SQLCODE after INSERT into authorization summary",
+        "failureOutcome": "Error handling based on SQLCODE value",
+        "location": {
+          "function": "INSERT-AUTH-SUMMARY",
+          "line": 422
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "database operations", "DB2"]
+      },
+      {
+        "description": "Authorization detail must be successfully inserted",
+        "type": "database validation",
+        "condition": "SQLCODE after INSERT into authorization detail",
+        "failureOutcome": "Error handling based on SQLCODE value",
+        "location": {
+          "function": "INSERT-AUTH-DETAIL",
+          "line": 468
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "database operations", "DB2"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+    "validations": [
+      {
+        "description": "Authorization records older than configured days should be purged",
+        "type": "business rule",
+        "condition": "WS-DAY-DIFF > WS-EXPIRY-DAYS",
+        "failureOutcome": "Record marked for deletion",
+        "location": {
+          "function": "CHECK-AUTH-AGE",
+          "line": 337
+        },
+        "field": "WS-DAY-DIFF",
+        "isConfigurable": true,
+        "relatedDomainConcepts": ["authorization", "data purging", "business rule"]
+      },
+      {
+        "description": "IMS segment retrieval must be successful",
+        "type": "database validation",
+        "condition": "IMS-RETURN-CODE checked after GU/GN operations",
+        "failureOutcome": "Error handling based on IMS return code",
+        "location": {
+          "function": "GET-NEXT-AUTH",
+          "line": 282
+        },
+        "field": "IMS-RETURN-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "IMS database", "database operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+    "validations": [
+      {
+        "description": "Start date must be valid for authorization summary query",
+        "type": "format check",
+        "condition": "SDTI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'Start Date must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-AUTH-FIELDS",
+          "line": 223
+        },
+        "field": "SDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "date validation", "authorization summary"]
+      },
+      {
+        "description": "End date must be valid for authorization summary query",
+        "type": "format check",
+        "condition": "EDTI NOT = SPACES AND NOT NUMERIC",
+        "failureOutcome": "Error message 'End Date must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-AUTH-FIELDS",
+          "line": 231
+        },
+        "field": "EDTI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "date validation", "authorization summary"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+    "validations": [
+      {
+        "description": "Application ID is required for authorization detail view",
+        "type": "required field",
+        "condition": "APPIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Appl ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-AUTH-FIELDS",
+          "line": 238
+        },
+        "field": "APPIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "authorization detail"]
+      },
+      {
+        "description": "Application ID must be numeric",
+        "type": "format check",
+        "condition": "APPIDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Appl ID must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-AUTH-FIELDS",
+          "line": 246
+        },
+        "field": "APPIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "data format"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+    "validations": [
+      {
+        "description": "Application ID is required for fraud management",
+        "type": "required field",
+        "condition": "APPIDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Appl ID can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-FRAUD-FIELDS",
+          "line": 258
+        },
+        "field": "APPIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "fraud management"]
+      },
+      {
+        "description": "Application ID must be numeric",
+        "type": "format check",
+        "condition": "APPIDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Appl ID must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-FRAUD-FIELDS",
+          "line": 266
+        },
+        "field": "APPIDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "data format"]
+      },
+      {
+        "description": "Fraud confirmation is required",
+        "type": "required field",
+        "condition": "CONFIRMI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Confirmation can NOT be empty. Enter (Y)es or (N)o ...' displayed",
+        "location": {
+          "function": "EDIT-FRAUD-FIELDS",
+          "line": 274
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "fraud management", "confirmation"]
+      },
+      {
+        "description": "Fraud confirmation must be 'Y' or 'N'",
+        "type": "format check",
+        "condition": "CONFIRMI NOT = 'Y' AND NOT = 'N'",
+        "failureOutcome": "Error message 'Invalid value. Valid values are (Y/N)...' displayed",
+        "location": {
+          "function": "EDIT-FRAUD-FIELDS",
+          "line": 283
+        },
+        "field": "CONFIRMI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "fraud management", "confirmation validation"]
+      },
+      {
+        "description": "Fraud record update must be successful",
+        "type": "database validation",
+        "condition": "SQLCODE after UPDATE fraud table",
+        "failureOutcome": "Error handling based on SQLCODE (0 = success, -803 = duplicate, other = error)",
+        "location": {
+          "function": "UPDATE-FRAUD-RECORD",
+          "line": 365
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization", "fraud management", "database operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+    "validations": [
+      {
+        "description": "IMS segment retrieval must be successful",
+        "type": "database validation",
+        "condition": "IMS-RETURN-CODE = STATUS-OK ('  ' or 'FW')",
+        "failureOutcome": "Processing stops based on return code (GE = not found, II = duplicate, GP = wrong parentage)",
+        "location": {
+          "function": "IMS-GET-OPERATIONS",
+          "line": 97
+        },
+        "field": "IMS-RETURN-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "IMS database", "database unload"]
+      },
+      {
+        "description": "Output file must open successfully",
+        "type": "file status validation",
+        "condition": "WS-OUTFL1-STATUS and WS-OUTFL2-STATUS checked",
+        "failureOutcome": "Error handling for file open failures",
+        "location": {
+          "function": "FILE-OPEN",
+          "line": 83
+        },
+        "field": "WS-OUTFL1-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "database unload"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+    "validations": [
+      {
+        "description": "IMS segment insertion must be successful",
+        "type": "database validation",
+        "condition": "IMS-RETURN-CODE = STATUS-OK ('  ' or 'FW')",
+        "failureOutcome": "Processing stops based on return code (GE = not found, other codes indicate errors)",
+        "location": {
+          "function": "IMS-INSERT-OPERATIONS",
+          "line": 99
+        },
+        "field": "IMS-RETURN-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "IMS database", "database load"]
+      },
+      {
+        "description": "Input file must open successfully",
+        "type": "file status validation",
+        "condition": "WS-INFIL1-STATUS and WS-INFIL2-STATUS checked",
+        "failureOutcome": "Error handling for file open failures",
+        "location": {
+          "function": "FILE-OPEN",
+          "line": 83
+        },
+        "field": "WS-INFIL1-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "database load"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+    "validations": [
+      {
+        "description": "IMS return code must indicate success",
+        "type": "database validation",
+        "condition": "IMS-RETURN-CODE checked after database operations",
+        "failureOutcome": "Error handling based on IMS return code",
+        "location": {
+          "function": "IMS-OPERATIONS",
+          "line": 100
+        },
+        "field": "IMS-RETURN-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "IMS database", "database unload"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+    "validations": [
+      {
+        "description": "Transaction type code is required",
+        "type": "required field",
+        "condition": "TTYPCDI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Type Cd can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRAN-TYPE-FIELDS",
+          "line": 286
+        },
+        "field": "TTYPCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "transaction type management"]
+      },
+      {
+        "description": "Transaction type code must be numeric",
+        "type": "format check",
+        "condition": "TTYPCDI NOT NUMERIC",
+        "failureOutcome": "Error message 'Tran Type Cd must be Numeric...' displayed",
+        "location": {
+          "function": "EDIT-TRAN-TYPE-FIELDS",
+          "line": 294
+        },
+        "field": "TTYPCDI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "data format"]
+      },
+      {
+        "description": "Transaction type description is required",
+        "type": "required field",
+        "condition": "TDESCI = SPACES OR LOW-VALUES",
+        "failureOutcome": "Error message 'Tran Type Desc can NOT be empty...' displayed",
+        "location": {
+          "function": "EDIT-TRAN-TYPE-FIELDS",
+          "line": 302
+        },
+        "field": "TDESCI",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "transaction type management"]
+      },
+      {
+        "description": "Transaction type must exist in DB2 table for update",
+        "type": "database validation",
+        "condition": "SQLCODE after SELECT statement",
+        "failureOutcome": "Error handling based on SQLCODE (0 = found, +100 = not found, <0 = error)",
+        "location": {
+          "function": "READ-TRAN-TYPE",
+          "line": 217
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "DB2", "database operations"]
+      },
+      {
+        "description": "Transaction type update must be successful",
+        "type": "database validation",
+        "condition": "SQLCODE after UPDATE statement",
+        "failureOutcome": "Error handling based on SQLCODE",
+        "location": {
+          "function": "UPDATE-TRAN-TYPE",
+          "line": 251
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "DB2", "database operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+    "validations": [
+      {
+        "description": "Type filter must be alphanumeric if provided",
+        "type": "format check",
+        "condition": "Type filter contains non-alphanumeric characters",
+        "failureOutcome": "FLG-TYPEFILTER-NOT-OK flag set",
+        "location": {
+          "function": "EDIT-TYPE-FILTER",
+          "line": 104
+        },
+        "field": "TYPE-FILTER",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "filter validation"]
+      },
+      {
+        "description": "Description filter must be alphanumeric if provided",
+        "type": "format check",
+        "condition": "Description filter contains non-alphanumeric characters",
+        "failureOutcome": "FLG-DESCFILTER-NOT-OK flag set",
+        "location": {
+          "function": "EDIT-DESC-FILTER",
+          "line": 108
+        },
+        "field": "DESC-FILTER",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "filter validation"]
+      },
+      {
+        "description": "Row selection must be 'D' (delete) or 'U' (update)",
+        "type": "format check",
+        "condition": "WS-EDIT-SELECT = 'D' or 'U' or blank",
+        "failureOutcome": "WS-ROW-SELECT-ERROR flag set if invalid",
+        "location": {
+          "function": "VALIDATE-ROW-SELECTION",
+          "line": 183
+        },
+        "field": "WS-EDIT-SELECT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "row selection", "user input validation"]
+      },
+      {
+        "description": "Row description must be alphanumeric",
+        "type": "format check",
+        "condition": "Row description contains non-alphanumeric characters",
+        "failureOutcome": "FLG-ROW-DESCRIPTION-NOT-OK flag set",
+        "location": {
+          "function": "VALIDATE-ROW-DESCRIPTION",
+          "line": 133
+        },
+        "field": "WS-ROW-TR-DESC-IN",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "data format"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+    "validations": [
+      {
+        "description": "Input file must open successfully",
+        "type": "file status validation",
+        "condition": "WS-INF-STATUS = '00'",
+        "failureOutcome": "Error message 'OPEN FILE NOT OK' displayed",
+        "location": {
+          "function": "0001-OPEN-FILES",
+          "line": 84
+        },
+        "field": "WS-INF-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "file operations", "transaction type batch update"]
+      },
+      {
+        "description": "Record type must be 'A', 'U', 'D', or '*'",
+        "type": "format check",
+        "condition": "INPUT-REC-TYPE = 'A' or 'U' or 'D' or '*'",
+        "failureOutcome": "Error message 'ERROR: TYPE NOT VALID', program abends",
+        "location": {
+          "function": "1003-TREAT-RECORD",
+          "line": 110
+        },
+        "field": "INPUT-REC-TYPE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "transaction type", "record type validation"]
+      },
+      {
+        "description": "INSERT operation must be successful",
+        "type": "database validation",
+        "condition": "SQLCODE = ZERO after INSERT",
+        "failureOutcome": "Error message with SQLCODE, program abends if SQLCODE < 0",
+        "location": {
+          "function": "10031-INSERT-DB",
+          "line": 152
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "DB2", "database operations"]
+      },
+      {
+        "description": "UPDATE operation must be successful",
+        "type": "database validation",
+        "condition": "SQLCODE = ZERO after UPDATE",
+        "failureOutcome": "Error message with SQLCODE (SQLCODE = +100 means no records found), program abends",
+        "location": {
+          "function": "10032-UPDATE-DB",
+          "line": 178
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "DB2", "database operations"]
+      },
+      {
+        "description": "DELETE operation must be successful",
+        "type": "database validation",
+        "condition": "SQLCODE = ZERO after DELETE",
+        "failureOutcome": "Error message with SQLCODE (SQLCODE = +100 means no records found), program abends",
+        "location": {
+          "function": "10033-DELETE-DB",
+          "line": 208
+        },
+        "field": "SQLCODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["batch processing", "DB2", "database operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/COACCT01.cbl",
+    "validations": [
+      {
+        "description": "CICS RETRIEVE must be successful",
+        "type": "cross-reference validation",
+        "condition": "WS-CICS-RESP1-CD = DFHRESP(NORMAL)",
+        "failureOutcome": "Error message with response codes, transaction terminated",
+        "location": {
+          "function": "1000-CONTROL",
+          "line": 196
+        },
+        "field": "WS-CICS-RESP1-CD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ operations", "CICS", "message queue"]
+      },
+      {
+        "description": "MQ queue open must be successful",
+        "type": "cross-reference validation",
+        "condition": "MQ-CONDITION-CODE = MQCC-OK",
+        "failureOutcome": "Error message 'INP MQOPEN ERR', error handling performed",
+        "location": {
+          "function": "2300-OPEN-INPUT-QUEUE",
+          "line": 189
+        },
+        "field": "MQ-CONDITION-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ operations", "message queue", "queue management"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/CODATE01.cbl",
+    "validations": [
+      {
+        "description": "CICS RETRIEVE must be successful",
+        "type": "cross-reference validation",
+        "condition": "WS-CICS-RESP1-CD = DFHRESP(NORMAL)",
+        "failureOutcome": "Error message with response codes, transaction terminated",
+        "location": {
+          "function": "1000-CONTROL",
+          "line": 145
+        },
+        "field": "WS-CICS-RESP1-CD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ operations", "CICS", "message queue"]
+      },
+      {
+        "description": "MQ queue open must be successful",
+        "type": "cross-reference validation",
+        "condition": "MQ-CONDITION-CODE = MQCC-OK",
+        "failureOutcome": "Error message 'INP MQOPEN ERR', error handling performed",
+        "location": {
+          "function": "2300-OPEN-INPUT-QUEUE",
+          "line": 189
+        },
+        "field": "MQ-CONDITION-CODE",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ operations", "message queue", "queue management"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBSWAIT.cbl",
+    "validations": []
+  }
+]
