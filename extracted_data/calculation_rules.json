@@ -456,5 +456,1455 @@
         ]
       }
     ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/COACCT01.cbl",
+    "rules": [
+      {
+        "description": "MQ options for input queue opening are calculated by combining option flags",
+        "type": "calculation",
+        "condition": "Opening input queue for message retrieval",
+        "outcome": "MQ-OPTIONS set to combination of MQOO-INPUT-SHARED, MQOO-SAVE-ALL-CONTEXT, and MQOO-FAIL-IF-QUIESCING",
+        "location": {
+          "function": "2300-OPEN-INPUT-QUEUE",
+          "line": 229
+        },
+        "variablesInvolved": [
+          "MQ-OPTIONS",
+          "MQOO-INPUT-SHARED",
+          "MQOO-SAVE-ALL-CONTEXT",
+          "MQOO-FAIL-IF-QUIESCING"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Queue Configuration",
+          "MQ Options"
+        ]
+      },
+      {
+        "description": "MQ options for output queue opening are calculated by combining option flags",
+        "type": "calculation",
+        "condition": "Opening output queue for message sending",
+        "outcome": "MQ-OPTIONS set to combination of MQOO-OUTPUT, MQOO-PASS-ALL-CONTEXT, and MQOO-FAIL-IF-QUIESCING",
+        "location": {
+          "function": "2400-OPEN-OUTPUT-QUEUE",
+          "line": 263
+        },
+        "variablesInvolved": [
+          "MQ-OPTIONS",
+          "MQOO-OUTPUT",
+          "MQOO-PASS-ALL-CONTEXT",
+          "MQOO-FAIL-IF-QUIESCING"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Queue Configuration",
+          "MQ Options"
+        ]
+      },
+      {
+        "description": "MQ options for error queue opening are calculated by combining option flags",
+        "type": "calculation",
+        "condition": "Opening error queue for error message handling",
+        "outcome": "MQ-OPTIONS set to combination of MQOO-OUTPUT, MQOO-PASS-ALL-CONTEXT, and MQOO-FAIL-IF-QUIESCING",
+        "location": {
+          "function": "2100-OPEN-ERROR-QUEUE",
+          "line": 298
+        },
+        "variablesInvolved": [
+          "MQ-OPTIONS",
+          "MQOO-OUTPUT",
+          "MQOO-PASS-ALL-CONTEXT",
+          "MQOO-FAIL-IF-QUIESCING"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Error Handling",
+          "MQ Options"
+        ]
+      },
+      {
+        "description": "Message counter is incremented for each message successfully retrieved",
+        "type": "calculation",
+        "condition": "Message successfully retrieved from input queue",
+        "outcome": "MQ-MSG-COUNT is increased by 1",
+        "location": {
+          "function": "3000-GET-REQUEST",
+          "line": 375
+        },
+        "variablesInvolved": [
+          "MQ-MSG-COUNT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Message Processing",
+          "Statistics"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/CODATE01.cbl",
+    "rules": [
+      {
+        "description": "Message counter is incremented for each message successfully retrieved",
+        "type": "calculation",
+        "condition": "Message successfully retrieved from input queue",
+        "outcome": "MQ-MSG-COUNT is increased by 1",
+        "location": {
+          "function": "3000-GET-REQUEST",
+          "line": 324
+        },
+        "variablesInvolved": [
+          "MQ-MSG-COUNT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Message Processing",
+          "Statistics"
+        ]
+      },
+      {
+        "description": "MQ character set identifier is computed from queue manager default",
+        "type": "calculation",
+        "condition": "Preparing message for reply queue",
+        "outcome": "MQMD-CODEDCHARSETID is set to MQCCSI-Q-MGR",
+        "location": {
+          "function": "4100-PUT-REPLY",
+          "line": 377
+        },
+        "variablesInvolved": [
+          "MQMD-CODEDCHARSETID",
+          "MQCCSI-Q-MGR"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Character Encoding",
+          "Message Format"
+        ]
+      },
+      {
+        "description": "MQ put message options are calculated by combining option flags",
+        "type": "calculation",
+        "condition": "Preparing to put message on reply queue",
+        "outcome": "MQPMO-OPTIONS set to combination of MQPMO-SYNCPOINT and MQPMO-DEFAULT-CONTEXT and MQPMO-FAIL-IF-QUIESCING",
+        "location": {
+          "function": "4100-PUT-REPLY",
+          "line": 379
+        },
+        "variablesInvolved": [
+          "MQPMO-OPTIONS",
+          "MQPMO-SYNCPOINT",
+          "MQPMO-DEFAULT-CONTEXT",
+          "MQPMO-FAIL-IF-QUIESCING"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Queue",
+          "Transaction Control",
+          "MQ Options"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "rules": [
+      {
+        "description": "Index is decremented to traverse transaction list backwards",
+        "type": "calculation",
+        "condition": "Processing transactions for display in reverse order",
+        "outcome": "WS-IDX is decreased by 1 for each transaction processed",
+        "location": {
+          "function": "PROCESS-PREV-PAGE-KEY",
+          "line": 355
+        },
+        "variablesInvolved": [
+          "WS-IDX"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Transaction Navigation",
+          "Loop Control"
+        ]
+      },
+      {
+        "description": "Page number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User requests previous page and not on first page",
+        "outcome": "CDEMO-CT00-PAGE-NUM is decreased by 1",
+        "location": {
+          "function": "PROCESS-PREV-PAGE-KEY",
+          "line": 364
+        },
+        "variablesInvolved": [
+          "CDEMO-CT00-PAGE-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "User Navigation",
+          "Page Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "rules": [
+      {
+        "description": "Index is decremented to traverse user list backwards",
+        "type": "calculation",
+        "condition": "Processing users for display in reverse order",
+        "outcome": "WS-IDX is decreased by 1 for each user processed",
+        "location": {
+          "function": "PROCESS-PREV-PAGE-KEY",
+          "line": 358
+        },
+        "variablesInvolved": [
+          "WS-IDX"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "User Navigation",
+          "Loop Control"
+        ]
+      },
+      {
+        "description": "Page number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User requests previous page and not on first page",
+        "outcome": "CDEMO-CU00-PAGE-NUM is decreased by 1",
+        "location": {
+          "function": "PROCESS-PREV-PAGE-KEY",
+          "line": 367
+        },
+        "variablesInvolved": [
+          "CDEMO-CU00-PAGE-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "User Navigation",
+          "Page Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "rules": [
+      {
+        "description": "Screen number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User presses PF7 and not on first page",
+        "outcome": "WS-CA-SCREEN-NUM is decreased by 1",
+        "location": {
+          "function": "PROCESS-PFK07",
+          "line": 508
+        },
+        "variablesInvolved": [
+          "WS-CA-SCREEN-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Card List Navigation",
+          "Screen Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN01C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for file close operation",
+        "type": "calculation",
+        "condition": "Closing daily transaction file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-DALYTRAN-CLOSE",
+          "line": 362
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for customer file close operation",
+        "type": "calculation",
+        "condition": "Closing customer file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9100-CUSTFILE-CLOSE",
+          "line": 380
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for cross reference file close operation",
+        "type": "calculation",
+        "condition": "Closing cross reference file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9200-XREFFILE-CLOSE",
+          "line": 398
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for card file close operation",
+        "type": "calculation",
+        "condition": "Closing card file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9300-CARDFILE-CLOSE",
+          "line": 416
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for account file close operation",
+        "type": "calculation",
+        "condition": "Closing account file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9400-ACCTFILE-CLOSE",
+          "line": 434
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for transaction file close operation",
+        "type": "calculation",
+        "condition": "Closing transaction file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9500-TRANFILE-CLOSE",
+          "line": 452
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for account file close operation",
+        "type": "calculation",
+        "condition": "Closing account file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-ACCTFILE-CLOSE",
+          "line": 389
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful file close",
+        "type": "calculation",
+        "condition": "Account file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9000-ACCTFILE-CLOSE",
+          "line": 392
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for file close error",
+        "type": "calculation",
+        "condition": "Account file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9000-ACCTFILE-CLOSE",
+          "line": 394
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT02C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for card file close operation",
+        "type": "calculation",
+        "condition": "Closing card file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-CARDFILE-CLOSE",
+          "line": 137
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful file close",
+        "type": "calculation",
+        "condition": "Card file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9000-CARDFILE-CLOSE",
+          "line": 140
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for file close error",
+        "type": "calculation",
+        "condition": "Card file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9000-CARDFILE-CLOSE",
+          "line": 142
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT03C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for cross reference file close operation",
+        "type": "calculation",
+        "condition": "Closing cross reference file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-XREFFILE-CLOSE",
+          "line": 137
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful file close",
+        "type": "calculation",
+        "condition": "Cross reference file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9000-XREFFILE-CLOSE",
+          "line": 140
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for file close error",
+        "type": "calculation",
+        "condition": "Cross reference file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9000-XREFFILE-CLOSE",
+          "line": 142
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBCUS01C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for customer file close operation",
+        "type": "calculation",
+        "condition": "Closing customer file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-CUSTFILE-CLOSE",
+          "line": 137
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful file close",
+        "type": "calculation",
+        "condition": "Customer file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9000-CUSTFILE-CLOSE",
+          "line": 140
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for file close error",
+        "type": "calculation",
+        "condition": "Customer file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9000-CUSTFILE-CLOSE",
+          "line": 142
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN03C.cbl",
+    "rules": [
+      {
+        "description": "Application result code is initialized to 8 for transaction file close operation",
+        "type": "calculation",
+        "condition": "Closing transaction file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9000-TRANFILE-CLOSE",
+          "line": 515
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful transaction file close",
+        "type": "calculation",
+        "condition": "Transaction file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9000-TRANFILE-CLOSE",
+          "line": 518
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for transaction file close error",
+        "type": "calculation",
+        "condition": "Transaction file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9000-TRANFILE-CLOSE",
+          "line": 520
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is initialized to 8 for report file close operation",
+        "type": "calculation",
+        "condition": "Closing report file",
+        "outcome": "APPL-RESULT is set to 8 as initial return code",
+        "location": {
+          "function": "9100-REPTFILE-CLOSE",
+          "line": 533
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      },
+      {
+        "description": "Application result code is reset to 0 for successful report file close",
+        "type": "calculation",
+        "condition": "Report file closed successfully with status 00",
+        "outcome": "APPL-RESULT is set to 0 by subtracting itself from itself",
+        "location": {
+          "function": "9100-REPTFILE-CLOSE",
+          "line": 536
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Success Handling"
+        ]
+      },
+      {
+        "description": "Application result code is set to 12 for report file close error",
+        "type": "calculation",
+        "condition": "Report file close failed with non-00 status",
+        "outcome": "APPL-RESULT is set to 12 as error return code",
+        "location": {
+          "function": "9100-REPTFILE-CLOSE",
+          "line": 538
+        },
+        "variablesInvolved": [
+          "APPL-RESULT"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "File Operations",
+          "Return Code",
+          "Error Handling"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "rules": [
+      {
+        "description": "Credit limit is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing account update with valid numeric input",
+        "outcome": "ACUP-NEW-CREDIT-LIMIT-N is set from NUMVAL-C conversion of string input",
+        "location": {
+          "function": "EDIT-ACCOUNT-INFORMATION",
+          "line": 1079
+        },
+        "variablesInvolved": [
+          "ACUP-NEW-CREDIT-LIMIT-N",
+          "ACRDLIMI",
+          "CACTUPAI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Update",
+          "Data Conversion",
+          "Credit Limit"
+        ]
+      },
+      {
+        "description": "Cash credit limit is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing account update with valid numeric input",
+        "outcome": "ACUP-NEW-CASH-CREDIT-LIMIT-N is set from NUMVAL-C conversion of string input",
+        "location": {
+          "function": "EDIT-ACCOUNT-INFORMATION",
+          "line": 1093
+        },
+        "variablesInvolved": [
+          "ACUP-NEW-CASH-CREDIT-LIMIT-N",
+          "ACSHLIMI",
+          "CACTUPAI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Update",
+          "Data Conversion",
+          "Cash Credit Limit"
+        ]
+      },
+      {
+        "description": "Current balance is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing account update with valid numeric input",
+        "outcome": "ACUP-NEW-CURR-BAL-N is set from NUMVAL-C conversion of string input",
+        "location": {
+          "function": "EDIT-ACCOUNT-INFORMATION",
+          "line": 1107
+        },
+        "variablesInvolved": [
+          "ACUP-NEW-CURR-BAL-N",
+          "ACUP-NEW-CURR-BAL-X",
+          "ACURBALI",
+          "CACTUPAI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Update",
+          "Data Conversion",
+          "Current Balance"
+        ]
+      },
+      {
+        "description": "Current cycle credit is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing account update with valid numeric input",
+        "outcome": "ACUP-NEW-CURR-CYC-CREDIT-N is set from NUMVAL-C conversion of string input",
+        "location": {
+          "function": "EDIT-ACCOUNT-INFORMATION",
+          "line": 1121
+        },
+        "variablesInvolved": [
+          "ACUP-NEW-CURR-CYC-CREDIT-N",
+          "ACRCYCRI",
+          "CACTUPAI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Update",
+          "Data Conversion",
+          "Cycle Credit"
+        ]
+      },
+      {
+        "description": "Current cycle debit is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing account update with valid numeric input",
+        "outcome": "ACUP-NEW-CURR-CYC-DEBIT-N is set from NUMVAL-C conversion of string input",
+        "location": {
+          "function": "EDIT-ACCOUNT-INFORMATION",
+          "line": 1135
+        },
+        "variablesInvolved": [
+          "ACUP-NEW-CURR-CYC-DEBIT-N",
+          "ACRCYDBI",
+          "CACTUPAI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Account Update",
+          "Data Conversion",
+          "Cycle Debit"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CORPT00C.cbl",
+    "rules": [
+      {
+        "description": "Month is incremented by 1 for date range calculation",
+        "type": "calculation",
+        "condition": "Computing end date for transaction report",
+        "outcome": "WS-CURDATE-MONTH is increased by 1",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 224
+        },
+        "variablesInvolved": [
+          "WS-CURDATE-MONTH"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Report Generation",
+          "Date Range"
+        ]
+      },
+      {
+        "description": "Year is incremented by 1 when month exceeds 12",
+        "type": "calculation",
+        "condition": "Month exceeds 12 during date calculation",
+        "outcome": "WS-CURDATE-YEAR is increased by 1",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 226
+        },
+        "variablesInvolved": [
+          "WS-CURDATE-YEAR",
+          "WS-CURDATE-MONTH"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Report Generation",
+          "Year Rollover"
+        ]
+      },
+      {
+        "description": "Current date is computed by decrementing integer date by 1",
+        "type": "calculation",
+        "condition": "Computing end date for transaction report",
+        "outcome": "WS-CURDATE-N is set to previous day using date functions",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 229
+        },
+        "variablesInvolved": [
+          "WS-CURDATE-N"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Date Calculation",
+          "Report Generation",
+          "Date Manipulation"
+        ]
+      },
+      {
+        "description": "Start date month is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-99 is set from NUMVAL-C conversion of month input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 305
+        },
+        "variablesInvolved": [
+          "WS-NUM-99",
+          "SDTMMI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      },
+      {
+        "description": "Start date day is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-99 is set from NUMVAL-C conversion of day input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 309
+        },
+        "variablesInvolved": [
+          "WS-NUM-99",
+          "SDTDDI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      },
+      {
+        "description": "Start date year is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-9999 is set from NUMVAL-C conversion of year input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 313
+        },
+        "variablesInvolved": [
+          "WS-NUM-9999",
+          "SDTYYYYI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      },
+      {
+        "description": "End date month is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-99 is set from NUMVAL-C conversion of month input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 317
+        },
+        "variablesInvolved": [
+          "WS-NUM-99",
+          "EDTMMI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      },
+      {
+        "description": "End date day is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-99 is set from NUMVAL-C conversion of day input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 321
+        },
+        "variablesInvolved": [
+          "WS-NUM-99",
+          "EDTDDI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      },
+      {
+        "description": "End date year is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Processing date input for report parameters",
+        "outcome": "WS-NUM-9999 is set from NUMVAL-C conversion of year input",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 325
+        },
+        "variablesInvolved": [
+          "WS-NUM-9999",
+          "EDTYYYYI",
+          "CORPT0AI"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Date Validation",
+          "Report Parameters"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+    "rules": [
+      {
+        "description": "Page number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User requests previous page and not on first page",
+        "outcome": "CDEMO-CPVS-PAGE-NUM is decreased by 1",
+        "location": {
+          "function": "PROCESS-PF07-KEY",
+          "line": 366
+        },
+        "variablesInvolved": [
+          "CDEMO-CPVS-PAGE-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Authorization Summary",
+          "User Navigation"
+        ]
+      },
+      {
+        "description": "Index is incremented to process next authorization record",
+        "type": "calculation",
+        "condition": "Authorization record successfully read and no errors",
+        "outcome": "WS-IDX is increased by 1",
+        "location": {
+          "function": "PROCESS-PF08-KEY",
+          "line": 432
+        },
+        "variablesInvolved": [
+          "WS-IDX"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Authorization Processing",
+          "Loop Control",
+          "Record Processing"
+        ]
+      },
+      {
+        "description": "Page number is incremented when starting new page",
+        "type": "calculation",
+        "condition": "Second authorization record on page is processed",
+        "outcome": "CDEMO-CPVS-PAGE-NUM is increased by 1",
+        "location": {
+          "function": "PROCESS-PF08-KEY",
+          "line": 437
+        },
+        "variablesInvolved": [
+          "CDEMO-CPVS-PAGE-NUM",
+          "WS-IDX"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Authorization Summary",
+          "Page Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+    "rules": [
+      {
+        "description": "Authorization time is extracted from complement representation",
+        "type": "calculation",
+        "condition": "Processing authorization record for fraud detection",
+        "outcome": "WS-AUTH-TIME is computed as 999999999 minus PA-AUTH-TIME-9C",
+        "location": {
+          "function": "BUILD-DB2-RECORD",
+          "line": 107
+        },
+        "variablesInvolved": [
+          "WS-AUTH-TIME",
+          "PA-AUTH-TIME-9C"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Time Calculation",
+          "Fraud Detection",
+          "Timestamp Extraction"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+    "rules": [
+      {
+        "description": "Screen number is incremented for next page navigation",
+        "type": "calculation",
+        "condition": "User presses PF8 and next page exists",
+        "outcome": "WS-CA-SCREEN-NUM is increased by 1",
+        "location": {
+          "function": "PROCESS-PFK08",
+          "line": 770
+        },
+        "variablesInvolved": [
+          "WS-CA-SCREEN-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Transaction Type List",
+          "Screen Navigation"
+        ]
+      },
+      {
+        "description": "Screen number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User presses PF7 and not on first page",
+        "outcome": "WS-CA-SCREEN-NUM is decreased by 1",
+        "location": {
+          "function": "PROCESS-PFK07",
+          "line": 784
+        },
+        "variablesInvolved": [
+          "WS-CA-SCREEN-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Transaction Type List",
+          "Screen Navigation"
+        ]
+      },
+      {
+        "description": "Row counter is incremented when transaction type record is fetched",
+        "type": "calculation",
+        "condition": "SQL fetch successful with SQLCODE = ZERO",
+        "outcome": "WS-ROW-NUMBER is increased by 1",
+        "location": {
+          "function": "8000-READ-FORWARD",
+          "line": 1636
+        },
+        "variablesInvolved": [
+          "WS-ROW-NUMBER"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Database Query",
+          "Record Processing",
+          "Screen Display"
+        ]
+      },
+      {
+        "description": "Screen number is incremented when first record is loaded",
+        "type": "calculation",
+        "condition": "First row is loaded and screen number is zero",
+        "outcome": "WS-CA-SCREEN-NUM is increased by 1",
+        "location": {
+          "function": "8000-READ-FORWARD",
+          "line": 1647
+        },
+        "variablesInvolved": [
+          "WS-CA-SCREEN-NUM",
+          "WS-ROW-NUMBER"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Screen Management",
+          "Pagination",
+          "Initial Load"
+        ]
+      },
+      {
+        "description": "Actions requested is computed by subtracting unselected rows from total",
+        "type": "calculation",
+        "condition": "Processing user action selections",
+        "outcome": "WS-ACTIONS-REQUESTED is set to max screen lines minus no actions selected",
+        "location": {
+          "function": "8500-PROCESS-ACTIONS-SELECTED",
+          "line": 1003
+        },
+        "variablesInvolved": [
+          "WS-ACTIONS-REQUESTED",
+          "WS-MAX-SCREEN-LINES",
+          "WS-NO-ACTIONS-SELECTED"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Actions",
+          "Screen Processing",
+          "Action Count"
+        ]
+      },
+      {
+        "description": "Valid actions count is computed by adding delete and update requests",
+        "type": "calculation",
+        "condition": "Processing user action selections",
+        "outcome": "WS-VALID-ACTIONS-SELECTED is set to sum of deletes and updates requested",
+        "location": {
+          "function": "8500-PROCESS-ACTIONS-SELECTED",
+          "line": 1009
+        },
+        "variablesInvolved": [
+          "WS-VALID-ACTIONS-SELECTED",
+          "WS-DELETES-REQUESTED",
+          "WS-UPDATES-REQUESTED"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Actions",
+          "Validation",
+          "Action Count"
+        ]
+      },
+      {
+        "description": "String length is computed for message centering",
+        "type": "calculation",
+        "condition": "Preparing to display centered info message",
+        "outcome": "WS-STRING-LEN is set to length of trimmed message",
+        "location": {
+          "function": "9800-DISPLAY-INFO-MESSAGE",
+          "line": 1562
+        },
+        "variablesInvolved": [
+          "WS-STRING-LEN",
+          "WS-INFO-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Display",
+          "Text Formatting",
+          "UI Layout"
+        ]
+      },
+      {
+        "description": "String midpoint is computed for message centering",
+        "type": "calculation",
+        "condition": "Preparing to display centered info message",
+        "outcome": "WS-STRING-MID is calculated for centering text",
+        "location": {
+          "function": "9800-DISPLAY-INFO-MESSAGE",
+          "line": 1566
+        },
+        "variablesInvolved": [
+          "WS-STRING-MID",
+          "WS-INFO-MSG",
+          "WS-STRING-LEN"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Display",
+          "Text Formatting",
+          "UI Layout"
+        ]
+      },
+      {
+        "description": "Row number is set to max screen lines for backward reading",
+        "type": "calculation",
+        "condition": "Starting to read transaction types backward",
+        "outcome": "WS-ROW-NUMBER is initialized to WS-MAX-SCREEN-LINES",
+        "location": {
+          "function": "8100-READ-BACKWARDS",
+          "line": 1735
+        },
+        "variablesInvolved": [
+          "WS-ROW-NUMBER",
+          "WS-MAX-SCREEN-LINES"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Backward Navigation",
+          "Screen Control"
+        ]
+      },
+      {
+        "description": "Row number is decremented during backward reading",
+        "type": "calculation",
+        "condition": "Processing transaction type records in reverse",
+        "outcome": "WS-ROW-NUMBER is decreased by 1",
+        "location": {
+          "function": "8100-READ-BACKWARDS",
+          "line": 1769
+        },
+        "variablesInvolved": [
+          "WS-ROW-NUMBER"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "Loop Control",
+          "Backward Navigation"
+        ]
+      },
+      {
+        "description": "Description length is computed for database update",
+        "type": "calculation",
+        "condition": "Preparing to update transaction type description",
+        "outcome": "DCL-TR-DESCRIPTION-LEN is set to length of description field",
+        "location": {
+          "function": "9300-UPDATE-TRANSACTION-TYPE",
+          "line": 1844
+        },
+        "variablesInvolved": [
+          "DCL-TR-DESCRIPTION-LEN",
+          "WS-ROW-TR-DESC-IN"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Database Update",
+          "Data Length",
+          "Transaction Type"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+    "rules": [
+      {
+        "description": "Transaction type code is computed from string input using numeric conversion",
+        "type": "calculation",
+        "condition": "Validating transaction type input",
+        "outcome": "WS-EDIT-NUMERIC-2 is set from NUMVAL conversion of type input",
+        "location": {
+          "function": "9110-EDIT-TTYP-TYPE",
+          "line": 835
+        },
+        "variablesInvolved": [
+          "WS-EDIT-NUMERIC-2",
+          "TTUP-NEW-TTYP-TYPE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Conversion",
+          "Input Validation",
+          "Transaction Type"
+        ]
+      },
+      {
+        "description": "String length is computed for message centering",
+        "type": "calculation",
+        "condition": "Preparing to display centered info message",
+        "outcome": "WS-STRING-LEN is set to length of trimmed message",
+        "location": {
+          "function": "9800-DISPLAY-INFO-MESSAGE",
+          "line": 1251
+        },
+        "variablesInvolved": [
+          "WS-STRING-LEN",
+          "WS-INFO-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Display",
+          "Text Formatting",
+          "UI Layout"
+        ]
+      },
+      {
+        "description": "String midpoint is computed for message centering",
+        "type": "calculation",
+        "condition": "Preparing to display centered info message",
+        "outcome": "WS-STRING-MID is calculated for centering text",
+        "location": {
+          "function": "9800-DISPLAY-INFO-MESSAGE",
+          "line": 1255
+        },
+        "variablesInvolved": [
+          "WS-STRING-MID",
+          "WS-INFO-MSG",
+          "WS-STRING-LEN"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Message Display",
+          "Text Formatting",
+          "UI Layout"
+        ]
+      },
+      {
+        "description": "Description length is computed for database insert",
+        "type": "calculation",
+        "condition": "Preparing to insert new transaction type",
+        "outcome": "DCL-TR-DESCRIPTION-LEN is set to length of description field",
+        "location": {
+          "function": "9200-ADD-TRANSACTION-TYPE",
+          "line": 1541
+        },
+        "variablesInvolved": [
+          "DCL-TR-DESCRIPTION-LEN",
+          "TTUP-NEW-TTYP-TYPE-DESC"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Database Insert",
+          "Data Length",
+          "Transaction Type"
+        ]
+      }
+    ]
   }
 ]
