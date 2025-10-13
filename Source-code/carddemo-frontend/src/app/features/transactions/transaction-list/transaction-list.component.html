@@ -1,0 +1,45 @@
+<div class="container">
+  <div class="header">
+    <h2>Transaction List</h2>
+    <div class="header-actions">
+      <button *ngIf="authService.isAdmin" class="btn-add" (click)="addTransaction()">Add Transaction</button>
+      <button class="btn-back" (click)="goBack()">Back to Menu</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading transactions...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="transaction-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Transaction ID</th>
+          <th>Card Number</th>
+          <th>Amount</th>
+          <th>Merchant</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let transaction of paginatedTransactions">
+          <td>{{ transaction.transactionId }}</td>
+          <td>{{ transaction.cardNumber }}</td>
+          <td>{{ transaction.amount | number:'1.2-2' }}</td>
+          <td>{{ transaction.merchantInfo }}</td>
+          <td>{{ transaction.processingDate }}</td>
+          <td>
+            <button class="btn-view" (click)="viewTransaction(transaction.transactionId)">View</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button [disabled]="currentPage === 0" (click)="previousPage()">Previous</button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+</div>

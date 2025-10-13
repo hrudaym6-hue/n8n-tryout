@@ -1,0 +1,46 @@
+<div class="container">
+  <div class="header">
+    <h2>Update User</h2>
+    <button class="btn-back" (click)="goBack()">Cancel</button>
+  </div>
+
+  <div *ngIf="isLoading && !user" class="loading">Loading user...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div *ngIf="!isLoading && user" class="update-form">
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" formControlName="userId" class="form-control" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" formControlName="firstName" class="form-control" [class.is-invalid]="updateForm.get('firstName')?.invalid && updateForm.get('firstName')?.touched" />
+        <div class="invalid-feedback" *ngIf="updateForm.get('firstName')?.invalid && updateForm.get('firstName')?.touched">First name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" formControlName="lastName" class="form-control" [class.is-invalid]="updateForm.get('lastName')?.invalid && updateForm.get('lastName')?.touched" />
+        <div class="invalid-feedback" *ngIf="updateForm.get('lastName')?.invalid && updateForm.get('lastName')?.touched">Last name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="userType">User Type:</label>
+        <select id="userType" formControlName="userType" class="form-control" [class.is-invalid]="updateForm.get('userType')?.invalid && updateForm.get('userType')?.touched">
+          <option value="">Select User Type</option>
+          <option value="R">Regular (R)</option>
+          <option value="A">Admin (A)</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="updateForm.get('userType')?.invalid && updateForm.get('userType')?.touched">User type is required</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">{{ isLoading ? 'Updating...' : 'Update User' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

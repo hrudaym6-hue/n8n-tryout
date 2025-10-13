@@ -1,0 +1,69 @@
+<div class="container">
+  <div class="header">
+    <h2>Authorization Details</h2>
+    <button class="btn-back" (click)="goBack()">Back to List</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading authorization...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && !errorMessage && authorization" class="auth-details">
+    <div class="detail-section">
+      <h3>Basic Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Authorization Key:</label>
+          <span>{{ authorization.authorizationKey }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Card Number:</label>
+          <span>{{ authorization.cardNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Response Code:</label>
+          <span>{{ authorization.responseCode || 'Pending' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Transaction Details</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Amount:</label>
+          <span>{{ authorization.amount | number:'1.2-2' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Merchant Info:</label>
+          <span>{{ authorization.merchantInfo }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Processing Code:</label>
+          <span>{{ authorization.processingCode || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Processing Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Processing Date:</label>
+          <span>{{ authorization.processingDate }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Processing Time:</label>
+          <span>{{ authorization.processingTime }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Decline Reason:</label>
+          <span>{{ authorization.declineReason || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Fraud Flag:</label>
+          <span>{{ authorization.isFraud ? 'Yes' : 'No' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

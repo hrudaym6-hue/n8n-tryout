@@ -1,0 +1,42 @@
+<div class="login-container">
+  <div class="login-card">
+    <h2>CardDemo Sign In</h2>
+    <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input
+          type="text"
+          id="userId"
+          formControlName="userId"
+          class="form-control"
+          [class.is-invalid]="userId?.invalid && userId?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="userId?.invalid && userId?.touched">
+          <div *ngIf="userId?.errors?.['required']">User ID is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input
+          type="password"
+          id="password"
+          formControlName="password"
+          class="form-control"
+          [class.is-invalid]="password?.invalid && password?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
+          <div *ngIf="password?.errors?.['required']">Password is required</div>
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+        {{ isLoading ? 'Signing in...' : 'Sign In' }}
+      </button>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,47 @@
+<div class="container">
+  <div class="header">
+    <h2>Card List</h2>
+    <div class="header-actions">
+      <button class="btn-search" (click)="searchCards()">Search Card</button>
+      <button class="btn-back" (click)="goBack()">Back to Menu</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading cards...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && !errorMessage" class="card-table">
+    <table>
+      <thead>
+        <tr>
+          <th>Card Number</th>
+          <th>Account ID</th>
+          <th>Cardholder Name</th>
+          <th>Expiry Date</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let card of paginatedCards">
+          <td>{{ card.cardNumber }}</td>
+          <td>{{ card.accountId }}</td>
+          <td>{{ card.cardHolderName }}</td>
+          <td>{{ card.expiryMonth }}/{{ card.expiryYear }}</td>
+          <td>{{ card.status === 'Y' ? 'Active' : 'Inactive' }}</td>
+          <td>
+            <button class="btn-select" (click)="selectCard(card.cardNumber)">
+              {{ authService.isAdmin ? 'Update' : 'View' }}
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination">
+      <button [disabled]="currentPage === 0" (click)="previousPage()">Previous</button>
+      <span>Page {{ currentPage + 1 }} of {{ totalPages }}</span>
+      <button [disabled]="currentPage >= totalPages - 1" (click)="nextPage()">Next</button>
+    </div>
+  </div>
+</div>

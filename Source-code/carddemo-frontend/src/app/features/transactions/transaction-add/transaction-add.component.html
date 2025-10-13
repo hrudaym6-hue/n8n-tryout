@@ -1,0 +1,124 @@
+<div class="container">
+  <div class="header">
+    <h2>Add Transaction</h2>
+    <button class="btn-back" (click)="goBack()">Cancel</button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div class="add-form">
+    <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="cardNumber">Card Number:</label>
+        <input
+          type="text"
+          id="cardNumber"
+          formControlName="cardNumber"
+          class="form-control"
+          placeholder="Enter 16-digit card number"
+          maxlength="16"
+          [class.is-invalid]="cardNumber?.invalid && cardNumber?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="cardNumber?.invalid && cardNumber?.touched">
+          <div *ngIf="cardNumber?.errors?.['required']">Card number is required</div>
+          <div *ngIf="cardNumber?.errors?.['pattern']">Card number must be 16 digits</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="typeId">Type ID:</label>
+          <input
+            type="text"
+            id="typeId"
+            formControlName="typeId"
+            class="form-control"
+            [class.is-invalid]="typeId?.invalid && typeId?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="typeId?.invalid && typeId?.touched">
+            <div *ngIf="typeId?.errors?.['required']">Type ID is required</div>
+            <div *ngIf="typeId?.errors?.['pattern']">Type ID must be numeric</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="categoryCode">Category Code:</label>
+          <input
+            type="text"
+            id="categoryCode"
+            formControlName="categoryCode"
+            class="form-control"
+            [class.is-invalid]="categoryCode?.invalid && categoryCode?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="categoryCode?.invalid && categoryCode?.touched">
+            <div *ngIf="categoryCode?.errors?.['required']">Category code is required</div>
+            <div *ngIf="categoryCode?.errors?.['pattern']">Category code must be numeric</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="transactionSource">Transaction Source:</label>
+        <input
+          type="text"
+          id="transactionSource"
+          formControlName="transactionSource"
+          class="form-control"
+          [class.is-invalid]="transactionSource?.invalid && transactionSource?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="transactionSource?.invalid && transactionSource?.touched">
+          <div *ngIf="transactionSource?.errors?.['required']">Transaction source is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="amount">Amount:</label>
+        <input
+          type="text"
+          id="amount"
+          formControlName="amount"
+          class="form-control"
+          placeholder="0.00"
+          [class.is-invalid]="amount?.invalid && amount?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="amount?.invalid && amount?.touched">
+          <div *ngIf="amount?.errors?.['required']">Amount is required</div>
+          <div *ngIf="amount?.errors?.['pattern']">Amount must be numeric</div>
+          <div *ngIf="amount?.errors?.['min']">Amount must be greater than zero</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="merchantInfo">Merchant Information:</label>
+        <input
+          type="text"
+          id="merchantInfo"
+          formControlName="merchantInfo"
+          class="form-control"
+          [class.is-invalid]="merchantInfo?.invalid && merchantInfo?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="merchantInfo?.invalid && merchantInfo?.touched">
+          <div *ngIf="merchantInfo?.errors?.['required']">Merchant information is required</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="description">Description:</label>
+        <textarea
+          id="description"
+          formControlName="description"
+          class="form-control"
+          rows="3"
+        ></textarea>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Adding...' : 'Add Transaction' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

@@ -1,0 +1,72 @@
+<div class="container">
+  <div class="header">
+    <h2>Bill Payment</h2>
+    <button class="btn-back" (click)="goBack()">Back to Menu</button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div class="payment-form">
+    <form [formGroup]="paymentForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input
+          type="text"
+          id="accountId"
+          formControlName="accountId"
+          class="form-control"
+          placeholder="Enter 11-digit account ID"
+          maxlength="11"
+          [class.is-invalid]="accountId?.invalid && accountId?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="accountId?.invalid && accountId?.touched">
+          <div *ngIf="accountId?.errors?.['required']">Account ID is required</div>
+          <div *ngIf="accountId?.errors?.['pattern']">Account ID must be 11 digits</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="paymentAmount">Payment Amount:</label>
+        <input
+          type="text"
+          id="paymentAmount"
+          formControlName="paymentAmount"
+          class="form-control"
+          placeholder="0.00"
+          [class.is-invalid]="paymentAmount?.invalid && paymentAmount?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="paymentAmount?.invalid && paymentAmount?.touched">
+          <div *ngIf="paymentAmount?.errors?.['required']">Payment amount is required</div>
+          <div *ngIf="paymentAmount?.errors?.['pattern']">Amount must be numeric with 2 decimals</div>
+          <div *ngIf="paymentAmount?.errors?.['min']">Amount must be greater than zero</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="confirmAmount">Confirm Amount:</label>
+        <input
+          type="text"
+          id="confirmAmount"
+          formControlName="confirmAmount"
+          class="form-control"
+          placeholder="0.00"
+          [class.is-invalid]="confirmAmount?.invalid && confirmAmount?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="confirmAmount?.invalid && confirmAmount?.touched">
+          <div *ngIf="confirmAmount?.errors?.['required']">Please confirm the payment amount</div>
+        </div>
+        <div class="invalid-feedback" *ngIf="paymentForm.errors?.['amountMismatch'] && confirmAmount?.touched">
+          Amounts do not match
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Processing...' : 'Make Payment' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
