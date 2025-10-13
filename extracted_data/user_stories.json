@@ -1,0 +1,692 @@
+[
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to sign in with my userid and password so that I can access the CardDemo application",
+        "component": "COSGN00C",
+        "trigger": "Enter userid and password, press Enter key",
+        "expectedBehavior": "Validates credentials against USRSEC file and routes to admin menu (COADM01C) or user menu (COMEN01C) based on user type",
+        "location": {"line": 209},
+        "route": "/CC00",
+        "dependencies": ["CICS READ USRSEC", "CICS XCTL to COADM01C", "CICS XCTL to COMEN01C"],
+        "validationStates": ["Please enter User ID", "Please enter Password", "User not found", "Wrong Password"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to select from the admin menu options so that I can access administrative functions",
+        "component": "COADM01C",
+        "trigger": "Enter option number (1-7), press Enter key",
+        "expectedBehavior": "Routes to selected program based on option: 1-Account, 2-Credit Card, 3-Transaction, 4-Bill Payment, 5-User, 6-Reports, 7-Authorization",
+        "location": {"line": 119},
+        "route": "/CA00",
+        "dependencies": ["CICS XCTL to COACTVWC", "CICS XCTL to COCRDLIC", "CICS XCTL to COTRN00C", "CICS XCTL to COBIL00C", "CICS XCTL to COUSR00C", "CICS XCTL to CORPT00C", "CICS XCTL to COPAUS0C"],
+        "validationStates": ["Option must be numeric", "Invalid option selected", "Option is not installed"]
+      },
+      {
+        "story": "As an administrator, I want to sign off from the admin menu so that I can end my session securely",
+        "component": "COADM01C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to sign-on screen (COSGN00C) and ends the user session",
+        "location": {"line": 137},
+        "route": "/CA00",
+        "dependencies": ["CICS XCTL to COSGN00C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "userStories": [
+      {
+        "story": "As a regular user, I want to select from the user menu options so that I can access available functions",
+        "component": "COMEN01C",
+        "trigger": "Enter option number (1-4), press Enter key",
+        "expectedBehavior": "Routes to selected program based on option: 1-Account, 2-Credit Card, 3-Transaction, 4-Bill Payment",
+        "location": {"line": 115},
+        "route": "/CM00",
+        "dependencies": ["CICS XCTL to COACTVWC", "CICS XCTL to COCRDLIC", "CICS XCTL to COTRN00C", "CICS XCTL to COBIL00C"],
+        "validationStates": ["Option must be numeric", "Invalid option selected", "This is ADMIN only function"]
+      },
+      {
+        "story": "As a regular user, I want to sign off from the user menu so that I can end my session securely",
+        "component": "COMEN01C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to sign-on screen (COSGN00C) and ends the user session",
+        "location": {"line": 164},
+        "route": "/CM00",
+        "dependencies": ["CICS XCTL to COSGN00C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view account details by entering an account ID so that I can see account information",
+        "component": "COACTVWC",
+        "trigger": "Enter account ID, press Enter key",
+        "expectedBehavior": "Reads ACCTDAT file and displays account details including ID, status, balance, credit limit, and associated customer information",
+        "location": {"line": 150},
+        "route": "/CA01",
+        "dependencies": ["CICS READ ACCTDAT", "CICS READ CUSTDAT", "CICS READ CCXREF"],
+        "validationStates": ["Account ID can NOT be empty", "Account not found", "Account ID must be numeric"]
+      },
+      {
+        "story": "As a user, I want to return to the previous menu from account view so that I can navigate back",
+        "component": "COACTVWC",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to previous menu (admin menu or user menu based on context)",
+        "location": {"line": 120},
+        "route": "/CA01",
+        "dependencies": ["CICS XCTL to COADM01C or COMEN01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to update account information so that I can maintain accurate customer data",
+        "component": "COACTUPC",
+        "trigger": "Enter account ID, modify fields (address, city, state, zip, phone, credit limit), press PF5 to update",
+        "expectedBehavior": "Validates input fields and updates ACCTDAT file with new account information",
+        "location": {"line": 200},
+        "route": "/CA02",
+        "dependencies": ["CICS READ ACCTDAT", "CICS REWRITE ACCTDAT", "CICS READ CUSTDAT", "CICS REWRITE CUSTDAT"],
+        "validationStates": ["Account ID can NOT be empty", "Account ID must be numeric", "Address line must be alphanumeric", "City must be alpha only", "State must be 2 characters", "ZIP must be 5 or 9 digits", "Phone number must be valid US format", "SSN must be valid format", "Credit limit must be numeric"]
+      },
+      {
+        "story": "As an administrator, I want to clear the update form so that I can start fresh with a different account",
+        "component": "COACTUPC",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 180},
+        "route": "/CA02",
+        "dependencies": [],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to search for a credit card by card number so that I can view its details",
+        "component": "COCRDSLC",
+        "trigger": "Enter card number, press Enter key",
+        "expectedBehavior": "Searches CARDDAT file and displays card details if found",
+        "location": {"line": 120},
+        "route": "/CC01",
+        "dependencies": ["CICS READ CARDDAT"],
+        "validationStates": ["Card number can NOT be empty", "Card not found", "Card number must be 16 digits"]
+      },
+      {
+        "story": "As a user, I want to return to the previous menu from card search so that I can navigate back",
+        "component": "COCRDSLC",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to previous menu (admin menu or user menu)",
+        "location": {"line": 110},
+        "route": "/CC01",
+        "dependencies": ["CICS XCTL to COADM01C or COMEN01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view a paginated list of credit cards so that I can browse available cards",
+        "component": "COCRDLIC",
+        "trigger": "Press Enter key or navigate pages",
+        "expectedBehavior": "Displays 10 cards per page from CARDDAT file. Admin users see all cards, regular users see only cards for their account",
+        "location": {"line": 150},
+        "route": "/CC02",
+        "dependencies": ["CICS STARTBR CARDDAT", "CICS READNEXT CARDDAT"],
+        "validationStates": ["No cards found", "End of card list"]
+      },
+      {
+        "story": "As a user, I want to navigate to the next page of cards so that I can view more cards",
+        "component": "COCRDLIC",
+        "trigger": "Press PF8 key",
+        "expectedBehavior": "Displays the next 10 cards in the list",
+        "location": {"line": 180},
+        "route": "/CC02",
+        "dependencies": ["CICS READNEXT CARDDAT"],
+        "validationStates": ["End of card list reached"]
+      },
+      {
+        "story": "As a user, I want to navigate to the previous page of cards so that I can view earlier cards",
+        "component": "COCRDLIC",
+        "trigger": "Press PF7 key",
+        "expectedBehavior": "Displays the previous 10 cards in the list",
+        "location": {"line": 175},
+        "route": "/CC02",
+        "dependencies": ["CICS READPREV CARDDAT"],
+        "validationStates": ["Beginning of card list reached"]
+      },
+      {
+        "story": "As a user, I want to select a card from the list so that I can view or update its details",
+        "component": "COCRDLIC",
+        "trigger": "Enter selection number next to a card, press Enter",
+        "expectedBehavior": "Routes to card detail or update screen with selected card number",
+        "location": {"line": 160},
+        "route": "/CC02",
+        "dependencies": ["CICS XCTL to COCRDSLC or COCRDUPC"],
+        "validationStates": ["Invalid selection"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to update credit card information so that I can maintain accurate card data",
+        "component": "COCRDUPC",
+        "trigger": "Enter card number and account ID, modify fields (cardholder name, status, expiry date), press PF5 to update",
+        "expectedBehavior": "Validates input fields and updates CARDDAT file with new card information",
+        "location": {"line": 200},
+        "route": "/CC03",
+        "dependencies": ["CICS READ CARDDAT", "CICS REWRITE CARDDAT"],
+        "validationStates": ["Card number can NOT be empty", "Card number must be 16 digits", "Account ID must be numeric", "Cardholder name must be alphanumeric", "Card status must be Y or N", "Expiry month must be 01-12", "Expiry year must be valid"]
+      },
+      {
+        "story": "As an administrator, I want to clear the card update form so that I can start fresh with a different card",
+        "component": "COCRDUPC",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 180},
+        "route": "/CC03",
+        "dependencies": [],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view a paginated list of transactions so that I can browse transaction history",
+        "component": "COTRN00C",
+        "trigger": "Press Enter key or navigate pages",
+        "expectedBehavior": "Displays 10 transactions per page from TRANSACT file with transaction ID, card number, date, amount, and merchant",
+        "location": {"line": 146},
+        "route": "/CT00",
+        "dependencies": ["CICS STARTBR TRANSACT", "CICS READNEXT TRANSACT"],
+        "validationStates": ["No transactions found", "End of transaction list"]
+      },
+      {
+        "story": "As a user, I want to navigate to the next page of transactions so that I can view more transactions",
+        "component": "COTRN00C",
+        "trigger": "Press PF8 key",
+        "expectedBehavior": "Displays the next 10 transactions in the list",
+        "location": {"line": 128},
+        "route": "/CT00",
+        "dependencies": ["CICS READNEXT TRANSACT"],
+        "validationStates": ["End of transaction list reached"]
+      },
+      {
+        "story": "As a user, I want to navigate to the previous page of transactions so that I can view earlier transactions",
+        "component": "COTRN00C",
+        "trigger": "Press PF7 key",
+        "expectedBehavior": "Displays the previous 10 transactions in the list",
+        "location": {"line": 126},
+        "route": "/CT00",
+        "dependencies": ["CICS READPREV TRANSACT"],
+        "validationStates": ["Beginning of transaction list reached"]
+      },
+      {
+        "story": "As a user, I want to select a transaction from the list so that I can view its full details",
+        "component": "COTRN00C",
+        "trigger": "Enter selection number next to a transaction, press Enter",
+        "expectedBehavior": "Routes to transaction detail screen (COTRN01C) with selected transaction ID",
+        "location": {"line": 149},
+        "route": "/CT00",
+        "dependencies": ["CICS XCTL to COTRN01C"],
+        "validationStates": ["Invalid selection"]
+      },
+      {
+        "story": "As a user, I want to return to the previous menu from transaction list so that I can navigate back",
+        "component": "COTRN00C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to user menu (COMEN01C)",
+        "location": {"line": 123},
+        "route": "/CT00",
+        "dependencies": ["CICS XCTL to COMEN01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to view detailed information for a specific transaction so that I can see all transaction details",
+        "component": "COTRN01C",
+        "trigger": "Enter transaction ID, press Enter key",
+        "expectedBehavior": "Reads TRANSACT file and displays complete transaction details including ID, card number, type, category, source, amount, merchant info, and processing date",
+        "location": {"line": 144},
+        "route": "/CT01",
+        "dependencies": ["CICS READ TRANSACT"],
+        "validationStates": ["Tran ID can NOT be empty", "Transaction not found"]
+      },
+      {
+        "story": "As a user, I want to clear the transaction view form so that I can search for a different transaction",
+        "component": "COTRN01C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears the transaction ID field and results, allowing a new search",
+        "location": {"line": 124},
+        "route": "/CT01",
+        "dependencies": [],
+        "validationStates": []
+      },
+      {
+        "story": "As a user, I want to return to the transaction list from transaction detail so that I can browse other transactions",
+        "component": "COTRN01C",
+        "trigger": "Press PF5 key",
+        "expectedBehavior": "Returns to transaction list screen (COTRN00C)",
+        "location": {"line": 126},
+        "route": "/CT01",
+        "dependencies": ["CICS XCTL to COTRN00C"],
+        "validationStates": []
+      },
+      {
+        "story": "As a user, I want to return to the previous menu from transaction detail so that I can navigate back",
+        "component": "COTRN01C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to previous menu or transaction list based on context",
+        "location": {"line": 115},
+        "route": "/CT01",
+        "dependencies": ["CICS XCTL to COMEN01C or COTRN00C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN02C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to add a new transaction so that I can record a transaction in the system",
+        "component": "COTRN02C",
+        "trigger": "Fill in transaction fields (card number, type ID, category code, source, description, amount, merchant), press Enter to submit",
+        "expectedBehavior": "Validates all input fields and writes new transaction record to TRANSACT file with generated transaction ID",
+        "location": {"line": 150},
+        "route": "/CT02",
+        "dependencies": ["CICS WRITE TRANSACT", "CICS READ CARDDAT"],
+        "validationStates": ["Card number can NOT be empty", "Card number must be 16 digits", "Card not found", "Type ID must be numeric", "Category code must be numeric", "Transaction source required", "Amount must be numeric", "Amount must be greater than zero", "Merchant information required"]
+      },
+      {
+        "story": "As an administrator, I want to clear the add transaction form so that I can start fresh with a new transaction",
+        "component": "COTRN02C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 130},
+        "route": "/CT02",
+        "dependencies": [],
+        "validationStates": []
+      },
+      {
+        "story": "As an administrator, I want to return to the previous menu from add transaction so that I can navigate back",
+        "component": "COTRN02C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to admin menu without saving",
+        "location": {"line": 125},
+        "route": "/CT02",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to view a paginated list of system users so that I can browse user accounts",
+        "component": "COUSR00C",
+        "trigger": "Press Enter key or navigate pages",
+        "expectedBehavior": "Displays 10 users per page from USRSEC file with user ID, name, and user type",
+        "location": {"line": 149},
+        "route": "/CU00",
+        "dependencies": ["CICS STARTBR USRSEC", "CICS READNEXT USRSEC"],
+        "validationStates": ["No users found", "End of user list"]
+      },
+      {
+        "story": "As an administrator, I want to navigate to the next page of users so that I can view more user accounts",
+        "component": "COUSR00C",
+        "trigger": "Press PF8 key",
+        "expectedBehavior": "Displays the next 10 users in the list",
+        "location": {"line": 131},
+        "route": "/CU00",
+        "dependencies": ["CICS READNEXT USRSEC"],
+        "validationStates": ["End of user list reached"]
+      },
+      {
+        "story": "As an administrator, I want to navigate to the previous page of users so that I can view earlier user accounts",
+        "component": "COUSR00C",
+        "trigger": "Press PF7 key",
+        "expectedBehavior": "Displays the previous 10 users in the list",
+        "location": {"line": 129},
+        "route": "/CU00",
+        "dependencies": ["CICS READPREV USRSEC"],
+        "validationStates": ["Beginning of user list reached"]
+      },
+      {
+        "story": "As an administrator, I want to select a user from the list so that I can view, update, or delete that user",
+        "component": "COUSR00C",
+        "trigger": "Enter selection number next to a user, press Enter",
+        "expectedBehavior": "Routes to user detail, update, or delete screen based on context",
+        "location": {"line": 150},
+        "route": "/CU00",
+        "dependencies": ["CICS XCTL to COUSR02C or COUSR03C"],
+        "validationStates": ["Invalid selection"]
+      },
+      {
+        "story": "As an administrator, I want to return to the admin menu from user list so that I can navigate back",
+        "component": "COUSR00C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to admin menu (COADM01C)",
+        "location": {"line": 126},
+        "route": "/CU00",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to add a new user account so that new users can access the system",
+        "component": "COUSR01C",
+        "trigger": "Fill in user fields (first name, last name, user ID, password, user type), press Enter to submit",
+        "expectedBehavior": "Validates all input fields and writes new user record to USRSEC file",
+        "location": {"line": 115},
+        "route": "/CU01",
+        "dependencies": ["CICS WRITE USRSEC"],
+        "validationStates": ["Please enter First Name", "Please enter Last Name", "Please enter User ID", "Please enter Password", "Please enter User Type", "User ID already exists", "User Type must be R or A"]
+      },
+      {
+        "story": "As an administrator, I want to clear the add user form so that I can start fresh with a new user",
+        "component": "COUSR01C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 195},
+        "route": "/CU01",
+        "dependencies": [],
+        "validationStates": []
+      },
+      {
+        "story": "As an administrator, I want to return to the admin menu from add user so that I can navigate back",
+        "component": "COUSR01C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to admin menu without saving",
+        "location": {"line": 190},
+        "route": "/CU01",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to update an existing user account so that I can maintain accurate user information",
+        "component": "COUSR02C",
+        "trigger": "Enter user ID, modify fields (first name, last name, password, user type), press PF5 or PF3 to update",
+        "expectedBehavior": "Validates input fields and updates USRSEC file with modified user information",
+        "location": {"line": 143},
+        "route": "/CU02",
+        "dependencies": ["CICS READ USRSEC", "CICS REWRITE USRSEC"],
+        "validationStates": ["User ID can NOT be empty", "User not found", "First name required", "Last name required", "User type must be R or A"]
+      },
+      {
+        "story": "As an administrator, I want to clear the update user form so that I can start fresh with a different user",
+        "component": "COUSR02C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 121},
+        "route": "/CU02",
+        "dependencies": [],
+        "validationStates": []
+      },
+      {
+        "story": "As an administrator, I want to return to the admin menu from update user so that I can navigate back",
+        "component": "COUSR02C",
+        "trigger": "Press PF12 key",
+        "expectedBehavior": "Returns to admin menu",
+        "location": {"line": 125},
+        "route": "/CU02",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to delete a user account so that I can remove users who no longer need access",
+        "component": "COUSR03C",
+        "trigger": "Enter user ID to delete, press PF5 to confirm deletion",
+        "expectedBehavior": "Validates user ID exists and deletes the user record from USRSEC file",
+        "location": {"line": 142},
+        "route": "/CU03",
+        "dependencies": ["CICS READ USRSEC", "CICS DELETE USRSEC"],
+        "validationStates": ["User ID can NOT be empty", "User not found", "Cannot delete currently logged-in user"]
+      },
+      {
+        "story": "As an administrator, I want to clear the delete user form so that I can start fresh with a different user",
+        "component": "COUSR03C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears the user ID field and resets the form",
+        "location": {"line": 120},
+        "route": "/CU03",
+        "dependencies": [],
+        "validationStates": []
+      },
+      {
+        "story": "As an administrator, I want to cancel the delete operation so that I can return without deleting",
+        "component": "COUSR03C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to admin menu or user list without deleting",
+        "location": {"line": 112},
+        "route": "/CU03",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBIL00C.cbl",
+    "userStories": [
+      {
+        "story": "As a user, I want to pay my account balance in full so that I can settle my outstanding balance",
+        "component": "COBIL00C",
+        "trigger": "Enter account ID and confirm payment amount, press Enter to process",
+        "expectedBehavior": "Validates account exists, creates payment transaction in TRANSACT file, and updates account balance in ACCTDAT file",
+        "location": {"line": 150},
+        "route": "/CB00",
+        "dependencies": ["CICS READ ACCTDAT", "CICS REWRITE ACCTDAT", "CICS WRITE TRANSACT", "CICS READ CARDDAT"],
+        "validationStates": ["Account ID can NOT be empty", "Account ID must be numeric", "Account not found", "No balance to pay", "Payment amount must match balance"]
+      },
+      {
+        "story": "As a user, I want to cancel the bill payment so that I can return without processing payment",
+        "component": "COBIL00C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to previous menu without processing payment",
+        "location": {"line": 130},
+        "route": "/CB00",
+        "dependencies": ["CICS XCTL to COADM01C or COMEN01C"],
+        "validationStates": []
+      },
+      {
+        "story": "As a user, I want to clear the bill payment form so that I can start fresh with a different account",
+        "component": "COBIL00C",
+        "trigger": "Press PF4 key",
+        "expectedBehavior": "Clears all input fields and resets the form to initial state",
+        "location": {"line": 135},
+        "route": "/CB00",
+        "dependencies": [],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CORPT00C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to generate a transaction report for a date range so that I can analyze transaction activity",
+        "component": "CORPT00C",
+        "trigger": "Enter start date and end date in YYYY-MM-DD format, press Enter to submit batch job",
+        "expectedBehavior": "Validates date format and range, submits batch job to extra partition TDQ to generate transaction report",
+        "location": {"line": 150},
+        "route": "/CR00",
+        "dependencies": ["CICS WRITEQ TD", "CSUTLDTC date validation", "Batch job TRNRPT00"],
+        "validationStates": ["Start date required", "End date required", "Invalid date format", "Start date must be before end date", "Date must be in YYYY-MM-DD format"]
+      },
+      {
+        "story": "As an administrator, I want to return to the admin menu from reports so that I can navigate back",
+        "component": "CORPT00C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to admin menu",
+        "location": {"line": 180},
+        "route": "/CR00",
+        "dependencies": ["CICS XCTL to COADM01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to view a summary list of pending authorization messages so that I can monitor authorization activity",
+        "component": "COPAUS0C",
+        "trigger": "Press Enter key or navigate pages",
+        "expectedBehavior": "Displays 5 authorization messages per page from IMS database with card number, amount, date, time, merchant, and approval status",
+        "location": {"line": 150},
+        "route": "/CPVS",
+        "dependencies": ["IMS GU PENDING-AUTH-SUMMARY", "IMS GN PENDING-AUTH-SUMMARY", "CICS READ ACCTDAT", "CICS READ CUSTDAT", "CICS READ CCXREF"],
+        "validationStates": ["No authorization messages found", "End of authorization list", "IMS database unavailable"]
+      },
+      {
+        "story": "As an administrator, I want to navigate to the next page of authorization messages so that I can view more messages",
+        "component": "COPAUS0C",
+        "trigger": "Press PF8 key",
+        "expectedBehavior": "Displays the next 5 authorization messages in the list",
+        "location": {"line": 200},
+        "route": "/CPVS",
+        "dependencies": ["IMS GN PENDING-AUTH-SUMMARY"],
+        "validationStates": ["End of authorization list reached"]
+      },
+      {
+        "story": "As an administrator, I want to navigate to the previous page of authorization messages so that I can view earlier messages",
+        "component": "COPAUS0C",
+        "trigger": "Press PF7 key",
+        "expectedBehavior": "Displays the previous 5 authorization messages in the list",
+        "location": {"line": 195},
+        "route": "/CPVS",
+        "dependencies": ["IMS GU PENDING-AUTH-SUMMARY"],
+        "validationStates": ["Beginning of authorization list reached"]
+      },
+      {
+        "story": "As an administrator, I want to select an authorization message from the list so that I can view its details",
+        "component": "COPAUS0C",
+        "trigger": "Enter selection number next to an authorization, press Enter",
+        "expectedBehavior": "Routes to authorization detail screen (COPAUS1C) with selected authorization key",
+        "location": {"line": 180},
+        "route": "/CPVS",
+        "dependencies": ["CICS XCTL to COPAUS1C"],
+        "validationStates": ["Invalid selection"]
+      },
+      {
+        "story": "As an administrator, I want to return to the main menu from authorization summary so that I can navigate back",
+        "component": "COPAUS0C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to user menu (COMEN01C)",
+        "location": {"line": 175},
+        "route": "/CPVS",
+        "dependencies": ["CICS XCTL to COMEN01C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+    "userStories": [
+      {
+        "story": "As an administrator, I want to view detailed information for a specific authorization message so that I can see all authorization details",
+        "component": "COPAUS1C",
+        "trigger": "Enter authorization key or navigate from summary list",
+        "expectedBehavior": "Reads IMS database and displays complete authorization details including card number, amount, date, time, merchant information, processing codes, response codes, and decline reasons",
+        "location": {"line": 150},
+        "route": "/CPVD",
+        "dependencies": ["IMS GU PENDING-AUTH-SUMMARY", "IMS GU PENDING-AUTH-DETAILS"],
+        "validationStates": ["Authorization key required", "Authorization not found", "IMS database unavailable"]
+      },
+      {
+        "story": "As an administrator, I want to mark an authorization as fraudulent so that I can flag suspicious activity",
+        "component": "COPAUS1C",
+        "trigger": "Press PF5 key to report fraud",
+        "expectedBehavior": "Calls COPAUS2C program to insert fraud record into DB2 AUTHFRDS table with fraud flag",
+        "location": {"line": 180},
+        "route": "/CPVD",
+        "dependencies": ["CICS LINK to COPAUS2C", "DB2 INSERT AUTHFRDS"],
+        "validationStates": ["Fraud report success", "Fraud report failed", "Database error"]
+      },
+      {
+        "story": "As an administrator, I want to remove fraud flag from an authorization so that I can correct false fraud reports",
+        "component": "COPAUS1C",
+        "trigger": "Press PF6 key to remove fraud flag",
+        "expectedBehavior": "Calls COPAUS2C program to update fraud record in DB2 AUTHFRDS table to remove fraud flag",
+        "location": {"line": 185},
+        "route": "/CPVD",
+        "dependencies": ["CICS LINK to COPAUS2C", "DB2 UPDATE AUTHFRDS"],
+        "validationStates": ["Fraud flag removed successfully", "Fraud removal failed", "Database error"]
+      },
+      {
+        "story": "As an administrator, I want to return to the authorization summary from detail so that I can view other authorizations",
+        "component": "COPAUS1C",
+        "trigger": "Press PF3 key",
+        "expectedBehavior": "Returns to authorization summary screen (COPAUS0C)",
+        "location": {"line": 170},
+        "route": "/CPVD",
+        "dependencies": ["CICS XCTL to COPAUS0C"],
+        "validationStates": []
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+    "userStories": [
+      {
+        "story": "As the system, I want to record fraud reports in the database so that fraudulent authorizations are tracked",
+        "component": "COPAUS2C",
+        "trigger": "Called from COPAUS1C with authorization data and fraud action flag",
+        "expectedBehavior": "Inserts new fraud record into DB2 AUTHFRDS table or updates existing record with fraud flag (F) and current date",
+        "location": {"line": 141},
+        "route": "N/A (linked program)",
+        "dependencies": ["DB2 INSERT AUTHFRDS", "DB2 UPDATE AUTHFRDS"],
+        "validationStates": ["ADD SUCCESS", "UPDT SUCCESS", "SYSTEM ERROR DB2", "Duplicate record (SQLCODE -803)"]
+      },
+      {
+        "story": "As the system, I want to remove fraud flags from the database so that corrected authorizations are properly tracked",
+        "component": "COPAUS2C",
+        "trigger": "Called from COPAUS1C with authorization data and remove fraud action flag",
+        "expectedBehavior": "Updates fraud record in DB2 AUTHFRDS table to remove fraud flag (R) and set current date",
+        "location": {"line": 221},
+        "route": "N/A (linked program)",
+        "dependencies": ["DB2 UPDATE AUTHFRDS"],
+        "validationStates": ["UPDT SUCCESS", "UPDT ERROR DB2"]
+      }
+    ]
+  }
+]
