@@ -1,0 +1,69 @@
+<div class="container">
+  <div class="header">
+    <h2>Transaction Details</h2>
+    <button class="btn-back" (click)="goBack()">Back to List</button>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading transaction...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && !errorMessage && transaction" class="transaction-details">
+    <div class="detail-section">
+      <h3>Transaction Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Transaction ID:</label>
+          <span>{{ transaction.transactionId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Card Number:</label>
+          <span>{{ transaction.cardNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Type ID:</label>
+          <span>{{ transaction.typeId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Category Code:</label>
+          <span>{{ transaction.categoryCode }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Transaction Source:</label>
+          <span>{{ transaction.transactionSource }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Amount:</label>
+          <span>{{ transaction.amount | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Merchant Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Merchant:</label>
+          <span>{{ transaction.merchantInfo }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Description:</label>
+          <span>{{ transaction.description || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Processing Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Processing Date:</label>
+          <span>{{ transaction.processingDate }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Processing Time:</label>
+          <span>{{ transaction.processingTime || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

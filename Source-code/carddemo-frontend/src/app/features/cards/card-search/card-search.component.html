@@ -1,0 +1,62 @@
+<div class="container">
+  <div class="header">
+    <h2>Search Credit Card</h2>
+    <button class="btn-back" (click)="goBack()">Back to Card List</button>
+  </div>
+
+  <div class="search-form">
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-group">
+        <label for="cardNumber">Card Number:</label>
+        <input
+          type="text"
+          id="cardNumber"
+          formControlName="cardNumber"
+          class="form-control"
+          placeholder="Enter 16-digit card number"
+          maxlength="16"
+          [class.is-invalid]="cardNumber?.invalid && cardNumber?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="cardNumber?.invalid && cardNumber?.touched">
+          <div *ngIf="cardNumber?.errors?.['required']">Card number is required</div>
+          <div *ngIf="cardNumber?.errors?.['pattern']">Card number must be 16 digits</div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Searching...' : 'Search' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="card" class="card-details">
+    <h3>Card Details</h3>
+    <div class="detail-grid">
+      <div class="detail-item">
+        <label>Card Number:</label>
+        <span>{{ card.cardNumber }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Account ID:</label>
+        <span>{{ card.accountId }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Cardholder Name:</label>
+        <span>{{ card.cardHolderName }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Expiry Date:</label>
+        <span>{{ card.expiryMonth }}/{{ card.expiryYear }}</span>
+      </div>
+      <div class="detail-item">
+        <label>Status:</label>
+        <span>{{ card.status === 'Y' ? 'Active' : 'Inactive' }}</span>
+      </div>
+    </div>
+  </div>
+</div>

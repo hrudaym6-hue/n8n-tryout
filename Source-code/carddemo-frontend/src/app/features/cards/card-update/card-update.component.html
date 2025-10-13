@@ -1,0 +1,110 @@
+<div class="container">
+  <div class="header">
+    <h2>Update Credit Card</h2>
+    <button class="btn-back" (click)="goBack()">Cancel</button>
+  </div>
+
+  <div *ngIf="isLoading && !card" class="loading">Loading card...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div *ngIf="!isLoading && card" class="update-form">
+    <form [formGroup]="updateForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="cardNumber">Card Number:</label>
+        <input type="text" id="cardNumber" formControlName="cardNumber" class="form-control" readonly />
+      </div>
+
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input
+          type="text"
+          id="accountId"
+          formControlName="accountId"
+          class="form-control"
+          [class.is-invalid]="updateForm.get('accountId')?.invalid && updateForm.get('accountId')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="updateForm.get('accountId')?.invalid && updateForm.get('accountId')?.touched">
+          <div *ngIf="updateForm.get('accountId')?.errors?.['required']">Account ID is required</div>
+          <div *ngIf="updateForm.get('accountId')?.errors?.['pattern']">Account ID must be numeric</div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="cardHolderName">Cardholder Name:</label>
+        <input
+          type="text"
+          id="cardHolderName"
+          formControlName="cardHolderName"
+          class="form-control"
+          [class.is-invalid]="updateForm.get('cardHolderName')?.invalid && updateForm.get('cardHolderName')?.touched"
+        />
+        <div class="invalid-feedback" *ngIf="updateForm.get('cardHolderName')?.invalid && updateForm.get('cardHolderName')?.touched">
+          <div *ngIf="updateForm.get('cardHolderName')?.errors?.['required']">Cardholder name is required</div>
+          <div *ngIf="updateForm.get('cardHolderName')?.errors?.['pattern']">Cardholder name must be alphanumeric</div>
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="expiryMonth">Expiry Month:</label>
+          <input
+            type="text"
+            id="expiryMonth"
+            formControlName="expiryMonth"
+            class="form-control"
+            placeholder="01-12"
+            maxlength="2"
+            [class.is-invalid]="updateForm.get('expiryMonth')?.invalid && updateForm.get('expiryMonth')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="updateForm.get('expiryMonth')?.invalid && updateForm.get('expiryMonth')?.touched">
+            <div *ngIf="updateForm.get('expiryMonth')?.errors?.['required']">Expiry month is required</div>
+            <div *ngIf="updateForm.get('expiryMonth')?.errors?.['pattern']">Expiry month must be 01-12</div>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="expiryYear">Expiry Year:</label>
+          <input
+            type="text"
+            id="expiryYear"
+            formControlName="expiryYear"
+            class="form-control"
+            placeholder="YYYY"
+            maxlength="4"
+            [class.is-invalid]="updateForm.get('expiryYear')?.invalid && updateForm.get('expiryYear')?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="updateForm.get('expiryYear')?.invalid && updateForm.get('expiryYear')?.touched">
+            <div *ngIf="updateForm.get('expiryYear')?.errors?.['required']">Expiry year is required</div>
+            <div *ngIf="updateForm.get('expiryYear')?.errors?.['pattern']">Expiry year must be valid</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="status">Status:</label>
+        <select
+          id="status"
+          formControlName="status"
+          class="form-control"
+          [class.is-invalid]="updateForm.get('status')?.invalid && updateForm.get('status')?.touched"
+        >
+          <option value="">Select Status</option>
+          <option value="Y">Active (Y)</option>
+          <option value="N">Inactive (N)</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="updateForm.get('status')?.invalid && updateForm.get('status')?.touched">
+          <div *ngIf="updateForm.get('status')?.errors?.['required']">Status is required</div>
+          <div *ngIf="updateForm.get('status')?.errors?.['pattern']">Status must be Y or N</div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Updating...' : 'Update Card' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>

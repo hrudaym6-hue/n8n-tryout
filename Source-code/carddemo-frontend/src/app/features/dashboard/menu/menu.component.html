@@ -1,0 +1,27 @@
+<div class="menu-container">
+  <div class="menu-card">
+    <h2>User Menu</h2>
+    <div class="menu-options">
+      <button class="menu-button" (click)="navigateToAccounts()">
+        <span class="menu-icon">📋</span>
+        <span class="menu-text">Account Information</span>
+      </button>
+      <button class="menu-button" (click)="navigateToCards()">
+        <span class="menu-icon">💳</span>
+        <span class="menu-text">Credit Card Management</span>
+      </button>
+      <button class="menu-button" (click)="navigateToTransactions()">
+        <span class="menu-icon">💰</span>
+        <span class="menu-text">Transaction History</span>
+      </button>
+      <button class="menu-button" (click)="navigateToBillPayment()">
+        <span class="menu-icon">💵</span>
+        <span class="menu-text">Bill Payment</span>
+      </button>
+      <button class="menu-button sign-off" (click)="signOff()">
+        <span class="menu-icon">🚪</span>
+        <span class="menu-text">Sign Off</span>
+      </button>
+    </div>
+  </div>
+</div>

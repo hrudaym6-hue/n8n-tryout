@@ -1,0 +1,52 @@
+<div class="container">
+  <div class="header">
+    <h2>Add User</h2>
+    <button class="btn-back" (click)="goBack()">Cancel</button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+  <div *ngIf="successMessage" class="success-message">{{ successMessage }}</div>
+
+  <div class="add-form">
+    <form [formGroup]="addForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="firstName">First Name:</label>
+        <input type="text" id="firstName" formControlName="firstName" class="form-control" [class.is-invalid]="addForm.get('firstName')?.invalid && addForm.get('firstName')?.touched" />
+        <div class="invalid-feedback" *ngIf="addForm.get('firstName')?.invalid && addForm.get('firstName')?.touched">First name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="lastName">Last Name:</label>
+        <input type="text" id="lastName" formControlName="lastName" class="form-control" [class.is-invalid]="addForm.get('lastName')?.invalid && addForm.get('lastName')?.touched" />
+        <div class="invalid-feedback" *ngIf="addForm.get('lastName')?.invalid && addForm.get('lastName')?.touched">Last name is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input type="text" id="userId" formControlName="userId" class="form-control" [class.is-invalid]="addForm.get('userId')?.invalid && addForm.get('userId')?.touched" />
+        <div class="invalid-feedback" *ngIf="addForm.get('userId')?.invalid && addForm.get('userId')?.touched">User ID is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input type="password" id="password" formControlName="password" class="form-control" [class.is-invalid]="addForm.get('password')?.invalid && addForm.get('password')?.touched" />
+        <div class="invalid-feedback" *ngIf="addForm.get('password')?.invalid && addForm.get('password')?.touched">Password is required</div>
+      </div>
+
+      <div class="form-group">
+        <label for="userType">User Type:</label>
+        <select id="userType" formControlName="userType" class="form-control" [class.is-invalid]="addForm.get('userType')?.invalid && addForm.get('userType')?.touched">
+          <option value="">Select User Type</option>
+          <option value="R">Regular (R)</option>
+          <option value="A">Admin (A)</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="addForm.get('userType')?.invalid && addForm.get('userType')?.touched">User type is required</div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">{{ isLoading ? 'Adding...' : 'Add User' }}</button>
+      </div>
+    </form>
+  </div>
+</div>

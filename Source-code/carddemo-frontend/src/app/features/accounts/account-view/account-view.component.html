@@ -1,0 +1,84 @@
+<div class="container">
+  <div class="header">
+    <h2>Account Details</h2>
+    <div class="header-actions">
+      <button *ngIf="authService.isAdmin && account" class="btn-update" (click)="updateAccount()">Update Account</button>
+      <button class="btn-back" (click)="goBack()">Back to List</button>
+    </div>
+  </div>
+
+  <div *ngIf="isLoading" class="loading">Loading account...</div>
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div *ngIf="!isLoading && !errorMessage && account" class="account-details">
+    <div class="detail-section">
+      <h3>Account Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Account ID:</label>
+          <span>{{ account.accountId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Status:</label>
+          <span>{{ account.status }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Balance:</label>
+          <span>{{ account.balance | number:'1.2-2' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Credit Limit:</label>
+          <span>{{ account.creditLimit | number:'1.2-2' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Customer Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Customer ID:</label>
+          <span>{{ account.customerId }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Name:</label>
+          <span>{{ account.customerFirstName }} {{ account.customerLastName }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Email:</label>
+          <span>{{ account.email || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>Phone:</label>
+          <span>{{ account.phone || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>SSN:</label>
+          <span>{{ account.ssn || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-section">
+      <h3>Address Information</h3>
+      <div class="detail-grid">
+        <div class="detail-item">
+          <label>Address:</label>
+          <span>{{ account.address || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>City:</label>
+          <span>{{ account.city || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>State:</label>
+          <span>{{ account.state || 'N/A' }}</span>
+        </div>
+        <div class="detail-item">
+          <label>ZIP:</label>
+          <span>{{ account.zip || 'N/A' }}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

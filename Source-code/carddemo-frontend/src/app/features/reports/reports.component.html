@@ -1,0 +1,72 @@
+<div class="container">
+  <div class="header">
+    <h2>Reports</h2>
+    <button class="btn-back" (click)="goBack()">Back to Menu</button>
+  </div>
+
+  <div *ngIf="errorMessage" class="error-message">{{ errorMessage }}</div>
+
+  <div class="report-form">
+    <form [formGroup]="reportForm" (ngSubmit)="onGenerateReport()">
+      <div class="form-group">
+        <label for="reportType">Report Type:</label>
+        <select
+          id="reportType"
+          formControlName="reportType"
+          class="form-control"
+          [class.is-invalid]="reportType?.invalid && reportType?.touched"
+        >
+          <option value="">Select Report Type</option>
+          <option value="transactions">Transaction Report</option>
+          <option value="accounts">Account Summary</option>
+          <option value="cards">Card Activity</option>
+        </select>
+        <div class="invalid-feedback" *ngIf="reportType?.invalid && reportType?.touched">
+          Report type is required
+        </div>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date:</label>
+          <input
+            type="date"
+            id="startDate"
+            formControlName="startDate"
+            class="form-control"
+            [class.is-invalid]="startDate?.invalid && startDate?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="startDate?.invalid && startDate?.touched">
+            Start date is required
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date:</label>
+          <input
+            type="date"
+            id="endDate"
+            formControlName="endDate"
+            class="form-control"
+            [class.is-invalid]="endDate?.invalid && endDate?.touched"
+          />
+          <div class="invalid-feedback" *ngIf="endDate?.invalid && endDate?.touched">
+            End date is required
+          </div>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="button" class="btn btn-secondary" (click)="clearForm()">Clear</button>
+        <button type="submit" class="btn btn-primary" [disabled]="isLoading">
+          {{ isLoading ? 'Generating...' : 'Generate Report' }}
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <div *ngIf="reportData" class="report-results">
+    <h3>Report Results</h3>
+    <pre>{{ reportData | json }}</pre>
+  </div>
+</div>
