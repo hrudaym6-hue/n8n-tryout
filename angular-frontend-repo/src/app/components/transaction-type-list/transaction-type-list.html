@@ -1,0 +1,48 @@
+<div class="transaction-type-list-container">
+  <div class="transaction-type-list-card">
+    <h1>Transaction Type Management</h1>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="button-group header-buttons">
+      <button (click)="goBack()">Back to Admin Menu</button>
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      Loading transaction types...
+    </div>
+
+    <div class="types-section" *ngIf="!isLoading && transactionTypes.length > 0">
+      <h2>Transaction Types ({{ transactionTypes.length }})</h2>
+      <div class="types-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Type Code</th>
+              <th>Description</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let type of transactionTypes">
+              <td class="type-code">{{ type.typeCode }}</td>
+              <td>{{ type.description }}</td>
+              <td>
+                <div class="action-buttons">
+                  <button class="update-btn" (click)="onUpdate(type)">Update</button>
+                  <button class="delete-btn" (click)="onDelete(type)">Delete</button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div *ngIf="!isLoading && transactionTypes.length === 0" class="no-data">
+      No transaction types found.
+    </div>
+  </div>
+</div>

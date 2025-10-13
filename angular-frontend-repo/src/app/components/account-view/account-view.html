@@ -1,0 +1,71 @@
+<div class="account-view-container">
+  <div class="account-view-card">
+    <h1>Account View</h1>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId"
+          maxlength="11"
+          placeholder="Enter 11-digit Account ID"
+          [class.error]="searchForm.get('accountId')?.touched && searchForm.get('accountId')?.invalid"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isLoading">Search</button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="goBack()">Back to Menu</button>
+      </div>
+    </form>
+
+    <div class="account-details" *ngIf="account">
+      <h2>Account Details</h2>
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">Account ID:</span>
+          <span class="value">{{ account.accountId }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Account Status:</span>
+          <span class="value">{{ account.accountStatus }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Current Balance:</span>
+          <span class="value">{{ account.currentBalance | currency }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Credit Limit:</span>
+          <span class="value">{{ account.creditLimit | currency }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Open Date:</span>
+          <span class="value">{{ account.openDate }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Expiration Date:</span>
+          <span class="value">{{ account.expirationDate }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Customer ID:</span>
+          <span class="value">{{ account.customerId }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Group ID:</span>
+          <span class="value">{{ account.groupId }}</span>
+        </div>
+      </div>
+
+      <div class="action-buttons">
+        <button (click)="onUpdate()">Update Account</button>
+      </div>
+    </div>
+  </div>
+</div>

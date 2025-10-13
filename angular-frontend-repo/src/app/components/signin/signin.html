@@ -1,0 +1,45 @@
+<div class="signin-container">
+  <div class="signin-card">
+    <h1>CardDemo - Sign On</h1>
+    
+    <form [formGroup]="signinForm" (ngSubmit)="onSubmit()">
+      <div class="form-group">
+        <label for="userId">User ID:</label>
+        <input 
+          type="text" 
+          id="userId" 
+          formControlName="userId"
+          maxlength="8"
+          [class.error]="signinForm.get('userId')?.touched && signinForm.get('userId')?.invalid"
+        />
+        <div class="error-message" *ngIf="signinForm.get('userId')?.touched && signinForm.get('userId')?.invalid">
+          User ID is required
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="password">Password:</label>
+        <input 
+          type="password" 
+          id="password" 
+          formControlName="password"
+          maxlength="8"
+          [class.error]="signinForm.get('password')?.touched && signinForm.get('password')?.invalid"
+        />
+        <div class="error-message" *ngIf="signinForm.get('password')?.touched && signinForm.get('password')?.invalid">
+          Password is required
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isLoading">
+          {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
