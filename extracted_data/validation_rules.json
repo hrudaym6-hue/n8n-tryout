@@ -2188,5 +2188,364 @@
         ]
       }
     ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+    "validations": [
+      {
+        "description": "IMS Get Next call for summary must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Process authorization summary",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 232},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "root segment"]
+      },
+      {
+        "description": "IMS end of database for summary",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = 'GB'",
+        "failureOutcome": "Set end-of-root-seg flag",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 249},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "end of data"]
+      },
+      {
+        "description": "Account ID must be numeric for GSAM insert",
+        "type": "data type validation",
+        "condition": "PA-ACCT-ID IS NUMERIC",
+        "failureOutcome": "Skip non-numeric account IDs",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 241},
+        "field": "PA-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account number", "data validation"]
+      },
+      {
+        "description": "IMS Get Next Parent for details must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Process authorization details",
+        "location": {"function": "3000-FIND-NEXT-AUTH-DTL", "line": 276},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "child segment"]
+      },
+      {
+        "description": "IMS end of parent segment for details",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = 'GE'",
+        "failureOutcome": "Set end-of-child-seg flag",
+        "location": {"function": "3000-FIND-NEXT-AUTH-DTL", "line": 284},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "end of parent"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+    "validations": [
+      {
+        "description": "IMS insert call for parent segment must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Abend with error message",
+        "location": {"function": "3100-INSERT-PARENT-SEG-GSAM", "line": 303},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "parent segment insert"]
+      },
+      {
+        "description": "IMS insert call for child segment must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Abend with error message",
+        "location": {"function": "3200-INSERT-CHILD-SEG-GSAM", "line": 331},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "child segment insert"]
+      },
+      {
+        "description": "Parent segment file status must be valid on open",
+        "type": "format check",
+        "condition": "PASFL-STATUS = SPACES OR '00'",
+        "failureOutcome": "Abend with error message",
+        "location": {"function": "1000-INITIALIZE", "line": 186},
+        "field": "PASFL-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file open"]
+      },
+      {
+        "description": "Child segment file status must be valid on open",
+        "type": "format check",
+        "condition": "PADFL-STATUS = SPACES OR '00'",
+        "failureOutcome": "Abend with error message",
+        "location": {"function": "1000-INITIALIZE", "line": 195},
+        "field": "PADFL-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file open"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+    "validations": [
+      {
+        "description": "IMS Get Unique call must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Process next summary record",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 246},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "database read"]
+      },
+      {
+        "description": "IMS end of database reached",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = 'GB'",
+        "failureOutcome": "Set end-of-root-seg flag",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 263},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "end of database"]
+      },
+      {
+        "description": "Account ID must be numeric for processing",
+        "type": "data type validation",
+        "condition": "PA-ACCT-ID IS NUMERIC",
+        "failureOutcome": "Skip non-numeric account IDs",
+        "location": {"function": "2000-FIND-NEXT-AUTH-SUMMARY", "line": 254},
+        "field": "PA-ACCT-ID",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account number", "data validation"]
+      },
+      {
+        "description": "IMS Get Next Parent call for details must succeed",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = SPACES",
+        "failureOutcome": "Continue processing details",
+        "location": {"function": "3000-FIND-NEXT-AUTH-DTL", "line": 290},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "child segment"]
+      },
+      {
+        "description": "IMS end of parent segment",
+        "type": "format check",
+        "condition": "PAUT-PCB-STATUS = 'GE'",
+        "failureOutcome": "Set end-of-child-seg flag",
+        "location": {"function": "3000-FIND-NEXT-AUTH-DTL", "line": 298},
+        "field": "PAUT-PCB-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["IMS status", "end of parent"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/CODATE01.cbl",
+    "validations": [
+      {
+        "description": "CICS retrieve must succeed to get queue name",
+        "type": "format check",
+        "condition": "WS-CICS-RESP1-CD = DFHRESP(NORMAL)",
+        "failureOutcome": "Error message and abend",
+        "location": {"function": "1000-CONTROL", "line": 145},
+        "field": "WS-CICS-RESP1-CD",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["CICS response", "queue management"]
+      },
+      {
+        "description": "Response queue must be open before processing",
+        "type": "format check",
+        "condition": "RESP-QUEUE-OPEN",
+        "failureOutcome": "Open queue before use",
+        "location": {"function": "2000-PROCESS-MESSAGES", "line": 200},
+        "field": "WS-RESP-QUEUE-STS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ queue status", "queue open"]
+      },
+      {
+        "description": "Error queue must be open before processing",
+        "type": "format check",
+        "condition": "ERR-QUEUE-OPEN",
+        "failureOutcome": "Open error queue before use",
+        "location": {"function": "2100-OPEN-ERROR-QUEUE", "line": 136},
+        "field": "WS-ERR-QUEUE-STS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["MQ queue status", "error handling"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03A.CBL",
+    "validations": [
+      {
+        "description": "File operation return code must be successful ('00')",
+        "type": "format check",
+        "condition": "WS-M03B-RC = '00'",
+        "failureOutcome": "Abend program with error message",
+        "location": {"function": "1000-XREFFILE-GET-NEXT", "line": 354},
+        "field": "WS-M03B-RC",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "subroutine call"]
+      },
+      {
+        "description": "File read return code indicates EOF ('10')",
+        "type": "format check",
+        "condition": "WS-M03B-RC = '10'",
+        "failureOutcome": "Set end-of-file flag",
+        "location": {"function": "1000-XREFFILE-GET-NEXT", "line": 356},
+        "field": "WS-M03B-RC",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "end of file"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03B.CBL",
+    "validations": [
+      {
+        "description": "Transaction file status must be valid for operations",
+        "type": "format check",
+        "condition": "TRNXFILE-STATUS checked after operations",
+        "failureOutcome": "Return status to calling program",
+        "location": {"function": "1900-EXIT", "line": 152},
+        "field": "TRNXFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file operations"]
+      },
+      {
+        "description": "Cross-reference file status must be valid for operations",
+        "type": "format check",
+        "condition": "XREFFILE-STATUS checked after operations",
+        "failureOutcome": "Return status to calling program",
+        "location": {"function": "2900-EXIT", "line": 176},
+        "field": "XREFFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file operations"]
+      },
+      {
+        "description": "Customer file status must be valid for operations",
+        "type": "format check",
+        "condition": "CUSTFILE-STATUS checked after operations",
+        "failureOutcome": "Return status to calling program",
+        "location": {"function": "3900-EXIT", "line": 201},
+        "field": "CUSTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file operations"]
+      },
+      {
+        "description": "Account file status must be valid for operations",
+        "type": "format check",
+        "condition": "ACCTFILE-STATUS checked after operations",
+        "failureOutcome": "Return status to calling program",
+        "location": {"function": "4900-EXIT", "line": 226},
+        "field": "ACCTFILE-STATUS",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["file status", "file operations"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COBSWAIT.cbl",
+    "validations": []
+  },
+  {
+    "file": "app/cbl/CSUTLDTC.cbl",
+    "validations": [
+      {
+        "description": "Date must be valid according to CEEDAYS API",
+        "type": "format check",
+        "condition": "FC-INVALID-DATE",
+        "failureOutcome": "Feedback code indicates date is valid",
+        "location": {"function": "A000-MAIN", "line": 129},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "CEEDAYS API"]
+      },
+      {
+        "description": "Date must have sufficient data",
+        "type": "format check",
+        "condition": "FC-INSUFFICIENT-DATA",
+        "failureOutcome": "Error result: 'Insufficient'",
+        "location": {"function": "A000-MAIN", "line": 131},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "data completeness"]
+      },
+      {
+        "description": "Date value must be valid",
+        "type": "format check",
+        "condition": "FC-BAD-DATE-VALUE",
+        "failureOutcome": "Error result: 'Datevalue error'",
+        "location": {"function": "A000-MAIN", "line": 133},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "value check"]
+      },
+      {
+        "description": "Date era must be valid",
+        "type": "format check",
+        "condition": "FC-INVALID-ERA",
+        "failureOutcome": "Error result: 'Invalid Era'",
+        "location": {"function": "A000-MAIN", "line": 135},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "era validation"]
+      },
+      {
+        "description": "Date must be within supported range",
+        "type": "range check",
+        "condition": "FC-UNSUPP-RANGE",
+        "failureOutcome": "Error result: 'Unsupp. Range'",
+        "location": {"function": "A000-MAIN", "line": 137},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "range check"]
+      },
+      {
+        "description": "Month must be valid",
+        "type": "format check",
+        "condition": "FC-INVALID-MONTH",
+        "failureOutcome": "Error result: 'Invalid month'",
+        "location": {"function": "A000-MAIN", "line": 139},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "month validation"]
+      },
+      {
+        "description": "Picture string must be valid",
+        "type": "format check",
+        "condition": "FC-BAD-PIC-STRING",
+        "failureOutcome": "Error result: 'Bad Pic String'",
+        "location": {"function": "A000-MAIN", "line": 141},
+        "field": "WS-DATE-FORMAT",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date format", "picture string"]
+      },
+      {
+        "description": "Date data must be numeric",
+        "type": "data type validation",
+        "condition": "FC-NON-NUMERIC-DATA",
+        "failureOutcome": "Error result: 'Nonnumeric data'",
+        "location": {"function": "A000-MAIN", "line": 143},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "numeric check"]
+      },
+      {
+        "description": "Year in era cannot be zero",
+        "type": "format check",
+        "condition": "FC-YEAR-IN-ERA-ZERO",
+        "failureOutcome": "Error result: 'YearInEra is 0'",
+        "location": {"function": "A000-MAIN", "line": 145},
+        "field": "WS-DATE-TO-TEST",
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "year validation"]
+      }
+    ]
   }
 ]
