@@ -1,0 +1,628 @@
+[
+  {
+    "file": "app/cbl/CBACT04C.cbl",
+    "rules": [
+      {
+        "description": "Calculate monthly interest for account balance based on interest rate",
+        "type": "calculation",
+        "condition": "Processing transaction category balance with associated interest rate",
+        "outcome": "Monthly interest amount is computed and added to total interest",
+        "location": { "function": "1300-COMPUTE-INTEREST", "line": 464 },
+        "variablesInvolved": ["WS-MONTHLY-INT", "TRAN-CAT-BAL", "DIS-INT-RATE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["interest calculation", "account balance", "disclosure group"]
+      },
+      {
+        "description": "Add monthly interest to total interest accumulator",
+        "type": "calculation",
+        "condition": "After computing monthly interest for a transaction category",
+        "outcome": "Total interest is incremented by monthly interest amount",
+        "location": { "function": "1300-COMPUTE-INTEREST", "line": 467 },
+        "variablesInvolved": ["WS-MONTHLY-INT", "WS-TOTAL-INT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["interest calculation", "interest accumulation"]
+      },
+      {
+        "description": "Generate unique transaction ID by combining date and suffix",
+        "type": "transformation",
+        "condition": "When writing a new interest transaction record",
+        "outcome": "Transaction ID is constructed from parameter date and incremented suffix",
+        "location": { "function": "1300-B-WRITE-TX", "line": 476 },
+        "variablesInvolved": ["PARM-DATE", "WS-TRANID-SUFFIX", "TRAN-ID"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction identification", "unique key generation"]
+      },
+      {
+        "description": "Increment transaction ID suffix for each transaction",
+        "type": "calculation",
+        "condition": "Before generating each new transaction record",
+        "outcome": "Transaction ID suffix is incremented by 1",
+        "location": { "function": "1300-B-WRITE-TX", "line": 474 },
+        "variablesInvolved": ["WS-TRANID-SUFFIX"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction sequencing", "counter increment"]
+      },
+      {
+        "description": "Assign transaction type code for interest transactions",
+        "type": "assignment",
+        "condition": "When creating interest transaction record",
+        "outcome": "Transaction type code is set to '01' for interest transactions",
+        "location": { "function": "1300-B-WRITE-TX", "line": 482 },
+        "variablesInvolved": ["TRAN-TYPE-CD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction type", "transaction categorization"]
+      },
+      {
+        "description": "Assign transaction category code for interest transactions",
+        "type": "assignment",
+        "condition": "When creating interest transaction record",
+        "outcome": "Transaction category code is set to '05' for interest",
+        "location": { "function": "1300-B-WRITE-TX", "line": 483 },
+        "variablesInvolved": ["TRAN-CAT-CD"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["transaction category", "interest categorization"]
+      },
+      {
+        "description": "Format DB2 timestamp from current date and time",
+        "type": "transformation",
+        "condition": "When generating timestamp for transaction processing",
+        "outcome": "Current date is transformed into DB2-compatible timestamp format",
+        "location": { "function": "Z-GET-DB2-FORMAT-TIMESTAMP", "line": 614 },
+        "variablesInvolved": ["COBOL-TS", "DB2-FORMAT-TS", "COB-YYYY", "COB-MM", "COB-DD", "COB-HH", "COB-MIN", "COB-SS", "COB-MIL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["timestamp formatting", "date conversion", "DB2 format"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUA0C.cbl",
+    "rules": [
+      {
+        "description": "Calculate available credit by subtracting credit balance from credit limit",
+        "type": "calculation",
+        "condition": "When authorization summary segment is found in IMS database",
+        "outcome": "Available credit amount is computed for authorization decision",
+        "location": { "function": "6000-MAKE-DECISION", "line": 666 },
+        "variablesInvolved": ["WS-AVAILABLE-AMT", "PA-CREDIT-LIMIT", "PA-CREDIT-BALANCE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit", "available credit", "authorization"]
+      },
+      {
+        "description": "Decline authorization if transaction amount exceeds available credit",
+        "type": "decision",
+        "condition": "When transaction amount is greater than available credit from authorization summary",
+        "outcome": "Authorization is declined and insufficient fund flag is set",
+        "location": { "function": "6000-MAKE-DECISION", "line": 668 },
+        "variablesInvolved": ["WS-TRANSACTION-AMT", "WS-AVAILABLE-AMT", "DECLINE-AUTH", "INSUFFICIENT-FUND"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization decision", "credit limit enforcement", "overlimit detection"]
+      },
+      {
+        "description": "Calculate available credit from account master when authorization summary not found",
+        "type": "calculation",
+        "condition": "When authorization summary segment not found but account master exists",
+        "outcome": "Available credit is computed using account credit limit and current balance",
+        "location": { "function": "6000-MAKE-DECISION", "line": 674 },
+        "variablesInvolved": ["WS-AVAILABLE-AMT", "ACCT-CREDIT-LIMIT", "ACCT-CURR-BAL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit", "account balance", "authorization fallback"]
+      },
+      {
+        "description": "Decline authorization if transaction exceeds account credit limit",
+        "type": "decision",
+        "condition": "When transaction amount exceeds available credit from account master",
+        "outcome": "Authorization is declined and insufficient fund flag is set",
+        "location": { "function": "6000-MAKE-DECISION", "line": 676 },
+        "variablesInvolved": ["WS-TRANSACTION-AMT", "WS-AVAILABLE-AMT", "DECLINE-AUTH", "INSUFFICIENT-FUND"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization decision", "credit limit enforcement", "overlimit detection"]
+      },
+      {
+        "description": "Set authorization response code to declined when authorization is denied",
+        "type": "assignment",
+        "condition": "When authorization decision is to decline",
+        "outcome": "Response code is set to '05' and approved amount is set to zero",
+        "location": { "function": "6000-MAKE-DECISION", "line": 688 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-CODE", "PA-RL-APPROVED-AMT", "WS-APPROVED-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization response", "transaction decline", "response code"]
+      },
+      {
+        "description": "Set authorization response code to approved when authorization is granted",
+        "type": "assignment",
+        "condition": "When authorization decision is to approve",
+        "outcome": "Response code is set to '00' and approved amount equals requested amount",
+        "location": { "function": "6000-MAKE-DECISION", "line": 693 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-CODE", "PA-RL-APPROVED-AMT", "WS-APPROVED-AMT", "PA-RQ-TRANSACTION-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["authorization response", "transaction approval", "response code"]
+      },
+      {
+        "description": "Assign response reason code for invalid card",
+        "type": "assignment",
+        "condition": "When authorization declined due to card not found or account/customer not found",
+        "outcome": "Response reason code is set to '3100' for invalid card",
+        "location": { "function": "6000-MAKE-DECISION", "line": 704 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "card validation", "error code"]
+      },
+      {
+        "description": "Assign response reason code for insufficient funds",
+        "type": "assignment",
+        "condition": "When authorization declined due to insufficient available credit",
+        "outcome": "Response reason code is set to '4100' for insufficient funds",
+        "location": { "function": "6000-MAKE-DECISION", "line": 706 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "insufficient funds", "credit limit"]
+      },
+      {
+        "description": "Assign response reason code for inactive card",
+        "type": "assignment",
+        "condition": "When authorization declined because card is not active",
+        "outcome": "Response reason code is set to '4200' for card not active",
+        "location": { "function": "6000-MAKE-DECISION", "line": 708 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "card status", "inactive card"]
+      },
+      {
+        "description": "Assign response reason code for closed account",
+        "type": "assignment",
+        "condition": "When authorization declined because account is closed",
+        "outcome": "Response reason code is set to '4300' for account closed",
+        "location": { "function": "6000-MAKE-DECISION", "line": 710 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "account status", "closed account"]
+      },
+      {
+        "description": "Assign response reason code for card fraud",
+        "type": "assignment",
+        "condition": "When authorization declined due to detected card fraud",
+        "outcome": "Response reason code is set to '5100' for card fraud",
+        "location": { "function": "6000-MAKE-DECISION", "line": 712 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "fraud detection", "card fraud"]
+      },
+      {
+        "description": "Assign response reason code for merchant fraud",
+        "type": "assignment",
+        "condition": "When authorization declined due to detected merchant fraud",
+        "outcome": "Response reason code is set to '5200' for merchant fraud",
+        "location": { "function": "6000-MAKE-DECISION", "line": 714 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "fraud detection", "merchant fraud"]
+      },
+      {
+        "description": "Assign response reason code for unknown decline reasons",
+        "type": "assignment",
+        "condition": "When authorization declined for reasons not matching specific categories",
+        "outcome": "Response reason code is set to '9000' for unknown reason",
+        "location": { "function": "6000-MAKE-DECISION", "line": 716 },
+        "variablesInvolved": ["PA-RL-AUTH-RESP-REASON"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["decline reason", "unknown error", "default error code"]
+      }
+    ]
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/CBPAUP0C.cbl",
+    "rules": [
+      {
+        "description": "Extract authorization date from 9's complement format",
+        "type": "transformation",
+        "condition": "When processing authorization record from IMS database",
+        "outcome": "Authorization date is extracted by subtracting complement from 99999",
+        "location": { "function": "2000-PROCESS-PAUT-SMRY", "line": 280 },
+        "variablesInvolved": ["WS-AUTH-DATE", "PA-AUTH-DATE-9C"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date conversion", "complement arithmetic", "IMS key format"]
+      },
+      {
+        "description": "Calculate day difference between current date and authorization date",
+        "type": "calculation",
+        "condition": "After extracting authorization date from complement format",
+        "outcome": "Number of days between current date and authorization date is computed",
+        "location": { "function": "2000-PROCESS-PAUT-SMRY", "line": 282 },
+        "variablesInvolved": ["WS-DAY-DIFF", "WS-CURRENT-DATE-DAYS", "WS-AUTH-DATE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date calculation", "age determination", "elapsed days"]
+      },
+      {
+        "description": "Check if authorization has expired based on configurable expiry days",
+        "type": "decision",
+        "condition": "After calculating day difference between dates",
+        "outcome": "Authorization is marked for deletion if day difference exceeds or equals expiry threshold",
+        "location": { "function": "2000-PROCESS-PAUT-SMRY", "line": 284 },
+        "variablesInvolved": ["WS-DAY-DIFF", "WS-EXPIRY-DAYS"],
+        "isConfigurable": true,
+        "relatedDomainConcepts": ["authorization expiry", "purge criteria", "retention policy"]
+      },
+      {
+        "description": "Increment purge counter for expired authorizations",
+        "type": "calculation",
+        "condition": "When authorization meets expiry criteria",
+        "outcome": "Purge counter is incremented by 1",
+        "location": { "function": "2000-PROCESS-PAUT-SMRY", "line": 287 },
+        "variablesInvolved": ["WS-PURGE-COUNT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["purge statistics", "counter increment", "audit trail"]
+      },
+      {
+        "description": "Increment skip counter for non-expired authorizations",
+        "type": "calculation",
+        "condition": "When authorization does not meet expiry criteria",
+        "outcome": "Skip counter is incremented by 1",
+        "location": { "function": "2000-PROCESS-PAUT-SMRY", "line": 293 },
+        "variablesInvolved": ["WS-SKIP-COUNT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["purge statistics", "counter increment", "audit trail"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBTRN02C.cbl",
+    "rules": [
+      {
+        "description": "Validate transaction amount does not exceed available credit",
+        "type": "validation",
+        "condition": "When adding a transaction to account",
+        "outcome": "Transaction is rejected if amount exceeds difference between credit limit and current balance",
+        "location": { "function": "1100-VALIDATE-TRANSACTION", "line": 403 },
+        "variablesInvolved": ["TRAN-AMT", "ACCT-CREDIT-LIMIT", "ACCT-CURR-BAL", "WS-EDIT-OVERLIMIT-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["credit limit validation", "overlimit check", "transaction validation"]
+      },
+      {
+        "description": "Validate account has not expired based on expiration date",
+        "type": "validation",
+        "condition": "When adding a transaction to account",
+        "outcome": "Transaction is rejected if current date exceeds account expiration date",
+        "location": { "function": "1100-VALIDATE-TRANSACTION", "line": 414 },
+        "variablesInvolved": ["WS-CURDATE-CCYYMMDD", "ACCT-EXPIRAION-DATE", "WS-EDIT-EXPIRY-DATE-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["account expiration", "date validation", "expired account"]
+      },
+      {
+        "description": "Update account current balance by adding transaction amount",
+        "type": "calculation",
+        "condition": "When posting approved transaction to account",
+        "outcome": "Account current balance is increased by transaction amount",
+        "location": { "function": "1500-UPDATE-ACCOUNT", "line": 547 },
+        "variablesInvolved": ["ACCT-CURR-BAL", "TRAN-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["balance update", "transaction posting", "account balance"]
+      },
+      {
+        "description": "Update account current cycle debit by adding transaction amount",
+        "type": "calculation",
+        "condition": "When posting approved transaction to account",
+        "outcome": "Account current cycle debit is increased by transaction amount",
+        "location": { "function": "1500-UPDATE-ACCOUNT", "line": 548 },
+        "variablesInvolved": ["ACCT-CURR-CYC-DEBIT", "TRAN-AMT"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["cycle tracking", "debit accumulation", "billing cycle"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "rules": [
+      {
+        "description": "Validate user ID is not empty",
+        "type": "validation",
+        "condition": "When processing user signin request",
+        "outcome": "Error message is displayed if user ID is spaces or low-values",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 118 },
+        "variablesInvolved": ["USERIDI", "WS-ERR-FLG", "WS-MESSAGE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "input validation", "required field"]
+      },
+      {
+        "description": "Validate password is not empty",
+        "type": "validation",
+        "condition": "When processing user signin request",
+        "outcome": "Error message is displayed if password is spaces or low-values",
+        "location": { "function": "PROCESS-ENTER-KEY", "line": 123 },
+        "variablesInvolved": ["PASSWDI", "WS-ERR-FLG", "WS-MESSAGE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user authentication", "input validation", "required field"]
+      },
+      {
+        "description": "Validate password matches stored user password",
+        "type": "validation",
+        "condition": "When user record is found in security file",
+        "outcome": "Authentication fails if entered password does not match stored password",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 223 },
+        "variablesInvolved": ["SEC-USR-PWD", "WS-USER-PWD", "WS-MESSAGE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["password verification", "authentication", "security"]
+      },
+      {
+        "description": "Route admin users to admin menu",
+        "type": "decision",
+        "condition": "When user type is admin and authentication succeeds",
+        "outcome": "User is transferred to COADM01C admin program",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 230 },
+        "variablesInvolved": ["CDEMO-USER-TYPE", "CDEMO-USRTYP-ADMIN"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user routing", "role-based access", "admin user"]
+      },
+      {
+        "description": "Route regular users to standard menu",
+        "type": "decision",
+        "condition": "When user type is not admin and authentication succeeds",
+        "outcome": "User is transferred to COMEN01C standard menu program",
+        "location": { "function": "READ-USER-SEC-FILE", "line": 236 },
+        "variablesInvolved": ["CDEMO-USER-TYPE"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user routing", "role-based access", "regular user"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate expiration month is within valid range",
+        "type": "validation",
+        "condition": "When updating card expiration date",
+        "outcome": "Month must be between 1 and 12, or error flag is set",
+        "location": { "function": "1100-CCUP-EDIT-MM", "line": 92 },
+        "variablesInvolved": ["EXPMMI", "WS-EDIT-EXPMM-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "month range", "expiration date"]
+      },
+      {
+        "description": "Validate expiration year is within valid range",
+        "type": "validation",
+        "condition": "When updating card expiration date",
+        "outcome": "Year must be between 1950 and 2099, or error flag is set",
+        "location": { "function": "1100-CCUP-EDIT-YYYY", "line": 96 },
+        "variablesInvolved": ["EXPYYI", "WS-EDIT-EXPYY-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "year range", "expiration date"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTUPC.cbl",
+    "rules": [
+      {
+        "description": "Validate reissue date is not empty",
+        "type": "validation",
+        "condition": "When updating account reissue date",
+        "outcome": "Error flag is set if reissue date contains spaces",
+        "location": { "function": "1700-EDIT-REISSUEDT", "line": 1507 },
+        "variablesInvolved": ["REISSDTI", "WS-EDIT-REISSUE-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["date validation", "required field", "reissue date"]
+      },
+      {
+        "description": "Validate current balance is numeric",
+        "type": "validation",
+        "condition": "When updating account current balance",
+        "outcome": "Error flag is set if current balance is not numeric",
+        "location": { "function": "1800-EDIT-CURBAL", "line": 1542 },
+        "variablesInvolved": ["CURBALI", "WS-EDIT-CURBAL-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["numeric validation", "balance validation", "data type check"]
+      },
+      {
+        "description": "Validate credit limit is numeric",
+        "type": "validation",
+        "condition": "When updating account credit limit",
+        "outcome": "Error flag is set if credit limit is not numeric",
+        "location": { "function": "1900-EDIT-CREDITLIM", "line": 1567 },
+        "variablesInvolved": ["CREDITLI", "WS-EDIT-CREDIT-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["numeric validation", "credit limit validation", "data type check"]
+      },
+      {
+        "description": "Validate cash credit limit is numeric",
+        "type": "validation",
+        "condition": "When updating account cash credit limit",
+        "outcome": "Error flag is set if cash credit limit is not numeric",
+        "location": { "function": "2000-EDIT-CASHCREDLIM", "line": 1592 },
+        "variablesInvolved": ["CASHCRLI", "WS-EDIT-CASHCR-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["numeric validation", "cash limit validation", "data type check"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "rules": [
+      {
+        "description": "Validate first name is not empty",
+        "type": "validation",
+        "condition": "When adding new user",
+        "outcome": "Error flag is set if first name is spaces or low-values",
+        "location": { "function": "1100-CUADD-EDIT-FSTNAME", "line": 227 },
+        "variablesInvolved": ["FNAMEI", "WS-EDIT-FNAME-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user validation", "required field", "user information"]
+      },
+      {
+        "description": "Validate last name is not empty",
+        "type": "validation",
+        "condition": "When adding new user",
+        "outcome": "Error flag is set if last name is spaces or low-values",
+        "location": { "function": "1200-CUADD-EDIT-LSTNAME", "line": 244 },
+        "variablesInvolved": ["LNAMEI", "WS-EDIT-LNAME-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user validation", "required field", "user information"]
+      },
+      {
+        "description": "Validate user ID is not empty",
+        "type": "validation",
+        "condition": "When adding new user",
+        "outcome": "Error flag is set if user ID is spaces or low-values",
+        "location": { "function": "1300-CUADD-EDIT-USERID", "line": 261 },
+        "variablesInvolved": ["USERIDI", "WS-EDIT-USRID-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user validation", "required field", "user ID"]
+      },
+      {
+        "description": "Validate password is not empty",
+        "type": "validation",
+        "condition": "When adding new user",
+        "outcome": "Error flag is set if password is spaces or low-values",
+        "location": { "function": "1400-CUADD-EDIT-USERPWD", "line": 278 },
+        "variablesInvolved": ["PASSWDI", "WS-EDIT-PSWD-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user validation", "required field", "password"]
+      },
+      {
+        "description": "Validate user type is not empty",
+        "type": "validation",
+        "condition": "When adding new user",
+        "outcome": "Error flag is set if user type is spaces or low-values",
+        "location": { "function": "1500-CUADD-EDIT-USERTYPE", "line": 295 },
+        "variablesInvolved": ["USRTYPEI", "WS-EDIT-USRTYP-FL"],
+        "isConfigurable": false,
+        "relatedDomainConcepts": ["user validation", "required field", "user type"]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBACT01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBACT02C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBACT03C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBCUS01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBTRN01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBTRN03C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBSTM03A.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CBSTM03B.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COCRDLIC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COBSWAIT.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COTRN00C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COTRN02C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CORPT00C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COUSR00C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/CSUTLDTC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COBIL00C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/COACCT01.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-vsam-mq/cbl/CODATE01.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTUPC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COTRTLIC.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS0C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS2C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/COPAUS1C.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+    "rules": []
+  }
+]
