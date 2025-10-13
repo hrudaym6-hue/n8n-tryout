@@ -1,0 +1,64 @@
+<div class="card-list-container">
+  <div class="card-list-card">
+    <h1>Card List</h1>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-group">
+        <label for="accountId">Account ID:</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId"
+          maxlength="11"
+          placeholder="Enter 11-digit Account ID"
+          [class.error]="searchForm.get('accountId')?.touched && searchForm.get('accountId')?.invalid"
+        />
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isLoading">Search</button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="goBack()">Back to Menu</button>
+      </div>
+    </form>
+
+    <div class="cards-section" *ngIf="cards.length > 0">
+      <h2>Cards ({{ cards.length }})</h2>
+      <div class="cards-grid">
+        <div *ngFor="let card of cards" class="card-item">
+          <div class="card-header">
+            <h3>{{ card.cardNumber }}</h3>
+            <span class="card-status" [ngClass]="'status-' + card.cardStatus">
+              {{ card.cardStatus }}
+            </span>
+          </div>
+          <div class="card-details">
+            <div class="detail-row">
+              <span class="label">Account ID:</span>
+              <span class="value">{{ card.accountId }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Card Type:</span>
+              <span class="value">{{ card.cardType }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">Expiration Date:</span>
+              <span class="value">{{ card.expirationDate }}</span>
+            </div>
+            <div class="detail-row">
+              <span class="label">CVV:</span>
+              <span class="value">***</span>
+            </div>
+          </div>
+          <div class="card-actions">
+            <button (click)="onUpdate(card)">Update Card</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,76 @@
+<div class="transaction-detail-container">
+  <div class="transaction-detail-card">
+    <h1>Transaction Detail</h1>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="loading" *ngIf="isLoading">
+      Loading transaction details...
+    </div>
+
+    <div *ngIf="transaction && !isLoading" class="transaction-details">
+      <div class="details-grid">
+        <div class="detail-item">
+          <span class="label">Transaction ID:</span>
+          <span class="value">{{ transaction.transactionId }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Card Number:</span>
+          <span class="value">{{ transaction.cardNumber }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Transaction Date:</span>
+          <span class="value">{{ transaction.transactionDate }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Transaction Time:</span>
+          <span class="value">{{ transaction.transactionTime }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Type Code:</span>
+          <span class="value">{{ transaction.transactionTypeCode }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Category Code:</span>
+          <span class="value">{{ transaction.transactionCategoryCode }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Transaction Source:</span>
+          <span class="value">{{ transaction.transactionSource }}</span>
+        </div>
+        <div class="detail-item">
+          <span class="label">Amount:</span>
+          <span class="value" [ngClass]="transaction.transactionAmount < 0 ? 'amount-negative' : 'amount-positive'">
+            {{ transaction.transactionAmount | currency }}
+          </span>
+        </div>
+        <div class="detail-item full-width">
+          <span class="label">Description:</span>
+          <span class="value">{{ transaction.transactionDescription }}</span>
+        </div>
+        <div class="detail-item" *ngIf="transaction.merchantId">
+          <span class="label">Merchant ID:</span>
+          <span class="value">{{ transaction.merchantId }}</span>
+        </div>
+        <div class="detail-item" *ngIf="transaction.merchantName">
+          <span class="label">Merchant Name:</span>
+          <span class="value">{{ transaction.merchantName }}</span>
+        </div>
+        <div class="detail-item" *ngIf="transaction.merchantCity">
+          <span class="label">Merchant City:</span>
+          <span class="value">{{ transaction.merchantCity }}</span>
+        </div>
+        <div class="detail-item" *ngIf="transaction.merchantZip">
+          <span class="label">Merchant ZIP:</span>
+          <span class="value">{{ transaction.merchantZip }}</span>
+        </div>
+      </div>
+
+      <div class="button-group">
+        <button (click)="goBack()">Back to Transaction List</button>
+      </div>
+    </div>
+  </div>
+</div>

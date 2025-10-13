@@ -1,0 +1,75 @@
+<div class="report-generation-container">
+  <div class="report-generation-card">
+    <h1>Report Generation</h1>
+
+    <div class="error-message" *ngIf="errorMessage">
+      {{ errorMessage }}
+    </div>
+
+    <div class="success-message" *ngIf="successMessage">
+      {{ successMessage }}
+    </div>
+
+    <form [formGroup]="reportForm" (ngSubmit)="onGenerate()">
+      <div class="form-group">
+        <label for="reportType">Report Type: *</label>
+        <select id="reportType" formControlName="reportType" class="form-control">
+          <option value="">Select Report Type</option>
+          <option value="TRANSACTION">Transaction Report</option>
+          <option value="ACCOUNT">Account Report</option>
+          <option value="CARD">Card Report</option>
+          <option value="AUTHORIZATION">Authorization Report</option>
+        </select>
+      </div>
+
+      <div class="form-row">
+        <div class="form-group">
+          <label for="startDate">Start Date (YYYY-MM-DD): *</label>
+          <input 
+            type="text" 
+            id="startDate" 
+            formControlName="startDate"
+            placeholder="YYYY-MM-DD"
+            [class.error]="reportForm.get('startDate')?.touched && reportForm.get('startDate')?.invalid"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="endDate">End Date (YYYY-MM-DD): *</label>
+          <input 
+            type="text" 
+            id="endDate" 
+            formControlName="endDate"
+            placeholder="YYYY-MM-DD"
+            [class.error]="reportForm.get('endDate')?.touched && reportForm.get('endDate')?.invalid"
+          />
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label for="accountId">Account ID (Optional):</label>
+        <input 
+          type="text" 
+          id="accountId" 
+          formControlName="accountId"
+          maxlength="11"
+          placeholder="Filter by Account ID"
+          [class.error]="reportForm.get('accountId')?.touched && reportForm.get('accountId')?.invalid"
+        />
+      </div>
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isGenerating || reportForm.invalid">
+          {{ isGenerating ? 'Generating...' : 'Generate Report' }}
+        </button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="goBack()">Back to Admin Menu</button>
+      </div>
+    </form>
+
+    <div *ngIf="reportUrl" class="download-section">
+      <h3>Report Ready</h3>
+      <button class="download-btn" (click)="onDownload()">Download Report</button>
+    </div>
+  </div>
+</div>

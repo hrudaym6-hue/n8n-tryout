@@ -1,0 +1,22 @@
+<div class="menu-container">
+  <div class="menu-card">
+    <div class="menu-header">
+      <h1>CardDemo - Main Menu</h1>
+      <div class="user-info" *ngIf="currentUser">
+        <span>Welcome, {{ currentUser.firstName }} {{ currentUser.lastName }}</span>
+        <button class="logout-btn" (click)="logout()">Sign Out</button>
+      </div>
+    </div>
+
+    <div class="menu-options">
+      <div 
+        *ngFor="let option of menuOptions" 
+        class="menu-option"
+        (click)="navigateTo(option.route)"
+      >
+        <span class="option-number">{{ option.id }}</span>
+        <span class="option-label">{{ option.label }}</span>
+      </div>
+    </div>
+  </div>
+</div>

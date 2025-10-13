@@ -1,0 +1,78 @@
+<div class="transaction-list-container">
+  <div class="transaction-list-card">
+    <h1>Transaction List</h1>
+
+    <form [formGroup]="searchForm" (ngSubmit)="onSearch()">
+      <div class="form-row">
+        <div class="form-group">
+          <label for="accountId">Account ID:</label>
+          <input 
+            type="text" 
+            id="accountId" 
+            formControlName="accountId"
+            maxlength="11"
+            placeholder="Enter 11-digit Account ID"
+            [class.error]="searchForm.get('accountId')?.touched && searchForm.get('accountId')?.invalid"
+          />
+        </div>
+
+        <div class="form-group">
+          <label for="cardNumber">Card Number (Optional):</label>
+          <input 
+            type="text" 
+            id="cardNumber" 
+            formControlName="cardNumber"
+            maxlength="16"
+            placeholder="Enter 16-digit Card Number"
+            [class.error]="searchForm.get('cardNumber')?.touched && searchForm.get('cardNumber')?.invalid"
+          />
+        </div>
+      </div>
+
+      <div class="error-message" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </div>
+
+      <div class="button-group">
+        <button type="submit" [disabled]="isLoading">Search</button>
+        <button type="button" (click)="onAddTransaction()">Add Transaction</button>
+        <button type="button" (click)="onClear()">Clear</button>
+        <button type="button" (click)="goBack()">Back to Menu</button>
+      </div>
+    </form>
+
+    <div class="transactions-section" *ngIf="transactions.length > 0">
+      <h2>Transactions ({{ transactions.length }})</h2>
+      <div class="transactions-table">
+        <table>
+          <thead>
+            <tr>
+              <th>Transaction ID</th>
+              <th>Date</th>
+              <th>Type</th>
+              <th>Description</th>
+              <th>Amount</th>
+              <th>Merchant</th>
+              <th>Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let transaction of transactions" class="transaction-row">
+              <td>{{ transaction.transactionId }}</td>
+              <td>{{ transaction.transactionDate }}</td>
+              <td>{{ transaction.transactionTypeCode }}</td>
+              <td>{{ transaction.transactionDescription }}</td>
+              <td [ngClass]="transaction.transactionAmount < 0 ? 'amount-negative' : 'amount-positive'">
+                {{ transaction.transactionAmount | currency }}
+              </td>
+              <td>{{ transaction.merchantName || 'N/A' }}</td>
+              <td>
+                <button class="view-btn" (click)="onViewDetail(transaction)">View Details</button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
