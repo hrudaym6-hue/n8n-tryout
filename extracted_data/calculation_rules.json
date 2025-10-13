@@ -1906,5 +1906,734 @@
         ]
       }
     ]
+  },
+  {
+    "file": "app/cbl/COSGN00C.cbl",
+    "rules": [
+      {
+        "description": "User ID is transformed to uppercase for standardization",
+        "type": "transformation",
+        "condition": "User ID is entered during sign-on process",
+        "outcome": "User ID is converted to uppercase for case-insensitive comparison",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 132
+        },
+        "variablesInvolved": [
+          "USERIDI",
+          "WS-USER-ID",
+          "CDEMO-USER-ID"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Authentication",
+          "Data Normalization",
+          "Case Conversion"
+        ]
+      },
+      {
+        "description": "Password is transformed to uppercase for standardization",
+        "type": "transformation",
+        "condition": "Password is entered during sign-on process",
+        "outcome": "Password is converted to uppercase for case-insensitive comparison",
+        "location": {
+          "function": "PROCESS-ENTER-KEY",
+          "line": 135
+        },
+        "variablesInvolved": [
+          "PASSWDI",
+          "WS-USER-PWD"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Authentication",
+          "Data Normalization",
+          "Case Conversion"
+        ]
+      },
+      {
+        "description": "Password validation is performed by comparing entered password with stored password",
+        "type": "validation",
+        "condition": "User record is found in security file",
+        "outcome": "If passwords match, user is authenticated and directed to appropriate menu; otherwise error message is displayed",
+        "location": {
+          "function": "READ-USER-SEC-FILE",
+          "line": 223
+        },
+        "variablesInvolved": [
+          "SEC-USR-PWD",
+          "WS-USER-PWD"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Authentication",
+          "Password Verification",
+          "Access Control"
+        ]
+      },
+      {
+        "description": "User type determines which menu program to transfer control to",
+        "type": "decision",
+        "condition": "User is successfully authenticated",
+        "outcome": "Admin users are directed to COADM01C program, regular users to COMEN01C program",
+        "location": {
+          "function": "READ-USER-SEC-FILE",
+          "line": 230
+        },
+        "variablesInvolved": [
+          "CDEMO-USRTYP-ADMIN",
+          "SEC-USR-TYPE",
+          "CDEMO-USER-TYPE"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "User Authorization",
+          "Role-Based Access",
+          "Menu Navigation"
+        ]
+      },
+      {
+        "description": "User not found error is identified by RESP code 13",
+        "type": "validation",
+        "condition": "File read operation returns RESP code 13",
+        "outcome": "Error message 'User not found' is displayed to user",
+        "location": {
+          "function": "READ-USER-SEC-FILE",
+          "line": 247
+        },
+        "variablesInvolved": [
+          "WS-RESP-CD",
+          "WS-MESSAGE"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Error Handling",
+          "User Authentication",
+          "CICS Response Codes"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR01C.cbl",
+    "rules": [
+      {
+        "description": "User ID is validated for non-blank input",
+        "type": "validation",
+        "condition": "User attempts to add a new user",
+        "outcome": "If User ID is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 425
+        },
+        "variablesInvolved": [
+          "USRIDIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Required Fields"
+        ]
+      },
+      {
+        "description": "First name is validated for non-blank input",
+        "type": "validation",
+        "condition": "User attempts to add a new user",
+        "outcome": "If first name is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 432
+        },
+        "variablesInvolved": [
+          "FNAMEIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Required Fields"
+        ]
+      },
+      {
+        "description": "Last name is validated for non-blank input",
+        "type": "validation",
+        "condition": "User attempts to add a new user",
+        "outcome": "If last name is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 439
+        },
+        "variablesInvolved": [
+          "LNAMEIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Required Fields"
+        ]
+      },
+      {
+        "description": "Password is validated for non-blank input",
+        "type": "validation",
+        "condition": "User attempts to add a new user",
+        "outcome": "If password is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 446
+        },
+        "variablesInvolved": [
+          "PASSWDIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Password Requirements"
+        ]
+      },
+      {
+        "description": "User type is validated against allowed values",
+        "type": "validation",
+        "condition": "User attempts to add a new user",
+        "outcome": "If user type is not 'A' (Admin) or 'U' (User), error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 453
+        },
+        "variablesInvolved": [
+          "USRTYPEIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "User Management",
+          "User Roles",
+          "Access Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR02C.cbl",
+    "rules": [
+      {
+        "description": "User ID is validated for non-blank input during update",
+        "type": "validation",
+        "condition": "User attempts to update an existing user",
+        "outcome": "If User ID is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 425
+        },
+        "variablesInvolved": [
+          "USRIDIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Update Operations"
+        ]
+      },
+      {
+        "description": "User type is validated against allowed values during update",
+        "type": "validation",
+        "condition": "User attempts to update an existing user",
+        "outcome": "If user type is not 'A' (Admin) or 'U' (User), error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 453
+        },
+        "variablesInvolved": [
+          "USRTYPEIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "User Management",
+          "User Roles",
+          "Update Validation"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COUSR03C.cbl",
+    "rules": [
+      {
+        "description": "User ID is validated for non-blank input during delete",
+        "type": "validation",
+        "condition": "User attempts to delete an existing user",
+        "outcome": "If User ID is blank or low-values, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCOUNT-FIELDS",
+          "line": 360
+        },
+        "variablesInvolved": [
+          "USRIDIN",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "User Management",
+          "Input Validation",
+          "Delete Operations"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COADM01C.cbl",
+    "rules": [
+      {
+        "description": "Menu option is validated against allowed range of values",
+        "type": "validation",
+        "condition": "Admin user selects a menu option",
+        "outcome": "If option is not in range 1-9, error message is displayed",
+        "location": {
+          "function": "PROCESS-OPTION-SELECTED",
+          "line": 117
+        },
+        "variablesInvolved": [
+          "OPTN1I",
+          "WS-MENU-OPT"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Menu Navigation",
+          "Admin Functions",
+          "Input Validation"
+        ]
+      },
+      {
+        "description": "Program to transfer control to is determined based on menu option selected",
+        "type": "decision",
+        "condition": "Admin user selects a valid menu option",
+        "outcome": "Appropriate program is called based on option: 1=COACTVW, 2=COUSR00, 3=COCRDLI, 4=COTRN00, 5=COBIL00, 6=COTRN02, 7=CORPT00, 8=COTRTLI, 9=COADMUSR",
+        "location": {
+          "function": "PROCESS-OPTION-SELECTED",
+          "line": 125
+        },
+        "variablesInvolved": [
+          "WS-MENU-OPT",
+          "WS-XCTL-PGM"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Menu Navigation",
+          "Program Flow Control",
+          "Admin Menu"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COACTVWC.cbl",
+    "rules": [
+      {
+        "description": "SSN is formatted with dashes for display",
+        "type": "transformation",
+        "condition": "Customer SSN is retrieved from database",
+        "outcome": "SSN is formatted as XXX-XX-XXXX for display on screen",
+        "location": {
+          "function": "9500-POPULATE-CUST-INFO",
+          "line": 497
+        },
+        "variablesInvolved": [
+          "CUST-SSN-N",
+          "WS-SSN-PART1",
+          "WS-SSN-PART2",
+          "WS-SSN-PART3",
+          "CUSTSSNO"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Data Formatting",
+          "SSN Display",
+          "PII Handling"
+        ]
+      },
+      {
+        "description": "Account filter is validated for numeric content",
+        "type": "validation",
+        "condition": "User provides an account number filter",
+        "outcome": "If account number is not numeric, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCT-FILTER",
+          "line": 622
+        },
+        "variablesInvolved": [
+          "ACCTFLTRI",
+          "FLG-ACCTFILTER-NOT-OK"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Input Validation",
+          "Account Filtering",
+          "Numeric Validation"
+        ]
+      },
+      {
+        "description": "Account filter is validated for non-zero value",
+        "type": "validation",
+        "condition": "User provides an account number filter",
+        "outcome": "If account number is all zeros, error message is displayed",
+        "location": {
+          "function": "EDIT-ACCT-FILTER",
+          "line": 630
+        },
+        "variablesInvolved": [
+          "ACCT-FILTER-N",
+          "FLG-ACCTFILTER-NOT-OK"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Input Validation",
+          "Account Filtering",
+          "Business Rule Validation"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDUPC.cbl",
+    "rules": [
+      {
+        "description": "Card number is validated for 16-digit length",
+        "type": "validation",
+        "condition": "User updates credit card information",
+        "outcome": "If card number is not exactly 16 digits, error message is displayed",
+        "location": {
+          "function": "EDIT-CARD-DATA",
+          "line": 540
+        },
+        "variablesInvolved": [
+          "CARDNUMI",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Credit Card Validation",
+          "Card Number Format",
+          "Input Validation"
+        ]
+      },
+      {
+        "description": "Card expiration month is validated against allowed range",
+        "type": "validation",
+        "condition": "User updates card expiration date",
+        "outcome": "If month is not between 01 and 12, error message is displayed",
+        "location": {
+          "function": "EDIT-CARD-DATA",
+          "line": 575
+        },
+        "variablesInvolved": [
+          "EXPMONI",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Date Validation",
+          "Expiration Date",
+          "Month Range"
+        ]
+      },
+      {
+        "description": "Card expiration year is validated for 4-digit format",
+        "type": "validation",
+        "condition": "User updates card expiration date",
+        "outcome": "If year is not 4 digits, error message is displayed",
+        "location": {
+          "function": "EDIT-CARD-DATA",
+          "line": 588
+        },
+        "variablesInvolved": [
+          "EXPYEARI",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Date Validation",
+          "Expiration Date",
+          "Year Format"
+        ]
+      },
+      {
+        "description": "Card status is validated against allowed values",
+        "type": "validation",
+        "condition": "User updates card status",
+        "outcome": "If status is not 'Y' (Active) or 'N' (Inactive), error message is displayed",
+        "location": {
+          "function": "EDIT-CARD-DATA",
+          "line": 601
+        },
+        "variablesInvolved": [
+          "CRDSTATUSI",
+          "WS-RETURN-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Card Status",
+          "Status Validation",
+          "Active/Inactive Flag"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COTRN01C.cbl",
+    "rules": [
+      {
+        "description": "Page number is incremented for next page navigation",
+        "type": "calculation",
+        "condition": "User presses F7 to view next page of transactions",
+        "outcome": "WS-PAGE-NUM is increased by 1 to display next set of records",
+        "location": {
+          "function": "PROCESS-PF7-NEXT",
+          "line": 312
+        },
+        "variablesInvolved": [
+          "WS-PAGE-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "List Navigation",
+          "Page Control"
+        ]
+      },
+      {
+        "description": "Page number is decremented for previous page navigation",
+        "type": "calculation",
+        "condition": "User presses F8 to view previous page of transactions and current page is greater than 1",
+        "outcome": "WS-PAGE-NUM is decreased by 1 to display previous set of records",
+        "location": {
+          "function": "PROCESS-PF8-PREV",
+          "line": 324
+        },
+        "variablesInvolved": [
+          "WS-PAGE-NUM"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Pagination",
+          "List Navigation",
+          "Page Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COPAUS1C.cbl",
+    "rules": [
+      {
+        "description": "Fraud flag is toggled between active and inactive states",
+        "type": "assignment",
+        "condition": "User presses F9 to toggle fraud status",
+        "outcome": "If current fraud flag is 'Y', it is set to spaces; if spaces, it is set to 'Y'",
+        "location": {
+          "function": "PROCESS-PF9-TOGGLE-FRAUD",
+          "line": 445
+        },
+        "variablesInvolved": [
+          "PA-FRAUD-FLAG",
+          "WS-FRAUD-FLAG"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Fraud Management",
+          "Status Toggle",
+          "Authorization Control"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COMEN01C.cbl",
+    "rules": [
+      {
+        "description": "Menu option is validated against allowed range for regular users",
+        "type": "validation",
+        "condition": "Regular user selects a menu option",
+        "outcome": "If option is not in range 1-6, error message is displayed",
+        "location": {
+          "function": "PROCESS-OPTION-SELECTED",
+          "line": 117
+        },
+        "variablesInvolved": [
+          "OPTN1I",
+          "WS-MENU-OPT"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Menu Navigation",
+          "User Functions",
+          "Input Validation"
+        ]
+      },
+      {
+        "description": "Program to transfer control to is determined based on menu option for regular users",
+        "type": "decision",
+        "condition": "Regular user selects a valid menu option",
+        "outcome": "Appropriate program is called based on option: 1=COACTVW, 2=COCRDLI, 3=COTRN00, 4=COBIL00, 5=COTRN02, 6=CORPT00",
+        "location": {
+          "function": "PROCESS-OPTION-SELECTED",
+          "line": 125
+        },
+        "variablesInvolved": [
+          "WS-MENU-OPT",
+          "WS-XCTL-PGM"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Menu Navigation",
+          "Program Flow Control",
+          "User Menu"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CSUTLDTC.cbl",
+    "rules": [
+      {
+        "description": "Date validation result is determined based on CEEDAYS API feedback code",
+        "type": "decision",
+        "condition": "CEEDAYS API returns a feedback code after date validation",
+        "outcome": "Specific validation result is assigned: code 1 = invalid character, code 2 = invalid date, code 3 = insufficient data, otherwise validation passed",
+        "location": {
+          "function": "1000-CALL-CEEDAYS",
+          "line": 128
+        },
+        "variablesInvolved": [
+          "WS-CEEDAYS-FEEDBACK-CODE",
+          "WS-EDIT-DATE-RESULT-MSG"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Date Validation",
+          "API Error Handling",
+          "Feedback Codes"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/COCRDSLC.cbl",
+    "rules": [
+      {
+        "description": "Account number filter is validated for numeric content",
+        "type": "validation",
+        "condition": "User provides account number to search for card details",
+        "outcome": "If account number is not numeric, error flag is set and error message displayed",
+        "location": {
+          "function": "2200-EDIT-MAP-INPUTS",
+          "line": 632
+        },
+        "variablesInvolved": [
+          "ACCTSIDI",
+          "CARD-ACCT-ID-N",
+          "FLG-ACCTFILTER-NOT-OK"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Input Validation",
+          "Account Search",
+          "Numeric Validation"
+        ]
+      },
+      {
+        "description": "Account number filter is validated for non-zero value",
+        "type": "validation",
+        "condition": "User provides account number to search for card details",
+        "outcome": "If account number is all zeros, error flag is set and error message displayed",
+        "location": {
+          "function": "2200-EDIT-MAP-INPUTS",
+          "line": 641
+        },
+        "variablesInvolved": [
+          "CARD-ACCT-ID-N",
+          "FLG-ACCTFILTER-NOT-OK"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Input Validation",
+          "Account Search",
+          "Business Rule Validation"
+        ]
+      },
+      {
+        "description": "Card number filter is validated for 16-digit length when provided",
+        "type": "validation",
+        "condition": "User optionally provides card number to filter search results",
+        "outcome": "If card number is provided and not 16 digits, error flag is set and error message displayed",
+        "location": {
+          "function": "2200-EDIT-MAP-INPUTS",
+          "line": 663
+        },
+        "variablesInvolved": [
+          "CARDSIDI",
+          "CARD-CARD-NUM-N",
+          "FLG-CARDFILTER-NOT-OK"
+        ],
+        "isConfigurable": true,
+        "relatedDomainConcepts": [
+          "Input Validation",
+          "Card Number Format",
+          "Search Filter"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/app-transaction-type-db2/cbl/COBTUPDT.cbl",
+    "rules": [
+      {
+        "description": "Database operation type is determined based on input record type",
+        "type": "decision",
+        "condition": "Processing transaction type update file",
+        "outcome": "Record type 'A' triggers INSERT, 'U' triggers UPDATE, 'D' triggers DELETE, '*' is ignored as comment, other values cause abend",
+        "location": {
+          "function": "1003-TREAT-RECORD",
+          "line": 110
+        },
+        "variablesInvolved": [
+          "INPUT-REC-TYPE"
+        ],
+        "isConfigurable": false,
+        "relatedDomainConcepts": [
+          "Database Operations",
+          "CRUD Operations",
+          "Record Type Processing"
+        ]
+      }
+    ]
+  },
+  {
+    "file": "app/cbl/CBSTM03B.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/cbl/COBSWAIT.cbl",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBLOD.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/PAUDBUNL.CBL",
+    "rules": []
+  },
+  {
+    "file": "app/app-authorization-ims-db2-mq/cbl/DBUNLDGS.CBL",
+    "rules": []
   }
 ]
